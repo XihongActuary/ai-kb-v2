@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>39 · 常见模型速查 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav on" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="39">
+<div class="ph-kicker">
+<span class="ph-no">39</span>
+<span class="ph-part">第 3 段 · 附录</span>
+<span class="ph-idx" title="你在第 39 页">共 43 页</span>
+</div>
+<h1>常见模型速查</h1>
+<p class="ph-lead">12 个常见模型，每个讲六件事：<b>是什么 · 什么时候用 · 怎么用 · 数学表达 · 图像 · 可折叠的 Python 代码</b>。
+每张卡片下面都挂一条「本案例用没用过」——用过的是绿的，能点进真实源码；没用的是灰的，并说清为什么没用。</p>
+</header>
+<div class="toc"><div class="t">本页目录</div>
+<a href="#use">这一页怎么用</a>
+<a href="#pick">三十秒选定模型</a>
+<a href="#lin">线性回归</a>
+<a href="#logi">逻辑回归</a>
+<a href="#glm">GLM 与泊松回归</a>
+<a href="#twe">Tweedie 回归</a>
+<a href="#tree">决策树</a>
+<a href="#rf">随机森林</a>
+<a href="#gbdt">GBDT / XGBoost</a>
+<a href="#knn">KNN</a>
+<a href="#svm">SVM</a>
+<a href="#km">K-Means</a>
+<a href="#pca">PCA</a>
+<a href="#mlp">神经网络 MLP</a>
+<a href="#no">什么时候别上大模型</a>
+</div>
+
+<div class="plain"><div class="p-row"><span class="p-q">这一页在讲什么</span><p>12 个常见模型的一页速查：每个都说清它是什么、什么时候该用、怎么用，并标出本案例到底用没用过它、用在哪段源码。</p></div><div class="p-row"><span class="p-q">读完你会知道</span><p class="p-know">别按名字选模型，按任务选：预测数字走回归分支，分组走聚类分支。本案例只用其中三个。</p></div></div>
+<h2 id="use">这一页怎么用</h2>
+<p>正文（B1–B14、第 01–13 章）是<b>顺着读的</b>；这一页是<b>回头查的</b>。
+每张卡片顺序固定：是什么 → 什么时候用 → 怎么用 → 数学表达 → 图像表达 → Python 代码。
+代码默认收起来，想抄的时候再点开，不挡视线。</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>库</th><th>装法</th><th>许可证</th><th>文档</th><th>本页用到</th></tr>
+<tr><td>NumPy</td><td><code>pip install numpy</code></td><td>BSD-3-Clause</td>
+<td>numpy.org</td><td>手写实现、造数据</td></tr>
+<tr><td>scikit-learn</td><td><code>pip install scikit-learn</code></td><td>BSD-3-Clause</td>
+<td>scikit-learn.org</td><td><a class="tl" href="glossary.html#term-regression" title="回归（预测连续值）｜要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。">回归</a>/树/<a class="tl" href="glossary.html#term-clustering" title="聚类（无标签分组）｜没有标准答案，模型自己按相似度把数据分成几堆，每堆起个名都不用你来定。">聚类</a>/<a class="tl" href="glossary.html#term-dimensionality-reduction" title="降维｜把一大堆特征压成少数几个，尽量不丢关键信息。">降维</a>/<a class="tl" href="glossary.html#term-cross-validation" title="交叉验证（K 折）｜把数据切成 K 份，轮流拿一份当考试、其余当练习，考 K 次取平均。比只切一次更稳、更不…">交叉验证</a></td></tr>
+<tr><td>statsmodels</td><td><code>pip install statsmodels</code></td><td>BSD-3-Clause</td>
+<td>statsmodels.org</td><td><a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a>（<a class="tl" href="glossary.html#term-poisson-regression" title="泊松回归｜专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。">泊松</a>、<a class="tl" href="glossary.html#term-tweedie" title="Tweedie 分布｜一种能同时处理「大量 0」和「极少数巨额」的分布，车险定价的正统工具。本库未实现，只讲思路。">Tweedie</a>）</td></tr>
+<tr><td>XGBoost</td><td><code>pip install xgboost</code></td><td>Apache-2.0</td>
+<td>xgboost.readthedocs.io</td><td><a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a> 的工业实现</td></tr>
+</table></div>
+<p class="tbl-cap">以上均为长期维护的主流库，API 稳定；版本号以各官方文档为准。
+本库自己的模型是 <b>手写的</b>（见 <code>code/models.py</code>），
+用这些库只是为了让示例能直接粘到你的环境里跑。</p>
+
+
+<h2 id="pick">三十秒选定模型</h2>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>你的情况</th><th>先用这个</th><th>为什么</th></tr>
+<tr><td>要预测一个数字，关系大致是直的</td><td>线性<a class="tl" href="glossary.html#term-regression" title="回归（预测连续值）｜要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。">回归</a> / <a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a></td>
+    <td>系数能直接念给人听，出事好解释</td></tr>
+<tr><td>要预测「会不会」（0/1）</td><td><a class="tl" href="glossary.html#term-logistic-regression" title="逻辑回归｜预测「是 / 否」概率的经典模型。形式跟线性模型一样，只是最后套一层变换把输出压到 0–…">逻辑回归</a></td>
+    <td>输出就是概率，天然能排序、能设<a class="tl" href="glossary.html#term-threshold-cut-off" title="阈值（切点）｜把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。">阈值</a></td></tr>
+<tr><td>要预测次数、金额，且大部分是 0</td><td><a class="tl" href="glossary.html#term-poisson-regression" title="泊松回归｜专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。">泊松</a> / <a class="tl" href="glossary.html#term-tweedie" title="Tweedie 分布｜一种能同时处理「大量 0」和「极少数巨额」的分布，车险定价的正统工具。本库未实现，只讲思路。">Tweedie</a></td>
+    <td>专门为正数、<a class="tl" href="glossary.html#term-zero-inflated" title="零膨胀｜数据里绝大多数是 0（大部分人一年不出险），0 多到会把普通模型带偏。">零膨胀</a>、长尾设计</td></tr>
+<tr><td>表格数据，想要精度，也要看<a class="tl" href="glossary.html#term-feature-importance" title="特征重要性｜排个序，看哪个特征对预测的贡献最大。注意：它只说明「模型用了谁」，不说明「谁导致了结果」。">变量重要性</a></td><td><a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a> / XGBoost</td>
+    <td>表格数据上的常胜将军</td></tr>
+<tr><td>要写成「如果…就…」给人审核</td><td><a class="tl" href="glossary.html#term-decision-tree" title="决策树｜一串 if-else 问题：「年龄&lt;25？是→车值&gt;30万？否→…」走到底就得答案。">决策树</a>（浅一点）</td>
+    <td>规则能原样导出成文字</td></tr>
+<tr><td>没有标签，只想把人分堆</td><td><a class="tl" href="glossary.html#term-clustering" title="聚类（无标签分组）｜没有标准答案，模型自己按相似度把数据分成几堆，每堆起个名都不用你来定。">K-Means</a></td>
+    <td>快、结果看得懂</td></tr>
+<tr><td>特征太多、彼此<a class="tl" href="glossary.html#term-correlation-vs-causation" title="相关与因果｜相关 = 两件事一起变；因果 = 一件导致了另一件。相关不等于因果，这是最容易栽跟头的地方。">相关</a></td><td>PCA</td>
+    <td>压成几个互不<a class="tl" href="glossary.html#term-correlation-vs-causation" title="相关与因果｜相关 = 两件事一起变；因果 = 一件导致了另一件。相关不等于因果，这是最容易栽跟头的地方。">相关</a>的新变量</td></tr>
+<tr><td>图像 / 文本 / 语音</td><td><a class="tl" href="glossary.html#term-neural-network" title="神经网络｜很多层「小计算器」叠起来的模型，每层只做一点简单加工。擅长图像、语音、文字，表格数据上未…">神经网络</a></td>
+    <td>这些任务上传统模型打不过它</td></tr>
+</table></div>
+<div class="note">表格数据（一行一个客户、几十个字段）上，
+<b>GBDT 类通常打过<a class="tl" href="glossary.html#term-dl" title="深度学习｜机器学习里的一个分支，用很多层「小计算器」叠起来，擅长处理图像、语音、文字这类复杂东西。">深度学习</a></b>，而且训练快、好解释。
+别因为「<a class="tl" href="glossary.html#term-dl" title="深度学习｜机器学习里的一个分支，用很多层「小计算器」叠起来，擅长处理图像、语音、文字这类复杂东西。">深度学习</a>听起来更高级」就先上它。</div>
+
+<div class="mdl">
+<h3 id="lin">线性回归<span class="en">Linear Regression</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">找一条直线（或超平面），让所有点到它的竖直距离平方和最小。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">要预测的是<b>连续数字</b>，且相信各项影响可以相加：保费 = 基础 + 车龄×a + 驾龄×b …</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">先看<a class="tl" href="glossary.html#term-residual-gradient" title="残差（梯度）｜残差 = 真实值 − 当前预测值，也就是「还差多少」。梯度是它的方向版：往哪边补、补多大。">残差</a>图有没有弯曲；有弯就加平方项或换模型。系数正负要和业务常识对得上。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">ŷ = β₀ + β₁x₁ + β₂x₂ + … + βₚxₚ &nbsp;&nbsp;·&nbsp;&nbsp; 目标：min Σ(yᵢ − ŷᵢ)²</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><line x1="26" y1="112" x2="284" y2="112" stroke="#ddd5c2"/><line x1="26" y1="14" x2="26" y2="112" stroke="#ddd5c2"/><circle cx="46" cy="76" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="68" cy="64" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="90" cy="53" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="112" cy="41" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="134" cy="30" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="156" cy="18" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="178" cy="7" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="200" cy="-5" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="222" cy="-16" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="244" cy="-28" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><circle cx="266" cy="-40" r="3.4" fill="#2f6b5a" fill-opacity=".75"/><line x1="30" y1="96" x2="280" y2="24" stroke="#b53d2e" stroke-width="2.4"/><line x1="46" y1="76" x2="46" y2="96" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="68" y1="64" x2="68" y2="89" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="90" y1="53" x2="90" y2="82" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="112" y1="41" x2="112" y2="75" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="134" y1="30" x2="134" y2="68" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="156" y1="18" x2="156" y2="61" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="178" y1="7" x2="178" y2="54" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="200" y1="-5" x2="200" y2="47" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="222" y1="-16" x2="222" y2="40" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="244" y1="-28" x2="244" y2="33" stroke="#8a8578" stroke-dasharray="3 3"/><line x1="266" y1="-40" x2="266" y2="26" stroke="#8a8578" stroke-dasharray="3 3"/><text x="150" y="128" font-size="11" fill="#8a8578" text-anchor="middle">虚线是残差，直线要让它们平方和最小</text></svg><div class="fig-cap">红线是拟合出来的直线，每个点到线的竖直虚线就是误差</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v">目标变量是<b>出险次数与金额</b>，不是正态<a class="tl" href="glossary.html#term-distribution" title="分布｜把所有可能的结果、以及它们各自出现的机会，摆在一张图上。看形状就知道「常见什么样、罕见什…">分布</a>的连续值，所以本案例走的是它的推广——GLM：<a class="codelink" href="src/models.html#L134-L210" target="_blank" rel="noopener">models.py · PoissonRegressor<span class="cl-ln">L134–210</span></a></span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>import numpy as np
+
+# 造点数据：y = 3 + 2x + 噪声
+rng = np.random.default_rng(0)
+X = rng.uniform(0, 10, size=200)
+y = 3 + 2 * X + rng.normal(0, 1.5, size=200)
+
+# 加一列 1，用来吸收截距
+A = np.column_stack([np.ones(len(X)), X])
+
+# 闭式解（正规方程）：一步算出系数
+beta = np.linalg.solve(A.T @ A, A.T @ y)
+print("截距=%.2f  斜率=%.2f" % (beta[0], beta[1]))   # ≈ 3.0, 2.0
+
+# 预测 + 评估
+pred = A @ beta
+print("RMSE = %.3f" % np.sqrt(np.mean((y - pred) ** 2)))</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="logi"><a class="tl" href="glossary.html#term-logistic-regression" title="逻辑回归｜预测「是 / 否」概率的经典模型。形式跟线性模型一样，只是最后套一层变换把输出压到 0–…">逻辑回归</a><span class="en">Logistic Regression</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">名字里有「回归」，干的是<b><a class="tl" href="glossary.html#term-classification" title="分类（预测类别）｜要预测的结果是几个固定选项里的一个（会不会续保、是不是欺诈），模型学的是「打勾」。">分类</a></b>：先算线性得分，再用 S 形函数压成 0–1 之间的概率。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">要判断「属不属于某一类」，而且<b>想要概率而不只是结论</b>——比如要按概率排序再圈人。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">输出是概率，<a class="tl" href="glossary.html#term-threshold-cut-off" title="阈值（切点）｜把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。">阈值</a>你自己定；调阈值就是调「宁可<a class="tl" href="glossary.html#term-wrongly-rejected" title="错杀｜真实风险明明够低，却被规则拒掉的人。本案例一共 2,259 个。">错杀</a>还是宁可放过」。别只看<a class="tl" href="glossary.html#term-accuracy-confusion-matrix-f1" title="准确率（混淆矩阵 · F1）｜准确率 = 猜对的比例；混淆矩阵 = 把「该抓抓了 / 该抓没抓 / 不该抓抓了 / 不…">准确率</a>。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">p = 1 / (1 + e^(−(β₀ + β₁x₁ + …))) &nbsp;&nbsp;·&nbsp;&nbsp; 训练：最大化对数似然 Σ[y·ln p + (1−y)·ln(1−p)]</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><line x1="26" y1="112" x2="284" y2="112" stroke="#ddd5c2"/><line x1="150" y1="10" x2="150" y2="112" stroke="#ddd5c2" stroke-dasharray="4 3"/><path d="M28,104 C80,102 120,86 150,62 C180,38 220,22 280,18" fill="none" stroke="#b53d2e" stroke-width="2.6"/><circle cx="34" cy="108.0" r="3" fill="#2f6b5a"/><circle cx="47" cy="106.8" r="3" fill="#2f6b5a"/><circle cx="60" cy="105.6" r="3" fill="#2f6b5a"/><circle cx="73" cy="104.4" r="3" fill="#2f6b5a"/><circle cx="86" cy="103.2" r="3" fill="#2f6b5a"/><circle cx="99" cy="102.0" r="3" fill="#2f6b5a"/><circle cx="112" cy="100.8" r="3" fill="#2f6b5a"/><circle cx="125" cy="99.6" r="3" fill="#2f6b5a"/><circle cx="138" cy="98.4" r="3" fill="#2f6b5a"/><circle cx="180" cy="24.0" r="3" fill="#9a6f12"/><circle cx="193" cy="25.0" r="3" fill="#9a6f12"/><circle cx="206" cy="26.0" r="3" fill="#9a6f12"/><circle cx="219" cy="27.0" r="3" fill="#9a6f12"/><circle cx="232" cy="28.0" r="3" fill="#9a6f12"/><circle cx="245" cy="29.0" r="3" fill="#9a6f12"/><circle cx="258" cy="30.0" r="3" fill="#9a6f12"/><circle cx="271" cy="31.0" r="3" fill="#9a6f12"/><line x1="150" y1="14" x2="150" y2="112" stroke="#2b2a26" stroke-dasharray="4 3"/><text x="150" y="126" font-size="11" fill="#8a8578" text-anchor="middle">竖线以上是「判为 1」，以下是「判为 0」，阈值可左右挪</text></svg><div class="fig-cap">S 曲线把得分压成概率；中间那条竖线是判定阈值</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v">本库手写了它，但<b>只在正确性自检里跑</b>（解析解 vs 数值解互印），主流水线没走这条路——因为「好司机」这条线最后是<b>排序＋圈选</b>，概率只是副产品，不是决策依据。实现见 <a class="codelink" href="src/models.html#L214-L274" target="_blank" rel="noopener">models.py · LogisticRegression<span class="cl-ln">L214–274</span></a>，自检见 <a class="codelink" href="src/test_models.html" target="_blank" rel="noopener">test_models.py</a></span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+
+rng = np.random.default_rng(0)
+X = rng.normal(size=(600, 3))
+y = (X @ np.array([1.2, -0.8, 0.5]) + rng.normal(0, .6, 600) &gt; 0).astype(int)
+
+m = LogisticRegression(penalty="l2", C=1.0, max_iter=1000)
+m.fit(X, y)
+
+p = m.predict_proba(X)[:, 1]          # 要概率，不要硬结论
+print("AUC = %.3f" % roc_auc_score(y, p))
+
+# 阈值不是非得 0.5：想少漏人就调低，想少误伤就调高
+for t in (0.3, 0.5, 0.7):
+    pred = (p &gt;= t).astype(int)
+    print("阈值 %.1f → 圈出 %d 人，命中 %d 人" % (t, pred.sum(), (pred &amp; y).sum()))</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="glm">GLM 与泊松回归<span class="en">Generalized Linear Model / Poisson</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">线性回归的推广：允许结果不是正态<a class="tl" href="glossary.html#term-distribution" title="分布｜把所有可能的结果、以及它们各自出现的机会，摆在一张图上。看形状就知道「常见什么样、罕见什…">分布</a>。泊松回归专为<b>计数</b>（出险次数）设计，用对数连接把「线性得分」变成「正的<a class="tl" href="glossary.html#term-expected-value" title="期望｜把所有可能的结果按概率加权平均出来的「长期平均值」。注意它不是「最可能出现的那个值」。">期望</a>值」。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">要预测<b>次数、件数、<a class="tl" href="glossary.html#term-frequency" title="出险频率｜一年里平均出几次险。是个「次数」，所以用泊松那套工具。">频率</a></b>这类非负整数；精算里的索赔<a class="tl" href="glossary.html#term-frequency" title="出险频率｜一年里平均出几次险。是个「次数」，所以用泊松那套工具。">频率</a>建模就是它。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">看偏差（deviance）是否<a class="tl" href="glossary.html#term-convergence" title="收敛｜改来改去，改进量越来越小，最后几乎不动了 —— 说明可以停了。">收敛</a>；检查预测均值与实际的比值（<a class="tl" href="glossary.html#term-calibration" title="校准｜模型说「这个人值 1000 元」，实际是不是真接近 1000 元。排序准 ≠ 数值准。">校准</a>比）。有过度离散要考虑负二项。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">ln μ = β₀ + β₁x₁ + … &nbsp;→&nbsp; μ = e^(β₀ + β₁x₁ + …) &nbsp;&nbsp;·&nbsp;&nbsp; y ~ Poisson(μ)，权重用暴露数</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><line x1="26" y1="112" x2="284" y2="112" stroke="#ddd5c2"/><line x1="26" y1="14" x2="26" y2="112" stroke="#ddd5c2"/><path d="M30,106 C90,100 140,84 180,58 C215,36 250,24 282,20" fill="none" stroke="#b53d2e" stroke-width="2.6"/><circle cx="40" cy="101" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><circle cx="64" cy="100" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><circle cx="88" cy="99" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><circle cx="112" cy="97" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><circle cx="136" cy="95" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><circle cx="160" cy="92" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><circle cx="184" cy="88" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><circle cx="208" cy="82" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><circle cx="232" cy="75" r="3.2" fill="#2f6b5a" fill-opacity=".8"/><text x="34" y="24" font-size="11" fill="#8a8578">μ（期望次数）</text><text x="150" y="128" font-size="11" fill="#8a8578" text-anchor="middle">曲线只会往上、不会到 0 以下，这正适合计数</text></svg><div class="fig-cap">指数曲线保证预测值永远是正数</div></div>
+<div class="cbox"><span class="cb-k">本案例</span><span class="cb-v"><b>本案例的主模型之一</b>。频率建模就是它，<a class="tl" href="glossary.html#term-irls" title="迭代重加权最小二乘｜GLM 的「训练算法」：先瞎猜一条线，看每个点差多少，按差距重新算一条，重复几次就到位了。">IRLS</a> 手写实现：<a class="codelink" href="src/models.html#L134-L210" target="_blank" rel="noopener">models.py · PoissonRegressor<span class="cl-ln">L134–210</span></a></span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><p>本库的 <code>PoissonRegressor</code> 是手写的（<a class="tl" href="glossary.html#term-irls" title="迭代重加权最小二乘｜GLM 的「训练算法」：先瞎猜一条线，看每个点差多少，按差距重新算一条，重复几次就到位了。">IRLS</a> 迭代），见 <a class="codelink" href="src/models.html#L134-L210" target="_blank" rel="noopener">models.py<span class="cl-ln">L134–210</span></a>。</p><pre><code>import numpy as np, statsmodels.api as sm
+
+rng = np.random.default_rng(0)
+n = 2000
+x = rng.normal(size=n)
+exposure = rng.uniform(0.4, 1.0, size=n)        # 暴露数：保了多久
+mu = np.exp(0.3 + 0.6 * x) * exposure           # 真正的期望次数
+y = rng.poisson(mu)
+
+# 泊松 GLM：对数连接 + 暴露数作 offset
+m = sm.GLM(y, sm.add_constant(x), family=sm.families.Poisson(),
+           offset=np.log(exposure)).fit()
+print(m.summary())
+print("偏差 deviance = %.1f，自由度 df = %d" % (m.deviance, m.df_resid))
+print("系数 =", np.round(m.params, 3))          # ≈ [0.3, 0.6]</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="twe">Tweedie 回归<span class="en">Tweedie Regression</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">专门对付「<b>一大堆 0 ＋ 少数巨额</b>」的金额：把「会不会出险」和「出险赔多少」揉进一个分布里一次建模。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">直接预测<b><a class="tl" href="glossary.html#term-pure-premium" title="纯保费｜刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。">纯保费</a>（金额）</b>：大多数人一年赔 0 元，极少数赔到几十万。本案例最后就是这么干的。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">调 power 参数 p（1&lt;p&lt;2，1.5 常用）。别用 <a class="tl" href="glossary.html#term-mse" title="均方误差 MSE｜把每一次的误差（真实值 − 预测值）平方之后取平均。数字越小越好，0 = 全对。平方会重…">MSE</a> 当主指标，零太多会把它压得没有意义。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">Var(μ) = φ·μ^p，p ∈ (1, 2) &nbsp;&nbsp;·&nbsp;&nbsp; <a class="tl" href="glossary.html#term-pure-premium" title="纯保费｜刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。">纯保费</a> = 频率 × <a class="tl" href="glossary.html#term-severity" title="案均损失｜已知出险了的前提下，一次平均赔多少钱。只在出过险的人身上算。">案均</a> = μ_freq × μ_sev</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><line x1="26" y1="112" x2="284" y2="112" stroke="#ddd5c2"/><rect x="30" y="34" width="15" height="78" fill="#2f6b5a" fill-opacity=".8"/><rect x="52" y="92" width="15" height="20" fill="#2f6b5a" fill-opacity=".8"/><rect x="74" y="103" width="15" height="9" fill="#2f6b5a" fill-opacity=".8"/><rect x="96" y="107" width="15" height="5" fill="#2f6b5a" fill-opacity=".8"/><rect x="118" y="109" width="15" height="3" fill="#2f6b5a" fill-opacity=".8"/><rect x="140" y="110" width="15" height="2" fill="#2f6b5a" fill-opacity=".8"/><rect x="162" y="111" width="15" height="1" fill="#2f6b5a" fill-opacity=".8"/><rect x="184" y="111" width="15" height="1" fill="#b53d2e" fill-opacity=".8"/><rect x="206" y="111" width="15" height="1" fill="#b53d2e" fill-opacity=".8"/><rect x="228" y="111.2" width="15" height="0.8" fill="#b53d2e" fill-opacity=".8"/><rect x="250" y="111.4" width="15" height="0.6" fill="#b53d2e" fill-opacity=".8"/><text x="34" y="24" font-size="11" fill="#b53d2e">大量 0</text><text x="250" y="60" font-size="11" fill="#8a8578">长尾</text><text x="150" y="128" font-size="11" fill="#8a8578" text-anchor="middle">柱子越往右越少但越长——这就是重尾，普通回归会被它带偏</text></svg><div class="fig-cap">第一根柱子是「赔 0 元」的人，右边那几根是巨额赔案</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v"><b>本库明确没实现</b>，在第 25 页写成了诚实声明：<a href="ch03.html#tweedie">03 页 · Tweedie 留作练习</a>。案例改用「频率 × <a class="tl" href="glossary.html#term-severity" title="案均损失｜已知出险了的前提下，一次平均赔多少钱。只在出过险的人身上算。">案均</a>」两步拆解达到同一目的。</span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>import numpy as np, statsmodels.api as sm
+
+rng = np.random.default_rng(0)
+n = 3000
+x = rng.normal(size=n)
+mu = np.exp(0.5 + 0.4 * x)
+
+# Tweedie 造数（简化）：先抽次数，再抽伽马金额
+cnt = rng.poisson(mu * 0.25)
+sev = rng.gamma(shape=2.0, scale=3000, size=n)
+y = cnt * sev                                   # 大多数是 0
+
+# power=1.5 是纯保费建模的常用档位
+m = sm.GLM(y, sm.add_constant(x),
+           family=sm.families.Tweedie(var_power=1.5, link=sm.families.links.Log())
+           ).fit()
+print("power=1.5 时的系数 =", np.round(m.params, 3))
+
+# 别忘了：零占比高时，先看「预测均值 / 实际均值」
+print("校准比 = %.3f" % (m.fittedvalues.mean() / y.mean()))</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="tree"><a class="tl" href="glossary.html#term-decision-tree" title="决策树｜一串 if-else 问题：「年龄&lt;25？是→车值&gt;30万？否→…」走到底就得答案。">决策树</a><span class="en">Decision Tree (CART)</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">一串「是非题」：先问最能分清好坏的那个问题，把人劈成两半，两半里再各自问。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">要的是<b>能念给人听的规则</b>；或者数据里有明显的<a class="tl" href="glossary.html#term-binning" title="分箱（离散化）｜把连续的数字切成几段（年龄 18–25、26–35…），每段当成一类。能扛住极端值，也更…">分段</a>（比如 25 岁以下一个价、以上另一个价）。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">限深度（3–6 层）和<a class="tl" href="glossary.html#term-tree-depth-leaf-node" title="树深与叶子｜深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容…">叶子</a>里最少样本数，否则一个<a class="tl" href="glossary.html#term-tree-depth-leaf-node" title="树深与叶子｜深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容…">叶子</a>一个人，等于背答案。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">回归树：叶子里取均值 &nbsp;·&nbsp; 分裂准则：min [ n_L·Var_L + n_R·Var_R ]；<a class="tl" href="glossary.html#term-classification" title="分类（预测类别）｜要预测的结果是几个固定选项里的一个（会不会续保、是不是欺诈），模型学的是「打勾」。">分类</a>树改用<a class="tl" href="glossary.html#term-gini" title="基尼不纯度｜和熵一样的「混乱尺」，只是算法不同：随机抓两个人，他俩不一样的概率。0 = 全一样，0.…">基尼</a>或<a class="tl" href="glossary.html#term-entropy-information-gain" title="熵与信息增益｜熵 = 一堆东西有多混乱；信息增益 = 问完这个问题之后，混乱减少了多少。树每层都挑减少…">熵</a></div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><line x1="150" y1="26" x2="80" y2="60" stroke="#ddd5c2"/><line x1="150" y1="26" x2="220" y2="60" stroke="#ddd5c2"/><line x1="80" y1="76" x2="50" y2="104" stroke="#ddd5c2"/><line x1="80" y1="76" x2="112" y2="104" stroke="#ddd5c2"/><line x1="220" y1="76" x2="192" y2="104" stroke="#ddd5c2"/><line x1="220" y1="76" x2="252" y2="104" stroke="#ddd5c2"/><rect x="118" y="10" width="64" height="20" rx="5" fill="#2b2a26"/><text x="150" y="24" font-size="10.5" fill="#f5f1e6" text-anchor="middle">车龄&gt;8?</text><rect x="52" y="60" width="56" height="20" rx="5" fill="#fff" stroke="#ddd5c2"/><text x="80" y="74" font-size="10.5" fill="#2b2a26" text-anchor="middle">里程&gt;2万?</text><rect x="192" y="60" width="56" height="20" rx="5" fill="#fff" stroke="#ddd5c2"/><text x="220" y="74" font-size="10.5" fill="#2b2a26" text-anchor="middle">营运车?</text><rect x="32" y="104" width="36" height="18" rx="5" fill="#2f6b5a" fill-opacity=".85"/><text x="50" y="117" font-size="10" fill="#f5f1e6" text-anchor="middle">低</text><rect x="94" y="104" width="36" height="18" rx="5" fill="#b53d2e" fill-opacity=".85"/><text x="112" y="117" font-size="10" fill="#f5f1e6" text-anchor="middle">高</text><rect x="174" y="104" width="36" height="18" rx="5" fill="#2f6b5a" fill-opacity=".85"/><text x="192" y="117" font-size="10" fill="#f5f1e6" text-anchor="middle">低</text><rect x="234" y="104" width="36" height="18" rx="5" fill="#b53d2e" fill-opacity=".85"/><text x="252" y="117" font-size="10" fill="#f5f1e6" text-anchor="middle">高</text><text x="150" y="129" font-size="11" fill="#8a8578" text-anchor="middle">叶子就是最终结论：落到哪片叶子，就是哪类人</text></svg><div class="fig-cap">一层一层问下去，叶子是结论</div></div>
+<div class="cbox"><span class="cb-k">本案例</span><span class="cb-v">单树用来产出<b>能给核保看的规则</b>：<a class="codelink" href="src/models.html#L278-L391" target="_blank" rel="noopener">models.py · DecisionTreeRegressor<span class="cl-ln">L278–391</span></a></span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><p>手写版（含「怎么挑最佳切点」）见 <a class="codelink" href="src/models.html#L278-L391" target="_blank" rel="noopener">models.py · DecisionTreeRegressor<span class="cl-ln">L278–391</span></a>。</p><pre><code>from sklearn.tree import DecisionTreeRegressor, export_text
+
+# 关键旋钮就是这两个：别让它长得太深、叶子别太小
+m = DecisionTreeRegressor(max_depth=4, min_samples_leaf=40, random_state=0)
+m.fit(X, y)
+
+print("叶子数 =", m.get_n_leaves(), " 深度 =", m.get_depth())
+# 规则可以直接念给业务听
+print(export_text(m, feature_names=["车龄", "车值", "里程"], max_depth=3))
+
+# 用它预测
+print(m.predict(X[:5]))</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="rf"><a class="tl" href="glossary.html#term-random-forest-bagging" title="随机森林与 Bagging｜造很多棵树，每棵只看一部分数据、一部分特征，最后投票。单棵容易偏，一群平均起来就稳了。">随机森林</a><span class="en">Random Forest</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">一堆树各看一部分数据、各看一部分特征，最后<b>投票/取平均</b>。单棵树容易走偏，一群树的平均就稳了。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">要<b>稳</b>、不想<a class="tl" href="glossary.html#term-hyperparameter-search" title="超参数搜索｜把几组候选超参数都试一遍（网格 = 全试，随机 = 抽着试），按验证集分数挑最好的那一组。">调参</a>、又想要非线性。是「先跑一个不丢人」的<a class="tl" href="glossary.html#term-baseline" title="基线｜一个「不动脑子也能做出来」的参照分数，比如全猜平均值。模型连它都打不过，那就别做了。">基线</a>模型。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">树数 300–500 够了，再加收益很小。想提速可以砍 max_depth。它给不了「公式」，但能给<a class="tl" href="glossary.html#term-feature-importance" title="特征重要性｜排个序，看哪个特征对预测的贡献最大。注意：它只说明「模型用了谁」，不说明「谁导致了结果」。">特征重要性</a>。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">ŷ = (1/B) Σ f_b(x) &nbsp;&nbsp;·&nbsp;&nbsp; 每棵树：样本自助抽样 + 每次分裂只看随机 m 个特征</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><g transform="translate(26,14)"><rect x="18" y="0" width="34" height="18" rx="4" fill="#fff" stroke="#ddd5c2"/><text x="35" y="13" font-size="10" fill="#2b2a26" text-anchor="middle">树1</text><line x1="35" y1="18" x2="18" y2="42" stroke="#ddd5c2"/><line x1="35" y1="18" x2="52" y2="42" stroke="#ddd5c2"/><rect x="2" y="42" width="32" height="17" rx="4" fill="#2f6b5a" fill-opacity=".3"/><rect x="36" y="42" width="32" height="17" rx="4" fill="#2f6b5a" fill-opacity=".3"/><text x="18" y="55" font-size="9.5" fill="#2b2a26" text-anchor="middle">9</text><text x="52" y="55" font-size="9.5" fill="#2b2a26" text-anchor="middle">11</text><line x1="18" y1="59" x2="35" y2="80" stroke="#8a8578"/><line x1="52" y1="59" x2="35" y2="80" stroke="#8a8578"/></g><g transform="translate(114,14)"><rect x="18" y="0" width="34" height="18" rx="4" fill="#fff" stroke="#ddd5c2"/><text x="35" y="13" font-size="10" fill="#2b2a26" text-anchor="middle">树2</text><line x1="35" y1="18" x2="18" y2="42" stroke="#ddd5c2"/><line x1="35" y1="18" x2="52" y2="42" stroke="#ddd5c2"/><rect x="2" y="42" width="32" height="17" rx="4" fill="#2f6b5a" fill-opacity=".3"/><rect x="36" y="42" width="32" height="17" rx="4" fill="#2f6b5a" fill-opacity=".3"/><text x="18" y="55" font-size="9.5" fill="#2b2a26" text-anchor="middle">12</text><text x="52" y="55" font-size="9.5" fill="#2b2a26" text-anchor="middle">15</text><line x1="18" y1="59" x2="35" y2="80" stroke="#8a8578"/><line x1="52" y1="59" x2="35" y2="80" stroke="#8a8578"/></g><g transform="translate(202,14)"><rect x="18" y="0" width="34" height="18" rx="4" fill="#fff" stroke="#ddd5c2"/><text x="35" y="13" font-size="10" fill="#2b2a26" text-anchor="middle">树3</text><line x1="35" y1="18" x2="18" y2="42" stroke="#ddd5c2"/><line x1="35" y1="18" x2="52" y2="42" stroke="#ddd5c2"/><rect x="2" y="42" width="32" height="17" rx="4" fill="#2f6b5a" fill-opacity=".3"/><rect x="36" y="42" width="32" height="17" rx="4" fill="#2f6b5a" fill-opacity=".3"/><text x="18" y="55" font-size="9.5" fill="#2b2a26" text-anchor="middle">9</text><text x="52" y="55" font-size="9.5" fill="#2b2a26" text-anchor="middle">11</text><line x1="18" y1="59" x2="35" y2="80" stroke="#8a8578"/><line x1="52" y1="59" x2="35" y2="80" stroke="#8a8578"/></g><rect x="112" y="98" width="76" height="22" rx="6" fill="#9a6f12" fill-opacity=".18" stroke="#9a6f12"/><text x="150" y="113" font-size="11" fill="#2b2a26" text-anchor="middle">取平均 → 11.7</text><text x="150" y="129" font-size="11" fill="#8a8578" text-anchor="middle">每棵树看得不一样，误差互相抵消</text></svg><div class="fig-cap">三棵树各自给个数，平均一下就是最终答案</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v">没用。案例要<b>能落成核保规则的单一路径</b>，几百棵树投票说不清；精度上也被 GBDT 压过，见 <a href="ch06.html">第 28 页</a>。</span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>from sklearn.ensemble import RandomForestRegressor
+
+m = RandomForestRegressor(n_estimators=400,      # 树数：300~500 够用
+                          max_depth=6,           # 不限深会又慢又容易过拟合
+                          min_samples_leaf=30,
+                          n_jobs=-1, random_state=0)
+m.fit(X, y)
+
+# 谁最重要？做特征筛选、跟业务解释都靠它
+imp = sorted(zip(m.feature_importances_, names), reverse=True)
+for v, n_ in imp[:5]:
+    print("%-10s %.3f" % (n_, v))</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="gbdt">GBDT / XGBoost<span class="en">Gradient Boosting Decision Trees</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v"><b>一棵接一棵地补</b>：第一棵树粗粗预测，第二棵专补第一棵的<a class="tl" href="glossary.html#term-residual-gradient" title="残差（梯度）｜残差 = 真实值 − 当前预测值，也就是「还差多少」。梯度是它的方向版：往哪边补、补多大。">残差</a>，第三棵再补剩下的……最后加起来。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">表格数据要精度时的第一选择。kaggle 和精算实务里最常见的赢家。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">三个旋钮：树数（配 early_stopping）、<a class="tl" href="glossary.html#term-learning-rate" title="学习率｜每一轮「补差」时，只补一部分而不是全补。步子小一点更稳，但要多走几轮。">学习率</a>（0.05–0.1）、树深（3–6）。<a class="tl" href="glossary.html#term-learning-rate" title="学习率｜每一轮「补差」时，只补一部分而不是全补。步子小一点更稳，但要多走几轮。">学习率</a>调小就要多加树。别忘留<a class="tl" href="glossary.html#term-validation-set" title="验证集｜从数据里另留的一份，用来在训练过程中调超参数（树多深、走多快），但不算进最终考试分数。">验证集</a>做<a class="tl" href="glossary.html#term-early-stopping" title="提前停止｜训练中一直盯着验证集，它好几轮不再变好就立刻停手，并保留那轮最好的参数。">提前停止</a>。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">F_m(x) = F_{m−1}(x) + η·h_m(x)，其中 h_m 去拟合残差 −∂L/∂F</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><line x1="26" y1="112" x2="284" y2="112" stroke="#ddd5c2"/><line x1="26" y1="106" x2="284" y2="106" stroke="#ddd5c2" stroke-dasharray="3 3"/><rect x="30" y="54" width="30" height="52" fill="#2f6b5a" fill-opacity="0.28"/><rect x="70" y="80" width="30" height="26" fill="#2f6b5a" fill-opacity="0.42"/><rect x="110" y="93" width="30" height="13" fill="#2f6b5a" fill-opacity="0.56"/><rect x="150" y="99" width="30" height="7" fill="#2f6b5a" fill-opacity="0.70"/><rect x="190" y="102" width="30" height="4" fill="#2f6b5a" fill-opacity="0.84"/><rect x="230" y="104" width="30" height="2" fill="#2f6b5a" fill-opacity="0.98"/><text x="45" y="98" font-size="10" fill="#2b2a26" text-anchor="middle">第1棵</text><text x="205" y="98" font-size="10" fill="#2b2a26" text-anchor="middle">…</text><path d="M30,54 C80,46 150,32 280,26" fill="none" stroke="#b53d2e" stroke-width="2"/><text x="150" y="129" font-size="11" fill="#8a8578" text-anchor="middle">每棵树只补「还差的那一点」，越往后补得越少</text></svg><div class="fig-cap">柱子一根比一根矮：后面的树只补剩下的残差</div></div>
+<div class="cbox"><span class="cb-k">本案例</span><span class="cb-v"><b>本案例精度最高的模型</b>，且要跟 GLM 对垒看谁更能往外走：<a class="codelink" href="src/models.html#L395-L539" target="_blank" rel="noopener">models.py · GBDT<span class="cl-ln">L395–539</span></a> · <a class="codelink" href="src/train_evaluate.html#L233-L459" target="_blank" rel="noopener">step45 四模型对垒<span class="cl-ln">L233–459</span></a></span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><p>手写版（含「叶子值怎么算、残差怎么补」）见 <a class="codelink" href="src/models.html#L395-L539" target="_blank" rel="noopener">models.py · GBDT<span class="cl-ln">L395–539</span></a>。</p><pre><code>from sklearn.ensemble import HistGradientBoostingRegressor
+# 或：import xgboost as xgb
+
+m = HistGradientBoostingRegressor(
+    max_iter=500, learning_rate=0.06, max_depth=5,
+    min_samples_leaf=30,
+    early_stopping=True, validation_fraction=0.15,   # 到点就停，别死跑
+    random_state=0)
+m.fit(X, y)
+print("实际用了", m.n_iter_, "棵树")
+
+# XGBoost 写法几乎一样
+# m = xgb.XGBRegressor(n_estimators=500, learning_rate=0.06,
+#                      max_depth=5, subsample=0.8, colsample_bytree=0.8,
+#                      early_stopping_rounds=40, eval_set=[(Xv, yv)])</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="knn"><a class="tl" href="glossary.html#term-svm-knn" title="支持向量机 · 最近邻｜另外两类常见算法：SVM 找一条「分得最开」的线把两类隔开；KNN 看「你身边最近的几个…">KNN</a><span class="en">K-Nearest Neighbors</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">不训练，只记住所有人；来一个新人，就找跟他最像的 K 个邻居，看邻居们怎么样。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">样本不大、特征不多、想做个<b>直观的对照<a class="tl" href="glossary.html#term-baseline" title="基线｜一个「不动脑子也能做出来」的参照分数，比如全猜平均值。模型连它都打不过，那就别做了。">基线</a></b>。也常用于填<a class="tl" href="glossary.html#term-missing-value" title="缺失值｜某个字段没填。要么补（用均值、用模型猜），要么单开一列标记「这一格没填」—— 别假装它是…">补缺失</a>值。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v"><b>必须<a class="tl" href="glossary.html#term-standardization-normalization" title="标准化 / 归一化｜把不同量纲的特征拉到相近的尺度上，比如都变成「均值 0、标准差 1」。树模型一般不需要。">标准化</a></b>，否则量纲大的特征会一个人说了算。K 太小会抖，太大会抹平边界。样本一大就慢。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">ŷ(x) = (1/K) Σ_{i ∈ N_K(x)} y_i &nbsp;&nbsp;·&nbsp;&nbsp; 距离常用欧氏：d = √Σ(x_i − x_j)²</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><circle cx="150" cy="66" r="46" fill="none" stroke="#9a6f12" stroke-dasharray="4 3"/><circle cx="120" cy="50" r="4" fill="#2f6b5a"/><circle cx="168" cy="46" r="4" fill="#2f6b5a"/><circle cx="176" cy="86" r="4" fill="#2f6b5a"/><circle cx="132" cy="92" r="4" fill="#b53d2e"/><circle cx="196" cy="62" r="4" fill="#b53d2e"/><circle cx="86" cy="78" r="4" fill="#b53d2e"/><circle cx="214" cy="96" r="4" fill="#b53d2e"/><circle cx="74" cy="40" r="4" fill="#b53d2e"/><rect x="144" y="60" width="12" height="12" fill="#2b2a26"/><text x="150" y="126" font-size="11" fill="#8a8578" text-anchor="middle">圈内 4 个邻居：3 绿 1 红 → 判为绿</text></svg><div class="fig-cap">虚线圈住最近的 K 个邻居，少数服从多数</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v">没用。<a class="tl" href="glossary.html#term-svm-knn" title="支持向量机 · 最近邻｜另外两类常见算法：SVM 找一条「分得最开」的线把两类隔开；KNN 看「你身边最近的几个…">KNN</a> 给不出<b>系数或规则</b>，核保要能解释为什么拒；而且十几个特征里有类别型，距离本身没意义。</span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>from sklearn.neighbors import KNeighborsRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+# KNN 对量纲极度敏感：标准化必须做，且要放进 pipeline 防泄漏
+m = make_pipeline(StandardScaler(),
+                  KNeighborsRegressor(n_neighbors=15, weights="distance"))
+m.fit(X, y)
+
+print("预测 =", m.predict(X[:3]))
+# weights="distance"：越近的邻居说话越算数</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="svm">SVM<span class="en">Support Vector Machine</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">不光找一条分界线，还要找一条<b>离两边都最远</b>的分界线。只有边界上那几个点（支持向量）说了算。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">样本不算大、特征维度高、边界清晰；文本分类的经典选择。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">先<a class="tl" href="glossary.html#term-standardization-normalization" title="标准化 / 归一化｜把不同量纲的特征拉到相近的尺度上，比如都变成「均值 0、标准差 1」。树模型一般不需要。">标准化</a>。核函数选 rbf 时，C 和 gamma 要调。样本上万就慢了，而且<b>不直接给概率</b>。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">min ‖w‖²/2 + C·Σξ_i，约束 y_i(wᵀx_i + b) ≥ 1 − ξ_i &nbsp;&nbsp;·&nbsp;&nbsp; 核技巧：k(x, x′) = exp(−γ‖x−x′‖²)</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><path d="M40,100 L260,32" fill="none" stroke="#b53d2e" stroke-width="2.4"/><path d="M34,116 L254,48" fill="none" stroke="#8a8578" stroke-dasharray="4 3"/><path d="M46,84 L266,16" fill="none" stroke="#8a8578" stroke-dasharray="4 3"/><circle cx="60" cy="100" r="4" fill="#2f6b5a"/><circle cx="92" cy="88" r="4" fill="#2f6b5a"/><circle cx="120" cy="76" r="4" fill="#2f6b5a"/><circle cx="150" cy="66" r="4" fill="#2f6b5a"/><circle cx="92" cy="108" r="4" fill="#2f6b5a"/><circle cx="180" cy="52" r="4" fill="#9a6f12"/><circle cx="208" cy="40" r="4" fill="#9a6f12"/><circle cx="238" cy="28" r="4" fill="#9a6f12"/><circle cx="210" cy="60" r="4" fill="#9a6f12"/><circle cx="250" cy="44" r="4" fill="#9a6f12"/><circle cx="108" cy="82" r="6.5" fill="none" stroke="#2b2a26" stroke-width="1.4"/><circle cx="188" cy="48" r="6.5" fill="none" stroke="#2b2a26" stroke-width="1.4"/><text x="150" y="126" font-size="11" fill="#8a8578" text-anchor="middle">中间实线是分界，两侧虚线是间隔；圈住的是支持向量</text></svg><div class="fig-cap">SVM 要的是「最宽的马路」，不是随便一条线</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v">没用。同样卡在<b>可解释性</b>上——强监管下「算不出来为什么」就等于不能用。</span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+clf = make_pipeline(StandardScaler(),
+                    SVC(kernel="rbf", C=1.0, gamma="scale",
+                        probability=True))      # 想要概率得显式打开，代价是更慢
+clf.fit(X, y)
+
+print("支持向量个数 =", len(clf[-1].support_))
+print("概率 =", clf.predict_proba(X[:3])[:, 1].round(3))</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="km">K-Means<span class="en">K-Means Clustering</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v"><b>没有答案</b>也要分组：先随便定 K 个中心，把每个人派给最近的中心，再把中心挪到队员的均值处，反复到不动。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">想把客户分成几类却说不清标准；或者做探索，看看数据里是不是天然有几堆。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">先标准化。K 要自己定（常用肘部法或多试几个看业务能不能解释）。多跑几个随机起点取最优。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">目标：min Σ_{k} Σ_{x ∈ C_k} ‖x − μ_k‖² &nbsp;&nbsp;·&nbsp;&nbsp; μ_k = C_k 里所有点的均值</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><circle cx="56" cy="44" r="3.4" fill="#2f6b5a" fill-opacity=".8"/><circle cx="70" cy="62" r="3.4" fill="#2f6b5a" fill-opacity=".8"/><circle cx="48" cy="74" r="3.4" fill="#2f6b5a" fill-opacity=".8"/><circle cx="84" cy="50" r="3.4" fill="#2f6b5a" fill-opacity=".8"/><circle cx="66" cy="90" r="3.4" fill="#2f6b5a" fill-opacity=".8"/><circle cx="96" cy="68" r="3.4" fill="#2f6b5a" fill-opacity=".8"/><circle cx="206" cy="44" r="3.4" fill="#9a6f12" fill-opacity=".85"/><circle cx="222" cy="62" r="3.4" fill="#9a6f12" fill-opacity=".85"/><circle cx="196" cy="76" r="3.4" fill="#9a6f12" fill-opacity=".85"/><circle cx="232" cy="54" r="3.4" fill="#9a6f12" fill-opacity=".85"/><circle cx="214" cy="90" r="3.4" fill="#9a6f12" fill-opacity=".85"/><circle cx="244" cy="74" r="3.4" fill="#9a6f12" fill-opacity=".85"/><rect x="62" y="58" width="12" height="12" fill="#2f6b5a" stroke="#fff"/><rect x="216" y="62" width="12" height="12" fill="#9a6f12" stroke="#fff"/><line x1="34" y1="30" x2="110" y2="98" stroke="#ddd5c2" stroke-dasharray="3 3"/><line x1="184" y1="30" x2="262" y2="98" stroke="#ddd5c2" stroke-dasharray="3 3"/><text x="150" y="126" font-size="11" fill="#8a8578" text-anchor="middle">方块是簇中心，虚线是大致边界</text></svg><div class="fig-cap">两堆点各自围绕自己的中心</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v">没用。本案例<b>标签是算出来的</b>（真实纯保费是否低于 1,063 元），不是要机器自己分组，见 <a href="ch02.html#label">第 24 页 · 标签从哪来</a>。</span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+Xs = StandardScaler().fit_transform(X)      # 聚类前必须标准化
+
+# 肘部法：换个 K 看「簇内紧密程度」下降的拐点
+for k in range(2, 7):
+    km = KMeans(n_clusters=k, n_init=10, random_state=0).fit(Xs)
+    print("K=%d   inertia=%.1f" % (k, km.inertia_))
+
+km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(Xs)
+print("每个人被分到：", km.labels_[:20])
+print("簇中心（标准化尺度）=", km.cluster_centers_.round(2))</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="pca">PCA<span class="en">Principal Component Analysis</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">特征太多又互相相关时，把它们<b>重新组合</b>成少数几个互不相关的新变量，尽量不丢信息。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">几十上百个特征、彼此高度相关；或者想画散点图但数据是高维的。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">先标准化。看「累计解释<a class="tl" href="glossary.html#term-variance-standard-deviation" title="方差 / 标准差｜衡量一组数据有多分散。方差越大越散；标准差是方差开根号，好处是单位跟原始数据一样。">方差</a>」选保留几个（常取 80–95%）。注意：<b>主成分不好解释</b>，要解释就用原变量。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">找 w 使 Var(Xw) 最大，且 ‖w‖ = 1 &nbsp;&nbsp;·&nbsp;&nbsp; 即 XᵀX 的特征向量；解释比例 = λ_i / Σλ</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><circle cx="60" cy="90" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="76" cy="78" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="92" cy="84" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="108" cy="68" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="124" cy="74" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="140" cy="58" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="156" cy="64" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="172" cy="48" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="188" cy="54" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="204" cy="40" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="220" cy="46" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="236" cy="32" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="86" cy="66" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="116" cy="56" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="146" cy="46" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="176" cy="34" r="3" fill="#8a8578" fill-opacity=".55"/><circle cx="206" cy="26" r="3" fill="#8a8578" fill-opacity=".55"/><line x1="40" y1="112" x2="250" y2="22" stroke="#b53d2e" stroke-width="2.4"/><line x1="150" y1="66" x2="186" y2="88" stroke="#2f6b5a" stroke-width="1.8" stroke-dasharray="4 3"/><text x="196" y="94" font-size="10" fill="#2f6b5a">第二主成分</text><text x="248" y="20" font-size="10" fill="#b53d2e" text-anchor="end">第一主成分</text><text x="150" y="126" font-size="11" fill="#8a8578" text-anchor="middle">红线方向上的点最分散 —— 那就是「信息最多」的方向</text></svg><div class="fig-cap">点云最伸展的方向就是第一主成分</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v">没用。特征只有十几个，<b>每一个都要能在核保规则里点名</b>，<a class="tl" href="glossary.html#term-dimensionality-reduction" title="降维｜把一大堆特征压成少数几个，尽量不丢关键信息。">降维</a>之后就说不清是谁在起作用了。</span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+Xs = StandardScaler().fit_transform(X)
+
+p = PCA(n_components=0.9)        # 直接说「保留 90% 的信息」，它会自己算要几个
+Z = p.fit_transform(Xs)
+print("从 %d 个特征压到 %d 个主成分" % (X.shape[1], Z.shape[1]))
+print("各主成分解释比例 =", p.explained_variance_ratio_.round(3))
+
+# 看每个主成分主要由哪些原变量构成（用来给主成分起名字）
+print(pd.DataFrame(p.components_, columns=names).round(2))</code></pre></div></details>
+</div>
+
+<div class="mdl">
+<h3 id="mlp"><a class="tl" href="glossary.html#term-neural-network" title="神经网络｜很多层「小计算器」叠起来的模型，每层只做一点简单加工。擅长图像、语音、文字，表格数据上未…">神经网络</a> MLP<span class="en">Multi-Layer Perceptron</span></h3>
+<div class="kv"><span class="k">是什么</span><span class="v">一堆「加权求和 → 非线性扭转」的小单元层层堆叠，靠反向传播一层层把误差传回去改权重。</span></div>
+<div class="kv"><span class="k">何时用</span><span class="v">图像、语音、文本这类<b>结构复杂</b>的数据；或者特征之间关系高度非线性且样本量极大。</span></div>
+<div class="kv"><span class="k">怎么用</span><span class="v">先标准化。层数别一上来就堆很深，先试一层 64/128 个单元。要 reproducibility 就固定<a class="tl" href="glossary.html#term-random-seed" title="随机种子｜给随机数发生器一个固定的起点，保证每次跑出来的「随机」一模一样 —— 别人才能复现你的结果。">随机种子</a>。</span></div>
+<div class="kv"><span class="k">数学表达</span><span class="v"><div class="fx">h = σ(W₁x + b₁) → ŷ = W₂h + b₂ &nbsp;&nbsp;·&nbsp;&nbsp; 反向传播：∂L/∂W = ∂L/∂ŷ · ∂ŷ/∂W（链式法则）</div></span></div>
+<div class="mini"><svg viewBox="0 0 300 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:340px;height:auto"><rect x="0" y="0" width="300" height="132" fill="#fbf8ef"/><circle cx="52" cy="28" r="7" fill="#2f6b5a" fill-opacity=".8"/><circle cx="52" cy="62" r="7" fill="#2f6b5a" fill-opacity=".8"/><circle cx="52" cy="96" r="7" fill="#2f6b5a" fill-opacity=".8"/><circle cx="150" cy="18" r="7" fill="#9a6f12" fill-opacity=".85"/><circle cx="150" cy="44" r="7" fill="#9a6f12" fill-opacity=".85"/><circle cx="150" cy="70" r="7" fill="#9a6f12" fill-opacity=".85"/><circle cx="150" cy="96" r="7" fill="#9a6f12" fill-opacity=".85"/><circle cx="150" cy="122" r="7" fill="#9a6f12" fill-opacity=".85"/><circle cx="248" cy="66" r="8" fill="#b53d2e" fill-opacity=".85"/><line x1="52" y1="28" x2="150" y2="18" stroke="#ddd5c2"/><line x1="52" y1="28" x2="150" y2="44" stroke="#ddd5c2"/><line x1="52" y1="28" x2="150" y2="70" stroke="#ddd5c2"/><line x1="52" y1="28" x2="150" y2="96" stroke="#ddd5c2"/><line x1="52" y1="28" x2="150" y2="122" stroke="#ddd5c2"/><line x1="52" y1="62" x2="150" y2="18" stroke="#ddd5c2"/><line x1="52" y1="62" x2="150" y2="44" stroke="#ddd5c2"/><line x1="52" y1="62" x2="150" y2="70" stroke="#ddd5c2"/><line x1="52" y1="62" x2="150" y2="96" stroke="#ddd5c2"/><line x1="52" y1="62" x2="150" y2="122" stroke="#ddd5c2"/><line x1="52" y1="96" x2="150" y2="18" stroke="#ddd5c2"/><line x1="52" y1="96" x2="150" y2="44" stroke="#ddd5c2"/><line x1="52" y1="96" x2="150" y2="70" stroke="#ddd5c2"/><line x1="52" y1="96" x2="150" y2="96" stroke="#ddd5c2"/><line x1="52" y1="96" x2="150" y2="122" stroke="#ddd5c2"/><line x1="150" y1="18" x2="248" y2="66" stroke="#ddd5c2"/><line x1="150" y1="44" x2="248" y2="66" stroke="#ddd5c2"/><line x1="150" y1="70" x2="248" y2="66" stroke="#ddd5c2"/><line x1="150" y1="96" x2="248" y2="66" stroke="#ddd5c2"/><line x1="150" y1="122" x2="248" y2="66" stroke="#ddd5c2"/><text x="52" y="14" font-size="10" fill="#8a8578" text-anchor="middle">输入</text><text x="150" y="10" font-size="10" fill="#8a8578" text-anchor="middle">隐藏层</text><text x="248" y="14" font-size="10" fill="#8a8578" text-anchor="middle">输出</text><text x="150" y="126" font-size="11" fill="#8a8578" text-anchor="middle">每个连接都有一个权重，训练就是不停改这些权重</text></svg><div class="fig-cap">三层全连接：线越密，参数越多，也越容易背答案</div></div>
+<div class="cbox no"><span class="cb-k">本案例没用</span><span class="cb-v">没用。样本 1.1 万条、特征十几个，这个量级上树模型更稳；且神经网络的可解释成本在保险核保里太高，见 <a href="ch06.html">第 28 页</a>。</span></div>
+<details class="fold"><summary>Python 代码（点击展开）</summary><div class="fold-body"><pre><code>from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+# 先小后大：一层 64 往往就够了，堆深了只会在表格数据上过拟合
+m = make_pipeline(StandardScaler(),
+                  MLPRegressor(hidden_layer_sizes=(64,), activation="relu",
+                               alpha=1e-3,          # L2，防止背答案
+                               max_iter=800, early_stopping=True,
+                               random_state=0))
+m.fit(X, y)
+print("迭代次数 =", m[-1].n_iter_, " 最终损失 =", round(m[-1].loss_, 4))
+
+# PyTorch 的最小写法（隐藏层 + ReLU + MSE）
+# net = torch.nn.Sequential(torch.nn.Linear(p, 64), torch.nn.ReLU(),
+#                           torch.nn.Linear(64, 1))
+# opt = torch.optim.Adam(net.parameters(), lr=1e-3)
+# for _ in range(200):
+#     loss = torch.nn.functional.mse_loss(net(Xt), yt)
+#     opt.zero_grad(); loss.backward(); opt.step()</code></pre></div></details>
+</div>
+
+<h2 id="no">什么时候别上大模型</h2>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>诱惑</th><th>现实</th><th>该做的</th></tr>
+<tr><td>「上深度学习才够先进」</td>
+    <td>表格数据上 GBDT 通常更好、更快、更好解释</td>
+    <td>先用 GBDT 做基线，赢不了再换</td></tr>
+<tr><td>「树越多越好」</td>
+    <td>过了一定的量，误差不再降，只是变慢、变难解释</td>
+    <td>配 early_stopping，看验证曲线拐点</td></tr>
+<tr><td>「特征全丢进去让它自己学」</td>
+    <td>垃圾特征进来，模型只会学到<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声</a>，还会<a class="tl" href="glossary.html#term-data-leakage" title="数据泄漏｜训练时用了「真正在用的时候根本拿不到」的信息，于是离线分数虚高、一上线就掉。">泄漏</a></td>
+    <td>先做业务筛选，再看重要性回删</td></tr>
+<tr><td>「换个模型就能救回数据问题」</td>
+    <td>数据本身歪了，什么模型都救不回来</td>
+    <td>先回到第②步查数据，再看模型</td></tr>
+</table></div>
+<div class="quote q-talk"><span class="q-tag">说 人 话</span>
+<p>选模型不是追新，是<b>够用 + 能解释 + 能落地</b>。
+在保险公司，一个能被核保人听懂、被合规通过的模型，
+比一个 <a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> 高 0.01 但没人敢用的模型值钱得多。</p></div>
+<div class="codebar"><div class="cb-t">本页用到的代码</div><div class="cb-items"><a class="cb-i" href="src/models.html"><b>models</b><span>手写模型库（纯 NumPy）</span></a><a class="cb-i" href="src/test_models.html"><b>test_models</b><span>手写模型的正确性自检</span></a><a class="cb-i" href="src/train_evaluate.html"><b>train_evaluate</b><span>流水线第 1–5 步</span></a></div><a class="cb-all" href="code.html">全部代码 → 代码入口<span>42</span></a></div>
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-standardization-normalization"><b>标准化 / 归一化</b></a><span>把不同量纲的特征拉到相近的尺度上，比如都变成「均值 0、标准差 1」。树模型一般不需要。</span></div><div class="t-item"><a href="glossary.html#term-regression"><b>回归（预测连续值）</b></a><span>要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。</span></div><div class="t-item"><a href="glossary.html#term-poisson-regression"><b>泊松回归</b></a><span>专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。</span></div><div class="t-item"><a href="glossary.html#term-probability"><b>概率</b></a><span>一件事发生的可能性，写成 0 到 1 之间的一个数。0 是绝不可能，1 是一定发生。</span></div><div class="t-item"><a href="glossary.html#term-tree-depth-leaf-node"><b>树深与叶子</b></a><span>深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容易把巧合当成规律。</span></div><div class="t-item"><a href="glossary.html#term-gbdt"><b>GBDT</b></a><span>一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。</span></div></div>
+<div class="pager">
+<a href="s06.html"><span class="dir">◀ 上一页</span>组织与分工</a>
+<a class="next" href="a01.html"><span class="dir">下一页 ▶</span>常见算法速查</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

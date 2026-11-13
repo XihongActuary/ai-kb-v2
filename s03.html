@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>36 · 投入产出账 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav on" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="36">
+<div class="ph-kicker">
+<span class="ph-no">36</span>
+<span class="ph-part">第 2 段 · 端到端</span>
+<span class="ph-idx" title="你在第 36 页">共 43 页</span>
+</div>
+<h1>投入产出账：要花多少钱，多久回本</h1>
+<p class="ph-lead">前面算出了「圈 4,400 件、增益 387,474 元」，但那是<b>半本账</b>——
+只有收益，没有成本。决策会问的从来不是「能赚多少」，是「要投多少、多久回本、什么情况下会亏」。
+这一页把成本侧补上。</p>
+</header>
+<div class="toc"><div class="t">本页目录</div>
+<a href="#gap">现在只有半本账</a>
+<a href="#cost">成本清单</a>
+<a href="#key">关键输入：单件复核成本</a>
+<a href="#calc">自己填一个数算一算</a>
+<a href="#sens">敏感性：什么情况下会亏</a>
+<a href="#time">节奏与回本</a>
+</div>
+
+<div class="gof">
+  <div class="gof-h">本页要做的三件事</div><p class="gof-what">收益侧已经算出来了，成本侧还是空的。这页把成本补上，并给出唯一的那个关键输入。</p>
+  <div class="gof-row"><span class="gof-k gof-goal">目标</span>
+    <div class="gof-v">把收益侧已算出的数字配上成本侧，形成一笔能拿进决策会的完整账。</div></div>
+  <div class="gof-row"><span class="gof-k gof-out">输出</span>
+    <div class="gof-v">一张成本清单、一条盈亏平衡线、一个填两个数就能算的测算器。</div></div>
+  <div class="gof-row"><span class="gof-k gof-read">怎么读</span>
+    <div class="gof-v">本页的成本数字是<b>占位假设</b>，必须由公司填真实值。真正的关键输入只有一个：复核一件的成本。</div></div>
+<div class="gof-row"><span class="gof-k gof-know">读完你会知道</span><div class="gof-v">盈亏平衡点在单件复核成本 88 元——这个数一拿到，整本账立刻就清楚了。</div></div></div>
+
+
+
+<h2 id="gap">现在只有半本账</h2>
+<p><a href="ch10.html">第 32 页</a>算清楚了收益侧：圈选<a class="tl" href="glossary.html#term-threshold-cut-off" title="阈值（切点）｜把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。">阈值</a>扫一遍，4,400 件时增益最大，
+387,474 元。但成本侧是空的。缺的不是「算不出来」，是<b>没算</b>——
+因为成本里有一半是公司内部的口径，本库不能替你假设它是多少。</p>
+
+<div class="note"><b>先把 387,474 这个数的身世说清楚，否则后面的账都是空的。</b>
+<p>它叫「<b>相对随机</b>的增益」：同一笔 4,400 件的人工预算，让模型挑人 vs 闭眼抽签，
+赚的钱之差。算法是
+<code>n × COR × (随机均赔 − 模型圈内均赔)</code> = 4,400 × 0.75 × (1,222 − 1,105)
+≈ 386,100 元。
+注意保费 3,000 元在相减时被<b>完全约掉</b>了——
+<b>模型的价值不来自保费规模，只来自挑人挑得比随机准。</b>
+完整推导见 <a href="ch10.html#howgain">第 32 页 · 这一列是怎么算出来的</a>。</p>
+<p>所以下面那条盈亏平衡线 <b>88 元/件</b>，其实就是「增益 ÷ 件数」，
+它的本质是模型<b>每挑对一件</b>比随机省下的赔款（0.75 × 117 ≈ 88 元）。
+一句话记住：<b>只要复核一件花的钱，少于这一件比随机省下的赔款，这笔投资就成立。</b></p></div>
+
+<div class="note red"><b>这个 88 元是刻意取保守的口径，别当成唯一答案。</b>
+<p>它要求「相对随机多赚的那部分」去<b>全额</b>覆盖 4,400 件的复核成本，
+等于先把随机圈也能赚到的那 9,167,400 元一分不计入模型的功劳。
+若换成「相对一件都不复核」的口径，单件毛利是 3,000 − 0.75 × 1,105 ≈ 2,171 元，
+能容忍的单件成本高得多。本库选保守的那个：<b>能过 88 元这一关就是铁案，
+不用再在会上争论口径。</b></p></div>
+
+<h2 id="cost">成本清单</h2>
+<div class="tbl-wrap"><table class="tbl"><tr><th>成本项</th><th>说明</th><th>口径</th><th>本库值</th><th>备注</th></tr><tr><td>① 数据治理</td><td>把核保 / 理赔 / 渠道的数据拼成一张可用的表</td><td>人月 × 单价</td><td>待填</td><td>通常是最容易被低估的一项</td></tr><tr><td>② 人工复核</td><td>圈出的 4,400 件逐件判</td><td><b>件数 × 单件成本</b></td><td><b>4,400 × 待填</b></td><td><b>成本大头，也是模型的用武之地</b></td></tr><tr><td>③ 系统改造</td><td>规则引擎接模型分、落日志、留痕</td><td>人月 × 单价</td><td>待填</td><td>不含新建系统，只算接口</td></tr><tr><td>④ 模型开发</td><td>建模 + <a class="tl" href="glossary.html#term-extrapolation-ood" title="外推（训练域外）｜给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。">外推</a>体检 + 业务账</td><td>人月 × 单价</td><td>本库已跑通</td><td>可直接复用本库流程与代码</td></tr><tr><td>⑤ 验证与<a class="tl" href="glossary.html#term-audit-sample" title="审计样本｜从被拒的人里抽一小部分，人工去查他们真实风险是多少。昂贵但能救命。">审计</a></td><td>独立复核、模型台账、<a class="tl" href="glossary.html#term-audit-sample" title="审计样本｜从被拒的人里抽一小部分，人工去查他们真实风险是多少。昂贵但能救命。">审计</a>留痕</td><td>人月 × 单价</td><td>待填</td><td>强监管行业<b>不能省</b>（见 s04）</td></tr><tr><td>⑥ 上线后运营</td><td><a class="tl" href="glossary.html#term-monitoring" title="上线后监控｜上线只是开始：每天盯住分数分布、人群构成和真实结果，偏了就报警，该回滚就回滚。">监控</a>看板、定期复训、年度验证</td><td>年度经常性</td><td>待填</td><td>模型上线那天才是花钱的开始</td></tr></table></div>
+
+<h2 id="key">关键输入：单件复核成本</h2>
+<div class="note red"><b>没有单件复核成本这个数，后面所有账都是空的。</b>
+<p>它决定了这件事成不成立。算法很简单：</p>
+<p style="font-size:15.5px">单件成本 = 核保员复核一件所需分钟数 ÷ 60 × 小时单价 ＋ 系统开销</p>
+<p>建议<b>先实测 50 件取平均</b>再往下算，不要拍脑袋。这个数一旦拿到，整本账立刻就清楚了。</p></div>
+<p>因为它乘的是固定动作——4,400 件复核是省不掉的——所以<b>每涨 1 元，毛利就少 4,400 元</b>：</p>
+<div class="sv wide"><svg viewBox="0 0 644 250" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto"><line x1="78" y1="196" x2="612" y2="196" stroke="#ddd5c2"/><line x1="78" y1="30" x2="78" y2="196" stroke="#ddd5c2"/><line x1="78" y1="128.44444444444446" x2="612" y2="128.44444444444446" stroke="#8a8578" stroke-dasharray="4 3"/><text x="70" y="132.44444444444446" font-size="10.5" fill="#8a8578" text-anchor="end">0</text><path d="M78.0 46.64437777777778 L598.0 195.2666" stroke="#2f6b5a" stroke-width="2.2" fill="none"/><circle cx="364.2023863636364" cy="128.44444444444446" r="5.5" fill="#b53d2e"/><text x="374.2023863636364" y="118.44444444444446" font-size="12" fill="#b53d2e" font-weight="bold">盈亏平衡 88 元/件</text><text x="84.0" y="38.64437777777778" font-size="11" fill="#2f6b5a">复核不要钱时，毛利 = 387,474 元</text><text x="322" y="222" font-size="11.5" fill="#8a8578" text-anchor="middle">单件复核成本（元）→</text><text x="78" y="242" font-size="10.5" fill="#8a8578">0</text><text x="612" y="242" font-size="10.5" fill="#8a8578" text-anchor="end">160</text><text x="322" y="20" font-size="12.5" fill="#2b2a26" text-anchor="middle" font-weight="bold">单件复核成本每涨 1 元，毛利就少 4,400 元</text><path d="M364.2023863636364 128.44444444444446 L364.2023863636364 196" stroke="#b53d2e" stroke-dasharray="3 3"/></svg><div class="fig-cap">复核 4,400 件是固定动作，所以成本是一条直线：单件成本涨一点，毛利掉一大截。</div></div>
+
+<h2 id="calc">自己填一个数算一算</h2>
+
+<div class="calc">
+  <table>
+    <tr><td class="calc-k">圈选件数（本库算出，固定）</td>
+        <td><b>4,400</b> 件</td></tr>
+    <tr><td class="calc-k">毛增益（本库算出，固定）</td>
+        <td><b>387,474</b> 元</td></tr>
+    <tr><td class="calc-k">单件复核成本（<b>请填真实值</b>）</td>
+        <td><input id="c-c" type="number" value="50" min="0" step="1"> 元 / 件</td></tr>
+    <tr><td class="calc-k">一次性投入（数据治理+开发+审计）</td>
+        <td><input id="c-s" type="number" value="300000" min="0" step="10000"> 元</td></tr>
+  </table>
+  <div class="calc-out">
+    <table>
+      <tr><td class="calc-k">复核总成本</td>
+          <td><b id="o-tot">—</b></td></tr>
+      <tr><td class="calc-k">毛利（增益 − 复核成本）</td>
+          <td><b id="o-gross">—</b></td></tr>
+      <tr><td class="calc-k"><b>第一年净收益（再减一次性投入）</b></td>
+          <td><span class="big" id="o-net">—</span></td></tr>
+      <tr><td class="calc-k">回本所需月数（按每月 367 件复核）</td>
+          <td><b id="o-mon">—</b></td></tr>
+    </table>
+    <div class="hint">数字随输入即时变化。默认 50 元/件、30 万元是一次性<b>占位假设</b>，
+      必须替换成公司实测值——尤其是单件复核成本，建议先实测 50 件取平均。</div>
+  </div>
+</div>
+<script>
+(function () {
+  var GAIN = 387474, N = 4400, PER_MONTH = 367;
+  var el = function (id) { return document.getElementById(id); };
+  function fmt(v) { return (v < 0 ? '−' : '') + Math.abs(Math.round(v)).toLocaleString('zh-CN') + ' 元'; }
+  function run() {
+    var c = parseFloat(el('c-c').value) || 0;
+    var s = parseFloat(el('c-s').value) || 0;
+    var tot = c * N, gross = GAIN - tot, net = gross - s;
+    el('o-tot').textContent = fmt(tot);
+    el('o-gross').textContent = fmt(gross);
+    var nEl = el('o-net');
+    nEl.textContent = fmt(net);
+    nEl.className = 'big ' + (net >= 0 ? 'pos' : 'neg');
+    var perMonth = gross / (N / PER_MONTH);
+    el('o-mon').textContent = (net <= 0 || perMonth <= 0) ? '无法回本'
+      : Math.ceil(s / perMonth) + ' 个月（毛利 ' + Math.round(perMonth).toLocaleString('zh-CN') + ' 元/月）';
+  }
+  ['c-c', 'c-s'].forEach(function (id) {
+    el(id).addEventListener('input', run);
+  });
+  run();
+})();
+</script>
+
+<h2 id="sens">敏感性：什么情况下会亏</h2>
+<div class="tbl-wrap"><table class="tbl"><tr><th>单件复核成本</th><th>复核 4,400 件的总成本</th><th>毛利（增益 387,474 − 成本）</th><th>判定</th></tr><tr><td>20 元</td><td>88,000 元</td><td><b style="color:#2f6b5a">299,474 元</b></td><td><span style="color:#2f6b5a">划算</span></td></tr><tr><td>40 元</td><td>176,000 元</td><td><b style="color:#2f6b5a">211,474 元</b></td><td><span style="color:#2f6b5a">划算</span></td></tr><tr><td>60 元</td><td>264,000 元</td><td><b style="color:#2f6b5a">123,474 元</b></td><td><span style="color:#2f6b5a">划算</span></td></tr><tr><td>80 元</td><td>352,000 元</td><td><b style="color:#2f6b5a">35,474 元</b></td><td><span style="color:#2f6b5a">划算</span></td></tr><tr><td>100 元</td><td>440,000 元</td><td><b style="color:#b53d2e">-52,526 元</b></td><td><span style="color:#b53d2e">不划算</span></td></tr><tr><td>150 元</td><td>660,000 元</td><td><b style="color:#b53d2e">-272,526 元</b></td><td><span style="color:#b53d2e">不划算</span></td></tr></table></div>
+<p><b>盈亏平衡点就在 88 元/件。</b>超过这个数，4,400 件的复核成本就把
+387,474 元增益全部吃掉，这件事就不成立了——
+<b>除非</b>能提高圈选精度（少复核几件也能救回同样多的人），
+或降低单件复核成本（工具辅助、模板化判定）。这两条恰恰是持续优化的方向。</p>
+
+<h2 id="time">节奏与回本</h2>
+<div class="tbl-wrap"><table class="tbl"><tr><th>时间</th><th>在做什么</th><th>财务表现</th><th>怎么理解</th></tr><tr><td>第 1 年</td><td>建立测量能力：随机抽检 + 定向复核 + 跟踪赔付</td><td>净收益大概率<b>持平或略亏</b></td><td>这一年买的是数据资产，不是利润</td></tr><tr><td>第 2 年</td><td>用真实标签重训，圈选精度提升</td><td>开始转正</td><td>标签积累到几千条，模型才有真正的地基</td></tr><tr><td>第 3 年起</td><td>复训常态化，规则与模型互相校准</td><td>稳定贡献</td><td>这时候才算「项目成功」</td></tr></table></div>
+<p><b>这就是为什么不该在第一年就用 ROI 卡死这个项目</b>——它的第一年产出是测量能力，
+不是利润。用 ROI 卡，等于要求一棵树在种下的当季就结果。</p>
+
+<div class="note jade"><b>看完这一页，你只需要记住三句话</b><ol><li>成本大头不是建模型，是复核。<b>盈亏平衡点是 88 元/件</b>——这个数一拿到，整本账就清楚了。</li><li>本页所有成本数字都是<b>占位假设</b>。真正只有两个输入必须公司自己填：单件复核成本、一次性投入。</li><li>第一年净收益大概率持平或略亏，<b>买的是测量能力</b>。用 ROI 卡第一年，等于要求树在种下的当季结果。</li></ol></div>
+<div class="codebar"><div class="cb-t">本页用到的代码</div><div class="cb-items"><a class="cb-i" href="src/steps_678.html"><b>steps_678</b><span>流水线第 6–8 步（真正的战场）</span></a></div><a class="cb-all" href="code.html">全部代码 → 代码入口<span>42</span></a></div>
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-recall"><b>召回率</b></a><span>真正该救的人里，你救到了百分之多少。漏掉的叫「漏网」。</span></div><div class="t-item"><a href="glossary.html#term-precision-purity"><b>精确率（圈选纯度）</b></a><span>你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。</span></div><div class="t-item"><a href="glossary.html#term-calibration"><b>校准</b></a><span>模型说「这个人值 1000 元」，实际是不是真接近 1000 元。排序准 ≠ 数值准。</span></div><div class="t-item"><a href="glossary.html#term-audit-sample"><b>审计样本</b></a><span>从被拒的人里抽一小部分，人工去查他们真实风险是多少。昂贵但能救命。</span></div><div class="t-item"><a href="glossary.html#term-probability"><b>概率</b></a><span>一件事发生的可能性，写成 0 到 1 之间的一个数。0 是绝不可能，1 是一定发生。</span></div><div class="t-item"><a href="glossary.html#term-underwriting"><b>核保与承保</b></a><span>核保 = 判断这个人能不能保、按什么条件保；承保 = 最终接下这笔业务。被拒掉的人从此就没有数据了。</span></div></div>
+<div class="pager">
+<a href="ch13.html"><span class="dir">◀ 上一页</span>落地 SOP 与清单</a>
+<a class="next" href="s04.html"><span class="dir">下一页 ▶</span>上线之后</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

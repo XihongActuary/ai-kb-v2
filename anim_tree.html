@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动画 · <a class="tl" href="glossary.html#term-decision-tree" title="决策树｜一串 if-else 问题：「年龄&lt;25？是→车值&gt;30万？否→…」走到底就得答案。">决策树</a>是怎么「挑问题」的 —— 一次分裂的全过程</title>
+<style>
+:root{--paper:#f5f1e6;--ink:#2b2a26;--red:#b53d2e;--amber:#9a6f12;--jade:#2f6b5a;--grey:#8a8578;--line:#ddd5c2;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--paper);color:var(--ink);padding:22px 26px 34px;}
+h1{font-family:"Songti SC","SimSun",serif;font-size:21px;font-weight:normal;letter-spacing:1px;}
+.sub{font-size:13px;color:var(--grey);margin:4px 0 16px;}
+.stage{display:flex;gap:18px;flex-wrap:wrap;}
+.panel{background:#fbf8ef;border:1px solid var(--line);border-radius:12px;padding:14px;}
+#cvS{display:block;background:#fff;border-radius:8px;}
+#cvG{display:block;background:#fff;border-radius:8px;}
+.side{width:296px;display:flex;flex-direction:column;gap:12px;}
+.side h3{font-family:"Songti SC","SimSun",serif;font-size:14.5px;font-weight:normal;color:var(--jade);letter-spacing:2px;}
+.row{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:6px 10px;background:#fff;border-radius:8px;border:1px solid var(--line);}
+.row b{font-variant-numeric:tabular-nums;color:var(--red);white-space:nowrap;}
+.row.hl{background:#fdf3ef;border-color:#e8c9c1;}
+.row.hl b{font-size:15px;}
+.caption{font-size:13.5px;line-height:1.8;min-height:150px;padding:10px 14px;background:#fff;border:1px dashed var(--line);border-radius:10px;}
+.caption b{color:var(--red);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+button{font-family:inherit;font-size:13.5px;padding:7px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+button:hover{border-color:var(--red);color:var(--red);}
+button.main{background:var(--red);border-color:var(--red);color:#fff;}
+button.main:hover{opacity:.88;color:#fff;}
+select{font-family:inherit;font-size:13px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:#fff;}
+.legend{font-size:12px;color:var(--grey);line-height:1.9;}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;}
+@media (max-width:900px){.side{width:100%;}}
+
+.guide{background:#fbf8ef;border:1px solid #ddd5c2;border-radius:12px;
+  padding:14px 20px 12px;margin:2px 0 16px;}
+.guide .g-t{font-family:"Songti SC","SimSun",serif;font-size:15px;color:#2f6b5a;
+  letter-spacing:2px;margin-bottom:8px;}
+.guide ul{margin:0;padding-left:20px;}
+.guide li{font-size:13.8px;line-height:1.85;color:#55524a;}
+.guide li b{color:#2b2a26;}
+.guide .g-term{margin-top:8px;padding-top:8px;border-top:1px dashed #ddd5c2;
+  font-size:13px;color:#8a8578;line-height:1.8;}
+.guide .g-term b{color:#b53d2e;}
+.modebar{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap;}
+button.mode{background:#2f6b5a;border-color:#2f6b5a;color:#fff;font-size:13px;padding:6px 14px;}
+button.mode:hover{opacity:.88;color:#fff;}
+.prog{height:5px;background:#efe9d8;border-radius:3px;overflow:hidden;margin:0 0 10px;}
+.prog-bar{height:100%;width:0;background:#b53d2e;border-radius:3px;transition:width .3s;}
+.three-box{background:#e6efe9;border:1px solid #c4d8cd;border-radius:12px;
+  padding:16px 22px;margin:24px 0 6px;}
+.three-box .t-t{font-family:"Songti SC","SimSun",serif;font-size:15px;color:#2f6b5a;
+  letter-spacing:2px;margin-bottom:8px;}
+.three-box ol{margin:0;padding-left:20px;}
+.three-box li{font-size:14.5px;line-height:1.85;margin-bottom:4px;color:#2b2a26;}
+.back-link{font-size:13px;margin-top:10px;}
+.knife-box{background:#fdf3ef;border:1px solid #e8c9c1;border-radius:12px;
+  padding:14px 20px;margin:16px 0 0;font-size:13.8px;line-height:1.85;color:#55524a;}
+.knife-box b{color:#b53d2e;}
+.knife-box .kb-t{font-family:"Songti SC","SimSun",serif;font-size:15px;color:#b53d2e;
+  letter-spacing:2px;margin-bottom:6px;}
+.knife-box table{border-collapse:collapse;width:100%;margin-top:8px;font-size:13px;}
+.knife-box th,.knife-box td{border:1px solid #e8c9c1;padding:5px 8px;text-align:right;}
+.knife-box th{background:#fbe9e4;color:#2b2a26;font-weight:normal;}
+.knife-box td:first-child,.knife-box th:first-child{text-align:left;}
+.knife-box td.num{font-variant-numeric:tabular-nums;}
+
+/* 移动端：canvas 是固定宽，必须等比缩放，否则溢出屏幕 */
+canvas { max-width: 100%; height: auto; }
+@media (max-width: 860px) {
+  body { padding: 14px 12px 24px; }
+  h1 { font-size: 18px; }
+  .side { width: 100%; }
+  .panel { padding: 10px; }
+}
+
+a.tl{color:inherit;text-decoration:none;cursor:help;border-bottom:1px dotted rgba(47,107,90,.6);}a.tl:hover{color:#b53d2e;border-bottom-color:#b53d2e;background:#f7e8e4;border-radius:2px;}
+</style>
+</head>
+<body>
+<h1>决策树是怎么「挑问题」的 —— 一次分裂的全过程</h1>
+<div class="sub">绿色=风险低的司机，红色=风险高的司机。树要做的只有一件事：问哪个问题，能把红绿分开得最彻底。</div>
+
+<div class="guide">
+<div class="g-t">先看懂这张图 · 30 秒</div>
+<ul>
+<li><b>每一个圆点</b>：一个真实的司机。<span style="color:#2f6b5a"><b>绿色</b></span> = 他真实风险低，
+<span style="color:#b53d2e"><b>红色</b></span> = 他真实风险高。</li>
+<li><b>横轴</b>：年龄。<b>纵轴</b>：一年开多少公里（越往上开得越多）。</li>
+<li><b>那条竖线或横线</b>：机器正在试探的一刀，比如「年龄 ≤ 32 岁？」——
+线左边算一组，右边算一组。<b>第 2 刀和第 3 刀的线只画在它自己那一半里</b>（左组只画左半边、右组只画右半边）。</li>
+<li><b>下面那条曲线</b>：把所有候选问题都试一遍后画出来的「混乱度」曲线。
+<b>曲线的最低点（谷底），就是分得最开的那个问题。</b></li>
+<li><b>曲线上那条红色虚线</b>：<b>切之前</b>这一片有多乱。虚线到曲线的<b>落差就是这一刀的收益 <a class="tl" href="glossary.html#term-gain" title="分裂收益 Gain｜切一刀「值不值」的度量：切之前的混乱 − 切之后的加权混乱。差得越多，这一刀越值。">Gain</a></b>——
+落得越深，这一刀越值。</li>
+<li><b>你会看到什么</b>：一共切 <b>3 刀</b>。第 1 刀在全部 56 人里找；第 2 刀在切出来的<b>左组</b> 20 人里找；
+第 3 刀在<b>右组</b> 36 人里找。右上角那个「正在切第几刀 · 哪一片」会一直告诉你现在在哪一步。</li>
+</ul>
+<div class="g-term"><b>顺手记两个词：</b>
+「<b><a class="tl" href="glossary.html#term-impurity" title="不纯度｜衡量「一堆人混得有多乱」。全是一样的就不纯=0，好坏各一半就最乱。">不纯度</a></b>」= 一堆人里好坏混得有多匀 —— 全是同一种人就最纯，好坏各一半就最乱。
+这棵树的目标就是让切出来的两堆各自<b>尽量纯</b>。
+「<b><a class="tl" href="glossary.html#term-decision-tree" title="决策树｜一串 if-else 问题：「年龄&lt;25？是→车值&gt;30万？否→…」走到底就得答案。">决策树</a></b>」这个名字就来自它的长相：一个问题分出两个枝，像一棵倒着长的树。</div>
+</div>
+
+<div class="stage">
+<div style="display:flex;flex-direction:column;gap:12px;">
+  <div class="panel"><canvas id="cvS" width="560" height="330"></canvas></div>
+  <div class="panel"><canvas id="cvG" width="560" height="200"></canvas></div>
+</div>
+<div class="side">
+  <div class="modebar"><button class="mode" id="bMode">当前：大白话 ▸ 点这里换术语</button></div>
+  <div class="prog"><div class="prog-bar" id="progBar"></div></div>
+  <h3>当前候选切分</h3>
+  <div class="row"><span class="lb" data-p="正在切第几刀 · 哪一片" data-t="当前层 depth · 节点">正在切第几刀 · 哪一片</span><b id="vknife">–</b></div>
+  <div class="row"><span class="lb" data-p="正在试探的问题" data-t="候选切分 (attr, thr)">正在试探的问题</span><b id="vq">–</b></div>
+  <div class="row"><span class="lb" data-p="左边多少人 / 右边多少人" data-t="左组 / 右组 样本数">左边多少人 / 右边多少人</span><b id="vn">–</b></div>
+  <div class="row"><span class="lb" data-p="切之前这一片有多乱" data-t="父节点 Gini">切之前这一片有多乱</span><b id="vpar">–</b></div>
+  <div class="row"><span class="lb" data-p="切之后两堆合起来多乱（越小越好）" data-t="加权 Gini（越小越好）">切之后两堆合起来多乱（越小越好）</span><b id="vimp">–</b></div>
+  <div class="row hl"><span class="lb" data-p="这一刀的收益 Gain = 切之前 − 切之后" data-t="Gain = Gini(父) − Gini(加权)">这一刀的收益 <a class="tl" href="glossary.html#term-gain" title="分裂收益 Gain｜切一刀「值不值」的度量：切之前的混乱 − 切之后的加权混乱。差得越多，这一刀越值。">Gain</a> = 切之前 − 切之后</span><b id="vgain">–</b></div>
+  <div class="row"><span class="lb" data-p="目前分得最开的那个问题" data-t="历史最优切分">目前分得最开的那个问题</span><b id="vbest">–</b></div>
+  <div class="caption" id="cap"></div>
+  <div class="ctrl">
+    <button class="main" id="bPlay">播放</button>
+    <button id="bPrev">上一步</button>
+    <button id="bNext">下一步</button>
+    <button id="bReset">重置</button>
+    <select id="spd"><option value="900" selected>慢速</option><option value="320">常速</option><option value="140">快速</option></select>
+  </div>
+  <div class="legend">
+    <i style="background:rgba(47,107,90,.65)"></i>风险低的司机　<i style="background:rgba(181,61,46,.65)"></i>风险高的司机<br>
+    上：散点与切分线　下：<a class="tl" href="glossary.html#term-impurity" title="不纯度｜衡量「一堆人混得有多乱」。全是一样的就不纯=0，好坏各一半就最乱。">不纯度</a>曲线（<b>虚线 = 切之前</b>，<b>落差 = <a class="tl" href="glossary.html#term-gain" title="分裂收益 Gain｜切一刀「值不值」的度量：切之前的混乱 − 切之后的加权混乱。差得越多，这一刀越值。">Gain</a></b>，谷底 = 最优切分）
+  </div>
+</div>
+</div>
+
+<script>
+"use strict";
+/* ---------------- 真实数据：风险 = 年轻 + 开得远（与案例同构） ---------------- */
+var rng=(function(){var s=77031;return function(){s=(s*1103515245+12345)>>>0;return s/4294967296;};})();
+var N=56, D=[];
+for(var i=0;i<N;i++){
+  var age=19+rng()*55, mile=8000+rng()*38000;
+  var p=1/(1+Math.exp(-(0.115*(28-age)+0.00007*(mile-15000)-1.1)));
+  var risky=rng()<p;
+  D.push({age:age,mile:mile,r:risky});
+}
+var MINLEAF=5;                              // 最小叶子人数
+/* ---------------- 不纯度：基尼系数（分类树标准做法） ---------------- */
+function gini(idxs){
+  if(idxs.length===0) return 0;
+  var n1=0;
+  for(var i=0;i<idxs.length;i++) if(D[idxs[i]].r) n1++;
+  var p=n1/idxs.length;
+  return 2*p*(1-p);
+}
+function pOf(idxs){
+  if(!idxs.length) return 0;
+  var n1=0;
+  for(var i=0;i<idxs.length;i++) if(D[idxs[i]].r) n1++;
+  return n1/idxs.length;
+}
+function splitGain(idx,attr,thr){
+  var L=[],R=[];
+  for(var i=0;i<idx.length;i++){
+    if(D[idx[i]][attr]<=thr) L.push(idx[i]); else R.push(idx[i]);
+  }
+  if(L.length<MINLEAF||R.length<MINLEAF) return null;   // 叶子太小不切：5 个人的「规律」是噪声
+  var w=(L.length*gini(L)+R.length*gini(R))/idx.length;
+  return {gain:gini(idx)-w,weighted:w,L:L,R:R,nL:L.length,nR:R.length};
+}
+/* ---------------- 步骤：三轮分裂，每轮先扫描候选 ----------------
+ * 每一轮只在一个「节点」内部扫：第 1 刀扫全部，第 2 刀扫左组，第 3 刀扫右组。
+ * box 记下这个节点的地盘（年龄区间 × 里程区间），切分线只画在自己地盘里，
+ * 免得第 3 刀那条线横穿整张图，看着像在切全部人。                        */
+var CANDS=["age","mile"];
+var CN={age:"年龄 ≤ ?",mile:"年里程 ≤ ?"};
+var BOX0={ax0:18,ax1:76,m0:8000,m1:55000};
+function childBox(box,attr,thr,side){
+  var b={ax0:box.ax0,ax1:box.ax1,m0:box.m0,m1:box.m1};
+  if(attr==="age"){ if(side==="L") b.ax1=thr; else b.ax0=thr; }
+  else { if(side==="L") b.m1=thr; else b.m0=thr; }
+  return b;
+}
+function buildScene(){
+  var scenes=[];
+  var root=D.map(function(_,i){return i;});
+  function scan(idxs,depth,tag,knife,box){
+    var best=null, list=[];
+    CANDS.forEach(function(attr){
+      var vals=idxs.map(function(i){return D[i][attr];}).sort(function(a,b){return a-b;});
+      for(var j=4;j<vals.length-4;j+=3){
+        var thr=(vals[j]+vals[j+1])/2;
+        var g=splitGain(idxs,attr,thr);
+        if(!g) continue;
+        var c={attr:attr,thr:thr,g:g,depth:depth,idx:idxs,tag:tag,knife:knife,box:box,par:gini(idxs)};
+        list.push(c);
+        if(!best||g.gain>best.g.gain) best=c;
+      }
+    });
+    return {list:list,best:best};
+  }
+  var r1=scan(root,0,"全部",1,BOX0);
+  r1.list.forEach(function(c){scenes.push({cand:c,isBest:c===r1.best});});
+  var b1=r1.best;
+  var r2=scan(b1.g.L,1,"左组",2,childBox(BOX0,b1.attr,b1.thr,"L"));
+  if(r2.best){ r2.list.forEach(function(c){scenes.push({cand:c,isBest:c===r2.best});}); }
+  var r3=scan(b1.g.R,1,"右组",3,childBox(BOX0,b1.attr,b1.thr,"R"));
+  if(r3.best){ r3.list.forEach(function(c){scenes.push({cand:c,isBest:c===r3.best});}); }
+  /* 终幕：三刀定下来的树结构（含每片的地盘，用来画叶子） */
+  var FIN=[b1,r2.best,r3.best].filter(function(x){return !!x;});
+  FIN.forEach(function(sp,i){ sp.knife=i+1; });
+  var TREE={box:BOX0,idxs:root,sp:null,L:null,R:null};
+  function branch(sp,side){
+    var ix=side==="L"?sp.g.L:sp.g.R;
+    return {box:childBox(sp.box,sp.attr,sp.thr,side),idxs:ix,sp:null,L:null,R:null};
+  }
+  TREE.L = r2.best ? {box:childBox(BOX0,b1.attr,b1.thr,"L"),idxs:b1.g.L,sp:r2.best,
+                      L:branch(r2.best,"L"),R:branch(r2.best,"R")}
+                   : branch(b1,"L");
+  TREE.R = r3.best ? {box:childBox(BOX0,b1.attr,b1.thr,"R"),idxs:b1.g.R,sp:r3.best,
+                      L:branch(r3.best,"L"),R:branch(r3.best,"R")}
+                   : branch(b1,"R");
+  scenes.push({final:FIN,tree:TREE});
+  return scenes;
+}
+var SC=buildScene();
+function leavesOf(tree){
+  var out=[];
+  (function rec(n){ if(!n) return; if(!n.L&&!n.R){out.push(n);return;} rec(n.L); rec(n.R); })(tree);
+  return out;
+}
+
+/* ---------------- 绘图 ---------------- */
+var cvS=document.getElementById("cvS"), c1=cvS.getContext("2d");
+var cvG=document.getElementById("cvG"), c2=cvG.getContext("2d");
+function dxy(d){ return [30+(d.age-18)/(76-18)*(cvS.width-50), cvS.height-26-(d.mile-8000)/(47000)*(cvS.height-56)]; }
+function xOf(t){ return 30+(t-18)/(76-18)*(cvS.width-50); }
+function yOf(t){ return cvS.height-26-(t-8000)/47000*(cvS.height-56); }
+function drawDot(d,hl,dim){
+  var p=dxy(d);
+  c1.beginPath(); c1.arc(p[0],p[1],hl?5.5:4,0,7);
+  c1.fillStyle=d.r?(dim?"rgba(181,61,46,.25)":"rgba(181,61,46,.7)")
+                  :(dim?"rgba(47,107,90,.25)":"rgba(47,107,90,.7)");
+  c1.fill();
+  if(hl){ c1.strokeStyle="#2b2a26"; c1.lineWidth=1.6; c1.stroke(); }
+}
+/* 切分线只画在自己那一块地盘里 */
+function splitLine(c,box,color,lw){
+  box=box||BOX0;
+  c1.strokeStyle=color||"#b53d2e"; c1.lineWidth=lw||2.2; c1.setLineDash([]);
+  c1.beginPath();
+  if(c.attr==="age"){
+    var x=xOf(c.thr); c1.moveTo(x,yOf(box.m1)); c1.lineTo(x,yOf(box.m0));
+  } else {
+    var y=yOf(c.thr); c1.moveTo(xOf(box.ax0),y); c1.lineTo(xOf(box.ax1),y);
+  }
+  c1.stroke();
+}
+function labelOf(c){
+  return c.attr==="age" ? ("年龄 ≤ "+Math.round(c.thr)+" 岁")
+                        : ("年里程 ≤ "+(Math.round(c.thr/100)/10)+" 万公里");
+}
+function drawScene(k){
+  var s=SC[k];
+  c1.clearRect(0,0,cvS.width,cvS.height);
+  c1.font="12px 'Microsoft YaHei'";
+  /* 轴 */
+  c1.fillStyle="#8a8578";
+  c1.fillText("年里程（高↑）",8,20);
+  c1.fillText("年龄（岁）→",cvS.width-100,cvS.height-8);
+  c1.strokeStyle="#ddd5c2"; c1.beginPath(); c1.moveTo(26,14); c1.lineTo(26,cvS.height-22); c1.lineTo(cvS.width-20,cvS.height-22); c1.stroke();
+  if(s.final){                                  // 终幕：三刀切出来的四片叶子
+    var f=s.final, lv=leavesOf(s.tree);
+    /* 先铺四片叶子的底色：越红说明这一片高风险越集中 */
+    lv.forEach(function(nd){
+      var x0=xOf(nd.box.ax0), x1=xOf(nd.box.ax1), y0=yOf(nd.box.m1), y1=yOf(nd.box.m0);
+      var p=pOf(nd.idxs);
+      c1.fillStyle=p>=0.5?"rgba(181,61,46,.10)":"rgba(47,107,90,.10)";
+      c1.fillRect(x0,y0,x1-x0,y1-y0);
+      c1.strokeStyle=p>=0.5?"rgba(181,61,46,.45)":"rgba(47,107,90,.45)";
+      c1.lineWidth=1; c1.setLineDash([4,3]);
+      c1.strokeRect(x0,y0,x1-x0,y1-y0); c1.setLineDash([]);
+    });
+    /* 三刀的线，各画在自己地盘里，并标上 ①②③ */
+    f.forEach(function(sp,i){
+      splitLine(sp,sp.box, i===0?"#b53d2e":"rgba(47,107,90,.85)", i===0?2.4:1.8);
+      var lx = sp.attr==="age" ? xOf(sp.thr)+5 : xOf(sp.box.ax0)+5;
+      var ly = sp.attr==="age" ? 26 : yOf(sp.thr)-6;
+      c1.font="bold 11px 'Microsoft YaHei'";
+      c1.fillStyle = i===0 ? "#b53d2e" : "#2f6b5a";
+      c1.fillText("①②③".charAt(i)+" "+labelOf(sp)+"（Gain "+sp.g.gain.toFixed(4)+"）",
+                  Math.max(30,Math.min(lx,cvS.width-200)), Math.max(16,ly));
+    });
+    D.forEach(function(d){drawDot(d,false,false);});
+    /* 每片叶子写清楚：多少人 · 多少是高风险 */
+    lv.forEach(function(nd){
+      var p=pOf(nd.idxs), cx=(xOf(nd.box.ax0)+xOf(nd.box.ax1))/2;
+      var cy=(yOf(nd.box.m1)+yOf(nd.box.m0))/2;
+      c1.font="bold 13px 'Microsoft YaHei'";
+      c1.fillStyle=p>=0.5?"#b53d2e":"#2f6b5a";
+      c1.fillText(Math.round(p*100)+"% 高风险", Math.max(34,Math.min(cx-34,cvS.width-96)), cy);
+      c1.font="11px 'Microsoft YaHei'"; c1.fillStyle="#8a8578";
+      c1.fillText(nd.idxs.length+" 人", Math.max(34,Math.min(cx-14,cvS.width-60)), cy+16);
+    });
+    return;
+  }
+  var c=s.cand;
+  /* 已经定下来的刀（第 1 刀、必要时第 2 刀）先画出来 */
+  SC[SC.length-1].final.slice(0,c.knife-1).forEach(function(sp){
+    splitLine(sp,sp.box, sp.knife===1?"rgba(181,61,46,.85)":"rgba(47,107,90,.7)", sp.knife===1?2.2:1.8);
+  });
+  D.forEach(function(d){drawDot(d,false,true);});
+  /* 当前节点里的人高亮，节点外的人压暗 */
+  c.g.L.forEach(function(i0){drawDot(D[i0],false,false);});
+  c.g.R.forEach(function(i0){drawDot(D[i0],false,false);});
+  splitLine(c,c.box,"#b53d2e",2.6);
+  if(s.isBest){ c1.fillStyle="#9a6f12"; c1.font="bold 12px 'Microsoft YaHei'";
+    c1.fillText("★ 目前最优",c.attr==="age"?xOf(c.thr)+8:xOf(c.box.ax0)+8,
+      c.attr==="age"?30:yOf(c.thr)-8); }
+  /* 收益曲线：同一层（同一刀）的所有候选画在一起 */
+  c2.clearRect(0,0,cvG.width,cvG.height);
+  var list=[], upto=-1;
+  for(var j=0;j<SC.length;j++){
+    if(SC[j].final){break;}
+    if(SC[j].cand.knife===c.knife){ list.push(SC[j]); if(j<=k) upto=list.length-1; }
+  }
+  if(list.length>1){
+    var W=cvG.width-56, H=cvG.height-40, bx=44, by=24;
+    var par=c.par;                       // 这一层「切之前」的不纯度，同一层是常数
+    var mx=par; list.forEach(function(x){mx=Math.max(mx,x.cand.g.weighted);});
+    mx=(mx||1)*1.12;
+    function yv(v){ return by+H-(v/mx)*H; }
+    c2.strokeStyle="#ddd5c2"; c2.lineWidth=1;
+    c2.beginPath(); c2.moveTo(bx,by); c2.lineTo(bx,by+H); c2.lineTo(bx+W,by+H); c2.stroke();
+    /* 虚线：切之前有多乱 */
+    var yp=yv(par);
+    c2.setLineDash([5,4]); c2.strokeStyle="#b53d2e"; c2.lineWidth=1.2;
+    c2.beginPath(); c2.moveTo(bx,yp); c2.lineTo(bx+W,yp); c2.stroke(); c2.setLineDash([]);
+    c2.fillStyle="#b53d2e"; c2.font="11px 'Microsoft YaHei'";
+    c2.fillText("切之前 "+par.toFixed(3), bx+4, yp-5);
+    /* 曲线：每个候选切完之后的加权不纯度 */
+    c2.strokeStyle="rgba(47,107,90,.8)"; c2.lineWidth=2; c2.beginPath();
+    for(var i2=0;i2<list.length;i2++){
+      var px=bx+i2/(list.length-1)*W, py=yv(list[i2].cand.g.weighted);
+      if(i2===0) c2.moveTo(px,py); else c2.lineTo(px,py);
+    }
+    c2.stroke(); c2.lineWidth=1;
+    /* 当前候选：虚线到曲线的落差 = 这一刀的 Gain */
+    if(upto>=0){
+      var cc=list[upto].cand, px2=bx+upto/(list.length-1)*W;
+      var yc=yv(cc.g.weighted);
+      c2.strokeStyle="#b53d2e"; c2.lineWidth=1.8; c2.setLineDash([]);
+      c2.beginPath(); c2.moveTo(px2,yp); c2.lineTo(px2,yc); c2.stroke();
+      c2.beginPath(); c2.moveTo(px2-5,yp); c2.lineTo(px2+5,yp);
+      c2.moveTo(px2-5,yc); c2.lineTo(px2+5,yc); c2.stroke();
+      c2.beginPath(); c2.arc(px2,yc,5,0,7); c2.fillStyle="#b53d2e"; c2.fill();
+      c2.font="bold 11px 'Microsoft YaHei'";
+      c2.fillText("Gain "+cc.g.gain.toFixed(4), Math.min(px2+8,cvG.width-92), (yp+yc)/2+4);
+    }
+    c2.fillStyle="#8a8578"; c2.font="11px 'Microsoft YaHei'";
+    c2.fillText("第 "+c.knife+" 刀（"+c.tag+" "+c.idx.length+" 人）的不纯度曲线：谷底=最会分组的问题，落差=Gain",bx,cvG.height-6);
+  } else {
+    c2.fillStyle="#8a8578"; c2.font="12px 'Microsoft YaHei'";
+    c2.fillText("换下一层了 —— 在新的一组里继续找最会分组的问题",44,cvG.height/2);
+  }
+}
+/* ---------------- 文案与控件 ---------------- */
+var CAP_PLAIN={
+scan:function(c,best){
+  var q=labelOf(c);
+  var s="第 <b>"+c.knife+"</b> 刀 · <b>"+c.tag+"</b>（"+c.idx.length+" 人）—— 正在试探：<b>"+q+"</b>";
+  s+="<br>照它切一刀：左边 <b>"+c.g.nL+"</b> 人、右边 <b>"+c.g.nR+"</b> 人。";
+  s+="<br>切之前这一片有多乱：<b>"+c.par.toFixed(3)+"</b>　切之后两堆合起来：<b>"+c.g.weighted.toFixed(3)+"</b>";
+  s+="<br><b>收益 Gain = "+c.par.toFixed(3)+" − "+c.g.weighted.toFixed(3)+" = "+c.g.gain.toFixed(4)+"</b>";
+  s+="　（落差越大，这一刀越值）";
+  s+=best?"<br>★ 到目前为止，这一刀分得最开，先记下来。":"<br>不如之前某个切法分得开 —— 换下一个再试。";
+  if(c.knife===3&&c.g.gain<0.02){
+    s+="<br><span style='color:#b53d2e'>⚠ 这一刀几乎白切：它要切的那一片本来就只有 "
+      +Math.round(pOf(c.idx)*100)+"% 是高风险，天花板就这么高。</span>";
+  }
+  return s;
+},
+final:function(f){
+  var last=f[f.length-1];
+  var gs=f.map(function(sp){return sp.g.gain.toFixed(4);}).join(" / ");
+  return "<b>切完了</b>：一共 "+f.length+" 刀，三刀的收益分别是 <b>"+gs+"</b>。"
+  +"<br><b>最后一刀只有 "+last.g.gain.toFixed(4)+"，几乎没分出新东西</b> —— 它要切的那一堆（"
+  +last.tag+" "+last.idx.length+" 人）本来就只有 "+Math.round(pOf(last.idx)*100)+"% 高风险，"
+  +"再怎么切也切不出多少信息。真实的树在这里就该停了。"
+  +"<br>现在你就能把规则背下来：「年龄 ≤ 某岁、且年里程 ≤ 某万公里 → 低风险叶」。"
+  +"<br><b>树模型能解释的秘密就在这：它不是在算公式，它是在连续问 yes / no。</b>";
+}};
+var MODE="plain";
+var CAP={
+scan:function(c,best){
+  var q=labelOf(c);
+  var s="<b>第 "+c.knife+" 刀 · "+c.tag+"</b>（n="+c.idx.length+"）：候选切分 <b>"+q+"</b>";
+  s+="<br>左组 "+c.g.nL+" 人 / 右组 "+c.g.nR+" 人；父节点 Gini = <b>"+c.par.toFixed(4)+"</b>，"+
+     "加权 Gini = <b>"+c.g.weighted.toFixed(4)+"</b>";
+  s+="<br><b>Gain = Gini(父) − Gini(加权) = "+c.g.gain.toFixed(4)+"</b>";
+  s+=best?"<br>★ 当前最优切分。":"<br>非最优，继续扫描。";
+  if(c.knife===3&&c.g.gain<0.02){
+    s+="<br><span style='color:#b53d2e'>⚠ Gain < 0.02：父节点已接近纯（p="+
+      pOf(c.idx).toFixed(3)+"），分裂收益趋近于 0，应触发停止条件。</span>";
+  }
+  return s;
+},
+final:function(f){
+  var last=f[f.length-1];
+  return "<b>停止生长</b>："+f.length+" 次分裂之后，各叶子已相当「纯」。三刀的 Gain = "+
+  f.map(function(sp){return sp.g.gain.toFixed(4);}).join(" / ")+
+  "。<br>最后一刀 Gain 仅 "+last.g.gain.toFixed(4)+"（父节点 p="+pOf(last.idx).toFixed(3)+
+  "），已达停止条件边界。<br>"+
+  "树的预测规则你现在就能背下来：例如「年龄≤某岁、且年里程≤某千公里 → 低风险叶」。"+
+  "<br><b>这就是树模型可解释性的全部秘密：它不是在算公式，它是在连续地问 yes / no 的问题。</b>";
+}};
+function show(k){
+  k=Math.max(0,Math.min(SC.length-1,k)); cur=k;
+  var s=SC[k];
+  drawScene(k);
+  if(s.final){
+    document.getElementById("vknife").textContent="— 已完成 —";
+    document.getElementById("vq").textContent="—";
+    document.getElementById("vn").textContent="—";
+    document.getElementById("vpar").textContent="—";
+    document.getElementById("vimp").textContent="—";
+    document.getElementById("vgain").textContent="—";
+    document.getElementById("vbest").textContent="—";
+    document.getElementById("cap").innerHTML=(MODE==="plain"?CAP_PLAIN:CAP).final(s.final);
+    var pb=document.getElementById("progBar"); if(pb) pb.style.width="100%";
+  } else {
+    var c=s.cand;
+    document.getElementById("vknife").textContent="第 "+c.knife+" 刀 · "+c.tag+" "+c.idx.length+" 人";
+    document.getElementById("vq").textContent=labelOf(c);
+    document.getElementById("vn").textContent=c.g.nL+" 人 / "+c.g.nR+" 人";
+    document.getElementById("vpar").textContent=c.par.toFixed(4);
+    document.getElementById("vimp").textContent=c.g.weighted.toFixed(4);
+    document.getElementById("vgain").textContent=(c.g.gain>=0?"+":"")+c.g.gain.toFixed(4);
+    document.getElementById("vbest").textContent=(function(){
+      var b=null;
+      for(var j=0;j<=k;j++){ if(SC[j].final)break; if(SC[j].isBest) b=SC[j].cand; }
+      return b?labelOf(b):"—";
+    })();
+    document.getElementById("cap").innerHTML=(MODE==="plain"?CAP_PLAIN:CAP).scan(c,s.isBest);
+    var pb=document.getElementById("progBar");
+    if(pb) pb.style.width=(k/(SC.length-1)*100)+"%";
+  }
+}
+var cur=0,timer=null;
+function stop(){ if(timer){clearInterval(timer);timer=null;document.getElementById("bPlay").textContent="播放";} }
+document.getElementById("bPlay").onclick=function(){
+  if(timer){stop();return;}
+  if(cur>=SC.length-1) show(0);
+  this.textContent="暂停";
+  timer=setInterval(function(){ if(cur>=SC.length-1){stop();return;} show(cur+1); },+document.getElementById("spd").value);
+};
+document.getElementById("bNext").onclick=function(){stop();show(cur+1);};
+document.getElementById("bPrev").onclick=function(){stop();show(cur-1);};
+document.getElementById("bReset").onclick=function(){stop();show(0);};
+document.getElementById("spd").onchange=function(){ if(timer){stop();document.getElementById("bPlay").click();} };
+
+/* ---------- 白话 ⇄ 术语 切换（后加的外壳，不改算法） ---------- */
+function applyMode(){
+  var els=document.querySelectorAll(".lb");
+  for(var i=0;i<els.length;i++){
+    var v=(MODE==="plain")?els[i].getAttribute("data-p"):els[i].getAttribute("data-t");
+    if(v) els[i].textContent=v;
+  }
+  var b=document.getElementById("bMode");
+  if(b) b.textContent=(MODE==="plain")?"当前：大白话 ▸ 点这里换术语"
+                                     :"当前：术语 ▸ 点这里换大白话";
+}
+document.getElementById("bMode").onclick=function(){
+  MODE=(MODE==="plain")?"term":"plain"; applyMode(); show0();
+};
+applyMode();
+
+function show0(){ show(cur); }
+show(0);
+</script>
+
+<div class="knife-box">
+<div class="kb-t">第三刀到底切在哪 · 收益 Gain 怎么算</div>
+<b>它在画面哪里：</b>第 1 刀（年龄 ≤ 36 岁）把 56 人切成<b>左组 20 人</b>和<b>右组 36 人</b>。
+第 2 刀在<b>左半边</b>（20 人那一片）扫，第 3 刀在<b>右半边</b>（36 人那一片）扫——
+所以你看到的第 3 刀那条横线<b>只画在竖线的右边</b>，它跟左半边的人一点关系都没有。
+右侧「正在切第几刀 · 哪一片」那一栏会实时写「第 3 刀 · 右组 36 人」。
+<p style="margin-top:8px"><b>Gain 怎么算（以第 3 刀为例，全程手算）：</b></p>
+<table>
+<tr><th>步骤</th><th>算式</th><th>结果</th></tr>
+<tr><td>① 父节点（右组 36 人，其中 2 人高风险）</td><td>p = 2 / 36 = 0.056　Gini = 2p(1−p)</td><td class="num">0.1049</td></tr>
+<tr><td>② 切完左边（17 人，0 人高风险）</td><td>p = 0　Gini = 2 × 0 × 1</td><td class="num">0.0000</td></tr>
+<tr><td>③ 切完右边（19 人，2 人高风险）</td><td>p = 2 / 19 = 0.105　Gini = 2 × 0.105 × 0.895</td><td class="num">0.1884</td></tr>
+<tr><td>④ 按人数加权平均</td><td>(17 × 0.0000 + 19 × 0.1884) / 36</td><td class="num">0.0994</td></tr>
+<tr><td>⑤ <b>收益 = 切之前 − 切之后</b></td><td><b>0.1049 − 0.0994</b></td><td class="num"><b>0.0055</b></td></tr>
+</table>
+<p style="margin-top:8px"><b>为什么这么小：</b>父节点本来就只有 5.6% 是高风险，<b>天花板就只有 0.1049</b>。
+更要命的是右边那一片切出来<b>反而更脏</b>（0.1884 &gt; 0.1049），
+全靠左边那片「0% 高风险」把加权平均值拉下来一点点。
+<b>这就是「看起来分开了，其实没分出新东西」——真实的树在这里就该停手。</b></p>
+</div>
+
+<div class="three-box">
+<div class="t-t">看完你该记住的四句话</div>
+<ol>
+<li>树不计算公式，它只是<b>连续地问 yes / no 问题</b>。</li>
+<li>每一刀挑的，都是<b>能把红绿分开得最彻底</b>的那个问题 —— 也就是「混乱度」曲线的最低点。</li>
+<li>这一刀值不值，用 <b>Gain = 切之前的混乱度 − 切之后的加权混乱度</b> 来量：
+曲线上就是<b>红色虚线到绿线的落差</b>。第 1 刀 0.1123、第 2 刀 0.1879、第 3 刀只有 0.0055。</li>
+<li>分到某片叶子里几乎全是同一种人，就可以<b>停了</b>。
+这就是为什么树模型能解释：你顺着枝走一遍，<b>每一步都是人话</b>。</li>
+</ol>
+<div class="back-link">← 回到 <a href="ch05.html">第 27 页</a>看完整讲解 ·
+不懂的词查 <a href="glossary.html">术语表</a></div>
+</div>
+</body>
+</html>

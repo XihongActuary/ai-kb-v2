@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>_fixno.py — 源码 · AI 实践库</title>
+<style>
+  body { margin: 0; background: #f5f1e6; color: #2b2a26;
+         font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+  .bar { position: sticky; top: 0; z-index: 5; background: #2b2a26; color: #e8e2d0;
+          padding: 10px 18px; font-size: 13px; line-height: 1.9; }
+  .bar b { font-family: Georgia, "Songti SC", serif; font-size: 15px; letter-spacing: 1px; }
+  .bar a { color: #d9cfa8; text-decoration: none; margin-right: 6px; }
+  .bar a:hover { color: #fff; text-decoration: underline; }
+  .bar .back { color: #e8a87c; }
+  .idx { background: #fbf8ef; border-bottom: 1px solid #ddd5c2; padding: 10px 18px;
+          font-size: 13px; line-height: 2; }
+  .idx a { display: inline-block; margin-right: 12px; color: #2f6b5a; text-decoration: none; }
+  .idx a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  td.ln { width: 52px; text-align: right; padding: 0 12px 0 8px; color: #a9a294;
+           user-select: none; vertical-align: top; font-variant-numeric: tabular-nums; }
+  td.ln a { color: inherit; text-decoration: none; }
+  td.src { padding-right: 16px; white-space: pre-wrap; word-break: break-all;
+            font-family: Consolas, "Courier New", monospace; line-height: 1.65; }
+  tr:hover td { background: #efe9d8; }
+  tr.mark td { background: #f7e6b8; }
+  tr.mark td.ln { background: #e8c98a; color: #6d3518; font-weight: bold; }
+  .cm { color: #9a927b; } .st { color: #6f7f4f; } .ds { color: #6f7f4f; }
+  .kw { color: #b53d2e; } .fn { color: #2f6b5a; font-weight: bold; }
+  .nm { color: #9a6f12; } .bi { color: #3a6b8a; }
+  .tip { padding: 8px 18px; font-size: 12.5px; color: #8a8578; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>_fixno.py</b> &nbsp;·&nbsp; 共 50 行 &nbsp;·&nbsp;
+  <a class="back" href="../code.html">← 回到代码入口</a>
+  &nbsp;·&nbsp; <a href="../index.html">总览</a>
+  <div>切换文件：<a href="_animfacts.html">_animfacts</a> · <a href="_build.html">_build</a> · <a href="_check.html">_check</a> · <a href="_facts.html">_facts</a> · <a href="_fixno.html">_fixno</a> · <a href="_scan_svg.html">_scan_svg</a> · <a href="_srcdoc.html">_srcdoc</a> · <a href="_tune.html">_tune</a> · <a href="fig_01_look.html">fig_01_look</a> · <a href="fig_02_model.html">fig_02_model</a> · <a href="gen_data.html">gen_data</a> · <a href="models.html">models</a> · <a href="navmap.html">navmap</a> · <a href="pages_a.html">pages_a</a> · <a href="pages_b.html">pages_b</a> · <a href="pages_basics.html">pages_basics</a> · <a href="pages_c.html">pages_c</a> · <a href="pages_code.html">pages_code</a> · <a href="pages_glossary.html">pages_glossary</a> · <a href="pages_p.html">pages_p</a> · <a href="pages_tools.html">pages_tools</a> · <a href="pages_up.html">pages_up</a> · <a href="pages_x.html">pages_x</a> · <a href="steps_678.html">steps_678</a> · <a href="terms.html">terms</a> · <a href="test_anim.html">test_anim</a> · <a href="test_models.html">test_models</a> · <a href="train_evaluate.html">train_evaluate</a></div>
+</div>
+<div class="idx"><a href="#L19">fix_bare</a> <a href="#L29">fix_link</a></div>
+<div class="tip">链接里的行号在构建时从真实文件算出，改代码后重建即可自动对齐。</div>
+<table>
+<tr id="L1"><td class="ln"><a href="#L1">1</a></td><td class="src"><span class="cm"># -*- coding: utf-8 -*-</span></td></tr><tr id="L2"><td class="ln"><a href="#L2">2</a></td><td class="src"><span class="ds">"""把正文里残留的旧「第 NN 页」引用，统一改成 navmap 的新页序。</span></td></tr><tr id="L3"><td class="ln"><a href="#L3">3</a></td><td class="src"><span class="ds"></span></td></tr><tr id="L4"><td class="ln"><a href="#L4">4</a></td><td class="src"><span class="ds">旧编号：段内编号 ch01=35 … ch13=47；新编号：连续页序 ch01=23 … ch13=35（差 12）</span></td></tr><tr id="L5"><td class="ln"><a href="#L5">5</a></td><td class="src"><span class="ds">"""</span></td></tr><tr id="L6"><td class="ln"><a href="#L6">6</a></td><td class="src"><span class="kw">import</span> re, os</td></tr><tr id="L7"><td class="ln"><a href="#L7">7</a></td><td class="src"><span class="kw">from</span> navmap <span class="kw">import</span> <span class="bi">NAV</span></td></tr><tr id="L8"><td class="ln"><a href="#L8">8</a></td><td class="src">&nbsp;</td></tr><tr id="L9"><td class="ln"><a href="#L9">9</a></td><td class="src"><span class="bi">NEW</span> = {n[<span class="nm">0</span>]: n[<span class="nm">2</span>] <span class="kw">for</span> n <span class="kw">in</span> <span class="bi">NAV</span> <span class="kw">if</span> n[<span class="nm">1</span>]}</td></tr><tr id="L10"><td class="ln"><a href="#L10">10</a></td><td class="src">&nbsp;</td></tr><tr id="L11"><td class="ln"><a href="#L11">11</a></td><td class="src"><span class="cm"># 上一版用的是「段内编号」(ch01=35…ch13=47)，现在改回连续页序，统一减 12</span></td></tr><tr id="L12"><td class="ln"><a href="#L12">12</a></td><td class="src"><span class="bi">OLD2NEW</span> = {f<span class="st">"{n}"</span>: f<span class="st">"{n - 12}"</span> <span class="kw">for</span> n <span class="kw">in</span> range(<span class="nm">35</span>, <span class="nm">48</span>)}</td></tr><tr id="L13"><td class="ln"><a href="#L13">13</a></td><td class="src">&nbsp;</td></tr><tr id="L14"><td class="ln"><a href="#L14">14</a></td><td class="src"><span class="bi">LOG</span> = []</td></tr><tr id="L15"><td class="ln"><a href="#L15">15</a></td><td class="src">&nbsp;</td></tr><tr id="L16"><td class="ln"><a href="#L16">16</a></td><td class="src"><span class="cm"># 1) 纯文本：按映射表换（此时还没有任何「正确的 35~47」，不会误伤）</span></td></tr><tr id="L17"><td class="ln"><a href="#L17">17</a></td><td class="src"><span class="bi">BARE</span> = re.compile(r<span class="st">'第\s?(\d\d)\s?页'</span>)</td></tr><tr id="L18"><td class="ln"><a href="#L18">18</a></td><td class="src">&nbsp;</td></tr><tr id="L19"><td class="ln"><a href="#L19">19</a></td><td class="src"><span class="kw">def </span><span class="fn">fix_bare</span>(m):</td></tr><tr id="L20"><td class="ln"><a href="#L20">20</a></td><td class="src">    new = <span class="bi">OLD2NEW</span>.get(m.group(<span class="nm">1</span>))</td></tr><tr id="L21"><td class="ln"><a href="#L21">21</a></td><td class="src">    <span class="kw">if</span> <span class="kw">not</span> new <span class="kw">or</span> new == m.group(<span class="nm">1</span>):</td></tr><tr id="L22"><td class="ln"><a href="#L22">22</a></td><td class="src">        <span class="kw">return</span> m.group(<span class="nm">0</span>)</td></tr><tr id="L23"><td class="ln"><a href="#L23">23</a></td><td class="src">    <span class="bi">LOG</span>.append((m.group(<span class="nm">0</span>), f<span class="st">"第 {new} 页"</span>))</td></tr><tr id="L24"><td class="ln"><a href="#L24">24</a></td><td class="src">    <span class="kw">return</span> f<span class="st">"第 {new} 页"</span></td></tr><tr id="L25"><td class="ln"><a href="#L25">25</a></td><td class="src">&nbsp;</td></tr><tr id="L26"><td class="ln"><a href="#L26">26</a></td><td class="src"><span class="cm"># 2) 带链接的：页号一律以 href 指向的文件为准</span></td></tr><tr id="L27"><td class="ln"><a href="#L27">27</a></td><td class="src"><span class="bi">LINK</span> = re.compile(r<span class="st">'(&lt;a href="(ch\d\d)\.html[^"]*"&gt;)(第 )?(\d\d)(?=[^&lt;]*&lt;/a&gt;)'</span>)</td></tr><tr id="L28"><td class="ln"><a href="#L28">28</a></td><td class="src">&nbsp;</td></tr><tr id="L29"><td class="ln"><a href="#L29">29</a></td><td class="src"><span class="kw">def </span><span class="fn">fix_link</span>(m):</td></tr><tr id="L30"><td class="ln"><a href="#L30">30</a></td><td class="src">    new = <span class="bi">NEW</span>.get(m.group(<span class="nm">2</span>))</td></tr><tr id="L31"><td class="ln"><a href="#L31">31</a></td><td class="src">    <span class="kw">if</span> <span class="kw">not</span> new <span class="kw">or</span> m.group(<span class="nm">4</span>) == new:</td></tr><tr id="L32"><td class="ln"><a href="#L32">32</a></td><td class="src">        <span class="kw">return</span> m.group(<span class="nm">0</span>)</td></tr><tr id="L33"><td class="ln"><a href="#L33">33</a></td><td class="src">    <span class="bi">LOG</span>.append((m.group(<span class="nm">0</span>), m.group(<span class="nm">1</span>) + (m.group(<span class="nm">3</span>) <span class="kw">or</span> <span class="st">""</span>) + new))</td></tr><tr id="L34"><td class="ln"><a href="#L34">34</a></td><td class="src">    <span class="kw">return</span> m.group(<span class="nm">1</span>) + (m.group(<span class="nm">3</span>) <span class="kw">or</span> <span class="st">""</span>) + new</td></tr><tr id="L35"><td class="ln"><a href="#L35">35</a></td><td class="src">&nbsp;</td></tr><tr id="L36"><td class="ln"><a href="#L36">36</a></td><td class="src">root = os.path.dirname(os.path.abspath(__file__))</td></tr><tr id="L37"><td class="ln"><a href="#L37">37</a></td><td class="src"><span class="kw">for</span> fn <span class="kw">in</span> sorted(os.listdir(root)):</td></tr><tr id="L38"><td class="ln"><a href="#L38">38</a></td><td class="src">    <span class="kw">if</span> <span class="kw">not</span> fn.endswith(<span class="st">".py"</span>) <span class="kw">or</span> fn.startswith(<span class="st">"_fix"</span>) <span class="kw">or</span> fn == <span class="st">"navmap.py"</span>:</td></tr><tr id="L39"><td class="ln"><a href="#L39">39</a></td><td class="src">        <span class="kw">continue</span></td></tr><tr id="L40"><td class="ln"><a href="#L40">40</a></td><td class="src">    p = os.path.join(root, fn)</td></tr><tr id="L41"><td class="ln"><a href="#L41">41</a></td><td class="src">    src = open(p, encoding=<span class="st">"utf-8"</span>).read()</td></tr><tr id="L42"><td class="ln"><a href="#L42">42</a></td><td class="src">    out = <span class="bi">LINK</span>.sub(fix_link, <span class="bi">BARE</span>.sub(fix_bare, src))</td></tr><tr id="L43"><td class="ln"><a href="#L43">43</a></td><td class="src">    <span class="kw">if</span> out != src:</td></tr><tr id="L44"><td class="ln"><a href="#L44">44</a></td><td class="src">        open(p, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>).write(out)</td></tr><tr id="L45"><td class="ln"><a href="#L45">45</a></td><td class="src">        <span class="kw">print</span>(f<span class="st">"[改] {fn}"</span>)</td></tr><tr id="L46"><td class="ln"><a href="#L46">46</a></td><td class="src">&nbsp;</td></tr><tr id="L47"><td class="ln"><a href="#L47">47</a></td><td class="src"><span class="kw">print</span>(f<span class="st">"\n本轮 {len(LOG)} 处："</span>)</td></tr><tr id="L48"><td class="ln"><a href="#L48">48</a></td><td class="src"><span class="kw">for</span> a, b <span class="kw">in</span> <span class="bi">LOG</span>:</td></tr><tr id="L49"><td class="ln"><a href="#L49">49</a></td><td class="src">    <span class="kw">print</span>(f<span class="st">"  {a}   -&gt;   {b}"</span>)</td></tr><tr id="L50"><td class="ln"><a href="#L50">50</a></td><td class="src">&nbsp;</td></tr>
+</table>
+<script>
+(function () {
+  var m = /L(\d+)(?:-L(\d+))?/.exec(location.hash || '');
+  if (!m) return;
+  var a = +m[1], b = m[2] ? +m[2] : a;
+  for (var i = a; i <= b; i++) {
+    var r = document.getElementById('L' + i);
+    if (r) r.className = 'mark';
+  }
+  var t = document.getElementById('L' + a);
+  if (t) t.scrollIntoView({ block: 'center' });
+})();
+</script>
+</body>
+</html>

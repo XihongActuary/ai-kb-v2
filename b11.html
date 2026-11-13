@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14 · 算法怎么分：先按任务分 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav on" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="14">
+<div class="ph-kicker">
+<span class="ph-no">14</span>
+<span class="ph-part">第 1 段 · 理论</span>
+<span class="ph-idx" title="你在第 14 页">共 43 页</span>
+</div>
+<h1>算法怎么分：先按任务分，再记名字</h1>
+<p class="ph-lead">学机器学习最容易走错的路，是<b>把算法名当菜单背</b>——线性回归、决策树、随机森林、K-Means、SVM……
+一长串，背完还是不知道该用哪个。正确的顺序是：<b>先看你的业务问题要预测什么，再去看哪个算法管这摊事。</b></p>
+</header>
+<div class="toc"><div class="t">本页目录</div><a href="#task">先按「要预测什么」分，不是按算法名分</a><a href="#case">本案例落在哪一格</a><a href="#four">下次拿到新问题，用这四问定算法</a></div>
+<div class="mlkb"><span class="ml-k">往深了学 · 机器学习知识库</span><a href="../ml-kb/notes.html" target="_blank" rel="noopener">西瓜书十七章 + 拓展</a></div>
+
+
+
+<div class="sv wide"><svg viewBox="0 0 644 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto"><rect x="10" y="10" width="152" height="196" rx="10" fill="#fbf8ef" stroke="#ddd5c2"/><text x="86" y="36" font-size="12.5" fill="#2b2a26" text-anchor="middle">① 回归算法</text><text x="86" y="56" font-size="10.5" fill="#8a8578" text-anchor="middle">预测连续数值</text><line x1="48" y1="140" x2="124" y2="140" stroke="#ddd5c2"/><line x1="48" y1="140" x2="48" y2="74" stroke="#ddd5c2"/><circle cx="68" cy="118" r="3.2" fill="#2f6b5a" opacity="0.6"/><circle cx="82" cy="104" r="3.2" fill="#2f6b5a" opacity="0.6"/><circle cx="94" cy="126" r="3.2" fill="#2f6b5a" opacity="0.6"/><circle cx="72" cy="88" r="3.2" fill="#2f6b5a" opacity="0.6"/><circle cx="104" cy="96" r="3.2" fill="#2f6b5a" opacity="0.6"/><circle cx="112" cy="112" r="3.2" fill="#2f6b5a" opacity="0.6"/><line x1="60" y1="132" x2="122" y2="80" stroke="#b53d2e" stroke-width="1.8"/><text x="86" y="166" font-size="11.5" fill="#2b2a26" text-anchor="middle">线性回归 / 岭回归</text><text x="86" y="184" font-size="11.5" fill="#2b2a26" text-anchor="middle">Lasso / Ridge</text><text x="86" y="202" font-size="11.5" fill="#2b2a26" text-anchor="middle">决策树 / GBDT</text><rect x="170" y="10" width="152" height="196" rx="10" fill="#fbf8ef" stroke="#ddd5c2"/><text x="246" y="36" font-size="12.5" fill="#2b2a26" text-anchor="middle">② 分类算法</text><text x="246" y="56" font-size="10.5" fill="#8a8578" text-anchor="middle">预测类别结果</text><line x1="208" y1="140" x2="284" y2="140" stroke="#ddd5c2"/><line x1="208" y1="140" x2="208" y2="74" stroke="#ddd5c2"/><circle cx="226" cy="112" r="3.4" fill="#2f6b5a" opacity="0.75"/><circle cx="236" cy="126" r="3.4" fill="#2f6b5a" opacity="0.75"/><circle cx="224" cy="94" r="3.4" fill="#2f6b5a" opacity="0.75"/><circle cx="266" cy="100" r="3.4" fill="#b53d2e" opacity="0.75"/><circle cx="278" cy="118" r="3.4" fill="#b53d2e" opacity="0.75"/><circle cx="264" cy="130" r="3.4" fill="#b53d2e" opacity="0.75"/><line x1="250" y1="72" x2="250" y2="140" stroke="#9a6f12" stroke-width="1.6" stroke-dasharray="4 3"/><text x="246" y="166" font-size="11.5" fill="#2b2a26" text-anchor="middle">逻辑回归 / KNN</text><text x="246" y="184" font-size="11.5" fill="#2b2a26" text-anchor="middle">SVM</text><text x="246" y="202" font-size="11.5" fill="#2b2a26" text-anchor="middle">决策树 / 随机森林</text><rect x="330" y="10" width="152" height="196" rx="10" fill="#fbf8ef" stroke="#ddd5c2"/><text x="406" y="36" font-size="12.5" fill="#2b2a26" text-anchor="middle">③ 聚类算法</text><text x="406" y="56" font-size="10.5" fill="#8a8578" text-anchor="middle">没有标签时自动分组</text><circle cx="216" cy="118" r="26" fill="none" stroke="#2f6b5a" stroke-dasharray="4 3"/><circle cx="292" cy="82" r="26" fill="none" stroke="#9a6f12" stroke-dasharray="4 3"/><circle cx="206" cy="112" r="3.4" fill="#2f6b5a"/><circle cx="220" cy="122" r="3.4" fill="#2f6b5a"/><circle cx="212" cy="100" r="3.4" fill="#2f6b5a"/><circle cx="224" cy="106" r="3.4" fill="#2f6b5a"/><circle cx="284" cy="76" r="3.4" fill="#9a6f12"/><circle cx="298" cy="90" r="3.4" fill="#9a6f12"/><circle cx="288" cy="66" r="3.4" fill="#9a6f12"/><circle cx="300" cy="76" r="3.4" fill="#9a6f12"/><text x="406" y="166" font-size="11.5" fill="#2b2a26" text-anchor="middle">K-Means</text><text x="406" y="184" font-size="11.5" fill="#2b2a26" text-anchor="middle">层次聚类</text><text x="406" y="202" font-size="11.5" fill="#2b2a26" text-anchor="middle">DBSCAN / GMM</text><rect x="490" y="10" width="152" height="196" rx="10" fill="#fbf8ef" stroke="#ddd5c2"/><text x="566" y="36" font-size="12.5" fill="#2b2a26" text-anchor="middle">④ 降维方法</text><text x="566" y="56" font-size="10.5" fill="#8a8578" text-anchor="middle">压缩特征、提主信息</text><line x1="368" y1="140" x2="444" y2="140" stroke="#ddd5c2"/><line x1="368" y1="140" x2="368" y2="74" stroke="#ddd5c2"/><circle cx="382" cy="112" r="3.4" fill="#2f6b5a" opacity="0.7"/><circle cx="394" cy="128" r="3.4" fill="#2f6b5a" opacity="0.7"/><circle cx="378" cy="88" r="3.4" fill="#2f6b5a" opacity="0.7"/><circle cx="392" cy="106" r="3.4" fill="#2f6b5a" opacity="0.7"/><circle cx="386" cy="120" r="3.4" fill="#2f6b5a" opacity="0.7"/><circle cx="398" cy="94" r="3.4" fill="#2f6b5a" opacity="0.7"/><line x1="418" y1="110" x2="446" y2="110" stroke="#b53d2e" stroke-width="1.6"/><circle cx="452" cy="106" r="4" fill="#b53d2e"/><circle cx="452" cy="118" r="4" fill="#b53d2e"/><text x="566" y="166" font-size="11.5" fill="#2b2a26" text-anchor="middle">PCA</text><text x="566" y="184" font-size="11.5" fill="#2b2a26" text-anchor="middle">LDA</text><text x="566" y="202" font-size="11.5" fill="#2b2a26" text-anchor="middle">特征选择</text></svg><div class="fig-cap">四类任务是「按要预测什么」分的：连续数值→<a class="tl" href="glossary.html#term-regression" title="回归（预测连续值）｜要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。">回归</a>，类别→<a class="tl" href="glossary.html#term-classification" title="分类（预测类别）｜要预测的结果是几个固定选项里的一个（会不会续保、是不是欺诈），模型学的是「打勾」。">分类</a>，无标签分组→<a class="tl" href="glossary.html#term-clustering" title="聚类（无标签分组）｜没有标准答案，模型自己按相似度把数据分成几堆，每堆起个名都不用你来定。">聚类</a>，压缩特征→<a class="tl" href="glossary.html#term-dimensionality-reduction" title="降维｜把一大堆特征压成少数几个，尽量不丢关键信息。">降维</a>。</div></div>
+
+
+<div class="gof">
+  <div class="gof-h">本页要做的三件事</div><p class="gof-what">算法名不该当菜单背。先看你到底要预测什么——数字、类别、还是分组。</p>
+  <div class="gof-row"><span class="gof-k gof-goal">目标</span>
+    <div class="gof-v">把「该用哪个算法」这个问题，从背名字改成「先问我要预测什么」。</div></div>
+  <div class="gof-row"><span class="gof-k gof-out">输出</span>
+    <div class="gof-v">一张四分区表：任务类型 → 典型算法 → 本案例用哪几个 → 对应哪一页。</div></div>
+  <div class="gof-row"><span class="gof-k gof-read">怎么读</span>
+    <div class="gof-v">先读四分区图建立<a class="tl" href="glossary.html#term-classification" title="分类（预测类别）｜要预测的结果是几个固定选项里的一个（会不会续保、是不是欺诈），模型学的是「打勾」。">分类</a>感；再对照「本案例落在哪一格」确认自己在干什么；最后看算法选择四问，下次拿到新问题自己就能定。</div></div>
+<div class="gof-row"><span class="gof-k gof-know">读完你会知道</span><div class="gof-v">数字→<a class="tl" href="glossary.html#term-regression" title="回归（预测连续值）｜要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。">回归</a>，类别→分类，无标签→<a class="tl" href="glossary.html#term-clustering" title="聚类（无标签分组）｜没有标准答案，模型自己按相似度把数据分成几堆，每堆起个名都不用你来定。">聚类</a>，特征太多→<a class="tl" href="glossary.html#term-dimensionality-reduction" title="降维｜把一大堆特征压成少数几个，尽量不丢关键信息。">降维</a>。本案例预测<a class="tl" href="glossary.html#term-pure-premium" title="纯保费｜刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。">纯保费</a>，是回归。</div></div></div>
+
+<h2 id="task">先按「要预测什么」分，不是按算法名分</h2>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th style="width:15%">任务类型</th><th style="width:26%">要预测的是什么</th>
+    <th style="width:30%">典型算法</th><th style="width:29%">生活里的例子</th></tr>
+<tr><td><b>回归</b></td><td>一个<b>连续数字</b>：多少钱、几次、多 long</td>
+    <td>线性回归、岭/<a class="tl" href="glossary.html#term-l1-l2-regularization" title="L1 / L2 正则化｜L1 罚到某些系数直接变成 0（等于顺手删特征）；L2 只是把大系数往 0 拉一点（整体…">Lasso</a> 回归、<a class="tl" href="glossary.html#term-decision-tree" title="决策树｜一串 if-else 问题：「年龄&lt;25？是→车值&gt;30万？否→…」走到底就得答案。">决策树</a>回归、<a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a></td><td>房价、销量、成本、<b>出险次数</b></td></tr>
+<tr><td><b>分类</b></td><td>一个<b>类别</b>：是或不是、A 类还是 B 类</td>
+    <td><a class="tl" href="glossary.html#term-logistic-regression" title="逻辑回归｜预测「是 / 否」概率的经典模型。形式跟线性模型一样，只是最后套一层变换把输出压到 0–…">逻辑回归</a>、<a class="tl" href="glossary.html#term-svm-knn" title="支持向量机 · 最近邻｜另外两类常见算法：SVM 找一条「分得最开」的线把两类隔开；KNN 看「你身边最近的几个…">KNN</a>、<a class="tl" href="glossary.html#term-svm-knn" title="支持向量机 · 最近邻｜另外两类常见算法：SVM 找一条「分得最开」的线把两类隔开；KNN 看「你身边最近的几个…">SVM</a>、<a class="tl" href="glossary.html#term-decision-tree" title="决策树｜一串 if-else 问题：「年龄&lt;25？是→车值&gt;30万？否→…」走到底就得答案。">决策树</a>、<a class="tl" href="glossary.html#term-random-forest-bagging" title="随机森林与 Bagging｜造很多棵树，每棵只看一部分数据、一部分特征，最后投票。单棵容易偏，一群平均起来就稳了。">随机森林</a></td><td>会不会流失、是不是垃圾邮件、<b>好司机还是坏司机</b></td></tr>
+<tr><td><b>聚类</b></td><td><b>没有标签</b>，只想把相似的归成一堆</td>
+    <td>K-Means、层次聚类、DBSCAN、GMM</td><td>用户分群、商品分层</td></tr>
+<tr><td><b>降维</b></td><td>特征太多，想<b>压缩又保留主要信息</b></td>
+    <td>PCA、LDA、特征选择</td><td>特征压缩、画散点图</td></tr>
+</table></div>
+<p>注意一件事：<b>回归和分类是「有监督」的</b>（有标准答案），聚类和降维是「<a class="tl" href="glossary.html#term-unsupervised-learning" title="无监督学习｜没有标准答案，机器只负责把「长得像的」归成一堆。">无监督</a>」的（没有答案，只有结构）。
+所以判断顺序其实只有两个问题：<b>① 有没有已知答案？② 答案是个数字还是个类别？</b>详见 <a href="b07.html">B7</a> 三大类型。</p>
+
+<h2 id="case">本案例落在哪一格</h2>
+<div class="quote q-talk"><span class="q-tag">说人话</span>
+<p>我们的目标是「这些被拒保的人，真实风险有多高」。风险高不高，是个<b>数字</b>（一年大概赔多少钱），
+所以落在<b>回归</b>这一格——不是分类。具体拆成两个模型：<b>出险次数</b>（多少次，计数型）用 <a class="tl" href="glossary.html#term-poisson-regression" title="泊松回归｜专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。">Poisson</a> 回归，
+<b>每次赔多少</b>（<a class="tl" href="glossary.html#term-severity" title="案均损失｜已知出险了的前提下，一次平均赔多少钱。只在出过险的人身上算。">案均</a><a class="tl" href="glossary.html#term-loss-function" title="损失函数｜一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。">损失</a>）用树模型，两个相乘得到<b><a class="tl" href="glossary.html#term-pure-premium" title="纯保费｜刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。">纯保费</a></b>。这就是 <a href="ch03.html">ch03</a> 说的「<a class="tl" href="glossary.html#term-frequency" title="出险频率｜一年里平均出几次险。是个「次数」，所以用泊松那套工具。">频率</a> × <a class="tl" href="glossary.html#term-loss-function" title="损失函数｜一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。">损失</a>」。</p></div>
+<div class="note jade"><b>但这里有个反直觉的地方，值得停一下：</b>
+我们最后<b>没有</b>拿预测出来的金额直接定价，而是拿它<b>排序、圈人</b>。
+圈选这个动作看起来像分类（圈 / 不圈），但它考核的不是「圈对了没有」，而是「<b>圈出来的这批人里，好司机占比高不高</b>」——
+所以看的是 <b><a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> 和<a class="tl" href="glossary.html#term-precision-purity" title="精确率（圈选纯度）｜你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。">纯度</a></b>，不是<a class="tl" href="glossary.html#term-accuracy-confusion-matrix-f1" title="准确率（混淆矩阵 · F1）｜准确率 = 猜对的比例；混淆矩阵 = 把「该抓抓了 / 该抓没抓 / 不该抓抓了 / 不…">准确率</a>。算法选回归，考核用排序指标，这是两件事。</div>
+
+<h2 id="four">下次拿到新问题，用这四问定算法</h2>
+<div class="steps">
+  <div class="step"><h4 id="sec4-1">第一问：我要预测的东西，是不是一个数字？</h4>
+    <p>是 → <b>回归</b>。赔多少钱、出几次险、什么时候来——都是回归。<br>
+    不是（是「是/否」「<a class="tl" href="glossary.html#term-a-b" title="A/B 测试｜把人随机分成两组，一组用老办法、一组用新模型，比一比谁的结果真的更好。这是唯一能证明「有…">A/B</a>/C」）→ <b>分类</b>。</p></div>
+  <div class="step"><h4 id="sec4-2">第二问：我手上有没有「已知答案」的历史数据？</h4>
+    <p>有 → 可以继续做回归 / 分类（<b><a class="tl" href="glossary.html#term-supervised-learning" title="监督学习｜每个例子都带着「标准答案」，机器照着答案学。我们这个案例全是这一类。">监督学习</a></b>）。<br>
+    <b>没有</b>，只是想按相似性分堆 → <b>聚类</b>（<b><a class="tl" href="glossary.html#term-unsupervised-learning" title="无监督学习｜没有标准答案，机器只负责把「长得像的」归成一堆。">无监督</a></b>），比如把客户分成高/中/低活跃。</p></div>
+  <div class="step"><h4 id="sec4-3">第三问：是不是没有答案、也没有对错，只要求一个最优策略？</h4>
+    <p>是 → <b><a class="tl" href="glossary.html#term-rl" title="强化学习｜不告诉它对错，只给它「加分/扣分」，让它在反复试错里自己摸索出最优做法。">强化学习</a></b>：在环境里反复试错，做对了给奖励。典型如自动驾驶、游戏 AI、动态定价策略。</p></div>
+  <div class="step"><h4 id="sec4-4">第四问：前面都定了，还差什么？</h4>
+    <p>特征太多 → <b>降维/特征选择</b>；想要更稳 → <b><a class="tl" href="glossary.html#term-ensemble" title="集成学习｜多个模型一起投票，比单个模型更稳。GBDT、随机森林都是这一类。">集成</a></b>（多棵树投票 / 逐轮补差）；
+    要能给人解释 → 优先<b>单棵决策树或 <a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a></b>，别上黑箱<a class="tl" href="glossary.html#term-ensemble" title="集成学习｜多个模型一起投票，比单个模型更稳。GBDT、随机森林都是这一类。">集成</a>。</p></div>
+</div>
+
+<div class="note jade"><b>看完这一页，你只需要记住三句话</b><ol><li>记名字之前先记任务：<b>数字→回归，类别→分类，无标签→聚类，特征太多→降维</b>。</li><li>本案例预测的是<b>纯保费（连续数字）</b>，所以是回归；但落地动作是排序圈人，所以<b>看 <a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> 不看<a class="tl" href="glossary.html#term-accuracy-confusion-matrix-f1" title="准确率（混淆矩阵 · F1）｜准确率 = 猜对的比例；混淆矩阵 = 把「该抓抓了 / 该抓没抓 / 不该抓抓了 / 不…">准确率</a></b>。</li><li>「算法越复杂越好」是错的：<b>能解释、能落地</b>的算法，常常比高 1 个点准确率的黑箱值钱得多。</li></ol></div>
+
+<div class="codebar"><div class="cb-t">本页用到的代码</div><div class="cb-items"><a class="cb-i" href="src/models.html"><b>models</b><span>手写模型库（纯 NumPy）</span></a></div><a class="cb-all" href="code.html">全部代码 → 代码入口<span>42</span></a></div>
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-supervised-learning"><b>监督学习</b></a><span>每个例子都带着「标准答案」，机器照着答案学。我们这个案例全是这一类。</span></div><div class="t-item"><a href="glossary.html#term-regression"><b>回归（预测连续值）</b></a><span>要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。</span></div><div class="t-item"><a href="glossary.html#term-classification"><b>分类（预测类别）</b></a><span>要预测的结果是几个固定选项里的一个（会不会续保、是不是欺诈），模型学的是「打勾」。</span></div><div class="t-item"><a href="glossary.html#term-clustering"><b>聚类（无标签分组）</b></a><span>没有标准答案，模型自己按相似度把数据分成几堆，每堆起个名都不用你来定。</span></div><div class="t-item"><a href="glossary.html#term-dimensionality-reduction"><b>降维</b></a><span>把一大堆特征压成少数几个，尽量不丢关键信息。</span></div><div class="t-item"><a href="glossary.html#term-gbdt"><b>GBDT</b></a><span>一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。</span></div></div>
+<div class="pager">
+<a href="b14.html"><span class="dir">◀ 上一页</span>模型是怎么被教会的一趟下山路</a>
+<a class="next" href="b12.html"><span class="dir">下一页 ▶</span>遇到问题该选哪类模型</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

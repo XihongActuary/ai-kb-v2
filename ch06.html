@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>28 · 动画 · GBDT 逐轮补差 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav on" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="28">
+<div class="ph-kicker">
+<span class="ph-no">28</span>
+<span class="ph-part">第 2 段 · 端到端</span>
+<span class="ph-idx" title="你在第 28 页">共 43 页</span>
+</div>
+<h1>动画 · GBDT 逐轮补差</h1>
+<p class="ph-lead">GBDT 的全名叫「梯度提升决策树」。名字里的每个词都会吓跑外行，
+但它做的事一句话说完：<b>找一群成绩一般的学生，每人只负责纠正前面所有人留下的错误。</b></p>
+</header>
+<div class="toc"><div class="t">本页目录</div><a href="#sec2-1">每一轮发生的三件事</a><a href="#sec2-2">本库踩过的一个真实大坑：发散</a><a href="#wrap">收个尾：这个动画最终给出了什么</a></div>
+
+
+
+
+
+<div class="gof">
+  <div class="gof-h">本页要做的三件事</div><p class="gof-what">一棵树不够用怎么办？让第二棵树专门去补第一棵漏掉的部分，再来第三棵……</p>
+  <div class="gof-row"><span class="gof-k gof-goal">目标</span>
+    <div class="gof-v">看一堆「成绩平平的小树」，怎么靠「每人只补前人的错题」叠加成一台强模型。</div></div>
+  <div class="gof-row"><span class="gof-k gof-out">输出</span>
+    <div class="gof-v">八轮 <a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a> 逐轮补差的动画，外加本库踩过的「发散」大坑和修法。</div></div>
+  <div class="gof-row"><span class="gof-k gof-read">怎么读</span>
+    <div class="gof-v">盯误差曲线单调下降、每轮改善递减——这叫健康训练；中途反弹通常是<a class="tl" href="glossary.html#term-learning-rate" title="学习率｜每一轮「补差」时，只补一部分而不是全补。步子小一点更稳，但要多走几轮。">学习率</a>太大或树太深。</div></div>
+<div class="gof-row"><span class="gof-k gof-know">读完你会知道</span><div class="gof-v"><a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a> 就是「学生做题」：第一遍做完，第二遍只攻错题，几轮下来就接近满分。</div></div></div>
+
+<iframe class="anim-frame" src="anim_gbdt.html" title="GBDT 逐轮拟合" loading="lazy"></iframe>
+<a class="anim-open" href="anim_gbdt.html" target="_blank">▶ 新窗口全屏播放（可单独分享给同事）</a>
+
+<h2 id="sec2-1">每一轮发生的三件事</h2>
+<div class="fx">① 算<a class="tl" href="glossary.html#term-residual-gradient" title="残差（梯度）｜残差 = 真实值 − 当前预测值，也就是「还差多少」。梯度是它的方向版：往哪边补、补多大。">残差</a>：r = y − F（现在还差多少）　② 让一棵小树去拟合 r（只学一点点）　③ F ← F + <a class="tl" href="glossary.html#term-learning-rate" title="学习率｜每一轮「补差」时，只补一部分而不是全补。步子小一点更稳，但要多走几轮。">学习率</a> × 树的输出
+<small>学习率本库取 0.45：每轮只允许补上<a class="tl" href="glossary.html#term-residual-gradient" title="残差（梯度）｜残差 = 真实值 − 当前预测值，也就是「还差多少」。梯度是它的方向版：往哪边补、补多大。">残差</a>的四成半 —— 宁可慢，不许猛。
+代价也很直观：8 轮之后误差就降到了数据本身的<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声</a>水平（0.0084 对 0.0096），再练就是背答案，该停手了</small></div>
+<p>动画里可以看到三个关键现象：</p>
+<div class="steps">
+  <div class="step"><h4 id="sec4-1">没有哪棵树很聪明</h4>
+    <p>下方每一轮的小树都只有两三层，形状笨拙。它们单独拿出来，预测能力都不堪一用。</p></div>
+  <div class="step"><h4 id="sec4-2">但累加起来追上了 U 形</h4>
+    <p>U 形是 <a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a> 的天敌（一条直线永远画不出 U）。而 8 棵笨树加起来，红色实线
+    一圈圈贴向墨色虚线。<b>这就是「提升」（Boosting）的全部含义：把一群弱者组织成强者。</b></p></div>
+  <div class="step"><h4 id="sec4-3">修幅自动越来越小</h4>
+    <p>残差变小了，小树自然没东西可学。误差曲线单调下降、每轮改善递减——
+    这个形态就是「健康训练」。反过来，如果误差中途反弹，通常是学习率太大或树太深。</p></div>
+</div>
+
+<details class="fold why"><summary>每一轮新加的那棵树，凭什么可以「补残差」？</summary><div class="fold-body"><div class="fx">f<sub>t</sub> ≈ − ∂L(y, F) / ∂F　　（平方<a class="tl" href="glossary.html#term-loss-function" title="损失函数｜一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。">损失</a> L = ½(y−F)² 时，它正好等于 y − F）</div><p class="explain">每一轮要找一棵树 f，让总<a class="tl" href="glossary.html#term-loss-function" title="损失函数｜一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。">损失</a>降得最快；下降最快的方向就是<b>负梯度</b>。平方损失下它恰好等于残差（真实值 − 当前预测值），所以「补差」的直觉是对的——但严格说它补的是负梯度，残差只是平方损失时的特例。</p><ul class="sym"><li><code>F</code> — 到上一轮为止的累计预测</li><li><code>L</code> — 损失函数：猜错要扣多少分</li><li><code>∂L/∂F</code> — 损失对预测的梯度：往哪个方向改最划算</li></ul><p class="explain">换成别的损失函数（比如 <a class="tl" href="glossary.html#term-poisson-regression" title="泊松回归｜专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。">Poisson</a> deviance），负梯度就不再等于残差了，但「沿负梯度补一棵树」这件事依然成立。这也是为什么 GBDT 能适配各种损失。</p></div></details>
+
+<h2 id="sec2-2">本库踩过的一个真实大坑：发散</h2>
+<div class="note red">最初版本的 GBDT，误差不降反升，几百轮后预测值直接爆到天文数字。
+排查了三天，根因是<b>树在拟合目标时把当前预测 F 也包了进去，然后又把树输出整个加回 F</b>——
+等于每轮把「已经算过的部分」重复累加，指数发散。修复方式一句话：
+<b>树只学纯增量（残差），<a class="tl" href="glossary.html#term-tree-depth-leaf-node" title="树深与叶子｜深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容…">叶子</a>值 = −Σg/Σh，再配一个步长上限。</b>
+这个坑的教训：梯度提升类算法的「提升」，提升的必须是「残差」，不是任何别的东西。</div>
+
+<div class="quote q-talk"><span class="q-tag">说人话</span>
+<p><a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a> 像「一次性找对答案」，GBDT 像「反复修改草稿」：<b>每改一轮，都只改目前还错的部分，
+而且每次只允许改三成。</b>改到没有明显可改的为止。</p></div>
+<div class="quote q-mgmt"><span class="q-tag">管理启示</span>
+<p>GBDT 是精算定价里当之无愧的工业级主力（XGBoost / LightGBM 都是它的工程强化版），
+但它吃数据、也吃<a class="tl" href="glossary.html#term-hyperparameter-search" title="超参数搜索｜把几组候选超参数都试一遍（网格 = 全试，随机 = 抽着试），按验证集分数挑最好的那一组。">调参</a>。<b>一个只有几千样本的险种，从 GLM 起步几乎总是对的；
+样本上十万、特征交互复杂，才轮到 GBDT 上场。</b>工具先进不等于工具合适。</p></div>
+
+
+<h2 id="wrap">收个尾：这个动画最终给出了什么</h2>
+<div class="note jade"><b>它到底在解决什么问题：</b>一条直线画不出来的形状（U 形、拐点、<a class="tl" href="glossary.html#term-interaction-term" title="交互特征｜两个特征「搭在一起」才起作用的效果，单看任何一个都看不出来。比如「年轻」配「高性能车」。">交互作用</a>）怎么办。落到本案例要说实话：<b>GBDT 在这里打了败仗</b>——<a class="tl" href="glossary.html#term-frequency" title="出险频率｜一年里平均出几次险。是个「次数」，所以用泊松那套工具。">频率</a> GBDT 的 <a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> 0.657，低于<a class="tl" href="glossary.html#term-frequency" title="出险频率｜一年里平均出几次险。是个「次数」，所以用泊松那套工具。">频率</a> GLM 的 0.753，所以最终方案没选它。这一页的价值不是「它多强」，而是<b>告诉你它什么时候才该上场</b>：样本上十万、特征之间有真交互、且你能拿出时间<a class="tl" href="glossary.html#term-hyperparameter-search" title="超参数搜索｜把几组候选超参数都试一遍（网格 = 全试，随机 = 抽着试），按验证集分数挑最好的那一组。">调参</a>的时候。</div>
+
+<h4 id="sec4-4" class="sub">① 跑完之后，你手上多了什么东西</h4>
+
+<p>一台由 <b>8 棵笨树</b>叠起来的机器，和一条一路下降的误差曲线：</p>
+<div class="fx">F<sub>8</sub>(x) = F₀ + 0.45 × (f₁(x) + f₂(x) + … + f<sub>8</sub>(x))　　F₀ = 0（教学版从零起步）</div>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th class="num"><a class="tl" href="glossary.html#term-epoch-batch-iteration" title="轮次 / 一批 / 一次更新｜Epoch = 全部数据完整过一遍；Batch = 一次更新拿出的那一小批；Iterat…">轮次</a></th><th class="num"><a class="tl" href="glossary.html#term-mse" title="均方误差 MSE｜把每一次的误差（真实值 − 预测值）平方之后取平均。数字越小越好，0 = 全对。平方会重…">MSE</a></th><th>这一轮发生了什么</th></tr>
+<tr><td class="num">第 0 轮</td><td class="num">1.9143</td><td>还没开始，预测恒为 0</td></tr><tr><td class="num">第 1 轮</td><td class="num">0.6026</td><td>第一棵树上场，误差直接砍掉三分之二</td></tr><tr><td class="num">第 2 轮</td><td class="num">0.1940</td><td>继续补，形状开始贴向 U 形</td></tr><tr><td class="num">第 3 轮</td><td class="num">0.0680</td><td>两头翘起来了</td></tr><tr><td class="num">第 4 轮</td><td class="num">0.0282</td><td>细节越来越像</td></tr><tr><td class="num">第 5 轮</td><td class="num">0.0146</td><td>改善开始变小</td></tr><tr><td class="num">第 6 轮</td><td class="num">0.0100</td><td>接近<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声地板</a></td></tr><tr><td class="num">第 7 轮</td><td class="num">0.0084</td><td><b>已经贴平噪声（0.0083），该停了</b></td></tr><tr><td class="num">第 8 轮</td><td class="num">0.0077</td><td>再练就是在背噪声 —— 这一轮不该有</td></tr>
+</table></div>
+<div class="tbl-cap">数据本身带的噪声：理论<a class="tl" href="glossary.html#term-variance-standard-deviation" title="方差 / 标准差｜衡量一组数据有多分散。方差越大越散；标准差是方差开根号，好处是单位跟原始数据一样。">方差</a> 0.0096（±0.17 的均匀噪声），
+本批 80 个样本实测 0.0083。<b>第 7 轮的 0.0084 已经贴平，
+第 8 轮的 0.0077 已经低于它</b>——多出来的那点「进步」，是把噪声当规律背下来了。</div>
+<p><b>一句话：</b>它把 <a class="tl" href="glossary.html#term-mse" title="均方误差 MSE｜把每一次的误差（真实值 − 预测值）平方之后取平均。数字越小越好，0 = 全对。平方会重…">MSE</a> 从 1.9143 压到 0.0077，
+把一条直线画不出来的 U 形给画出来了。但同时它也清清楚楚地告诉你：
+<b>练到什么时候必须停</b>。</p>
+
+
+<h4 id="sec4-5" class="sub">② 最终的数学表达式，和怎么读它</h4>
+<details class="fold why"><summary>为什么「每人只补前人的错」加起来就会变强？</summary><div class="fold-body"><div class="fx">F<sub>t</sub>(x) = F<sub>t−1</sub>(x) + η · f<sub>t</sub>(x)　　f<sub>t</sub> ≈ − ∂L(y, F)/∂F　　（平方损失下 = y − F）</div><p class="explain">每一轮要做的事是：<b>找一棵树，让总损失降得最快</b>。下降最快的方向是<b>负梯度</b>；平方损失下它恰好等于残差（真实值 − 当前预测）。所以「补差」这个直觉是对的，但严格说补的是负梯度，残差只是平方损失时的特例。再乘一个小于 1 的学习率 η：<b>每轮只允许补上一部分</b>——慢一点，但不至于一脚踩过。</p><ul class="sym"><li><code>F</code> — 到上一轮为止的累计预测</li><li><code>η</code> — 学习率，本例 0.45：每轮只补残差的四成半</li><li><code>f_t</code> — 这一轮新加的小树，深度只有 2</li><li><code>∂L/∂F</code> — 损失对预测的梯度：往哪个方向改最划算</li></ul><p class="explain">换成别的损失（比如 <a class="tl" href="glossary.html#term-poisson-regression" title="泊松回归｜专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。">Poisson</a> deviance），负梯度就不再等于残差了，但「沿负梯度补一棵树」这件事依然成立——这也是 GBDT 能适配各种损失的原因。本案例的 GBDT 用的是 Poisson deviance，所以它的树拟合的不是 y − F，而是 <code>F + g/h</code>（见案例代码）。</p></div></details>
+
+<h4 id="sec4-6" class="sub">③ 代码在哪，每一段在干什么</h4>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>点开看代码（新窗口）</th><th>这段代码负责哪一步</th></tr>
+<tr><td><a class="codelink" href="src/anim_gbdt.html#L15-L46" target="_blank" rel="noopener">动画 · fitStump<span class="cl-ln">L15–46</span></a></td><td>一棵深度 2 的<a class="tl" href="glossary.html#term-regression" title="回归（预测连续值）｜要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。">回归</a>树：穷举切分点，挑让残差平方和最小的那刀，<a class="tl" href="glossary.html#term-tree-depth-leaf-node" title="树深与叶子｜深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容…">叶子</a>值取组内残差的<b>均值</b>。注意那句 <code>bs.sse &gt;= node.sse0*0.98</code>——<b>这一刀只能削掉不到 2% 的误差就不切了</b>，防止无意义地长深。</td></tr><tr><td><a class="codelink" href="src/anim_gbdt.html#L58-L65" target="_blank" rel="noopener">动画 · 主循环<span class="cl-ln">L58–65</span></a></td><td>整个 Boosting 的骨架就这 8 行：算残差 → 拟合一棵树 → <code>F ← F + η × 树输出</code>。<b>「提升」两个字，全部内容在这里。</b></td></tr><tr><td><a class="codelink" href="src/models.html#L479-L521" target="_blank" rel="noopener">案例 · GBDT.fit<span class="cl-ln">L479–521</span></a></td><td>案例里的真家伙：用 Poisson deviance 的梯度 g 和二阶信息 h，让树去拟合 <code>F + g/h</code>，再用 η 累加。60 轮、学习率 0.08、叶子至少 30 人——比动画保守得多（动画是为了让你看清，不是为了打比赛）。</td></tr><tr><td><a class="codelink" href="src/models.html#L449-L478" target="_blank" rel="noopener">案例 · _set_leaf_values<span class="cl-ln">L449–478</span></a></td><td><b>整个 XGBoost 的核心就是这一行</b>：叶子值 v = −Σ(w·g) / Σ(w·h)，再夹在 ±step_cap 里。本库在这里踩过三天的大坑——早期版本让树把当前预测 F 也包进去拟合，又把树输出整个加回 F，每轮重复累加以至于<b>指数发散</b>。修法就一句话：<b>树只学纯增量</b>。</td></tr>
+</table></div>
+<p class="explain">三个动画放在一起看：<a href="x02.html">X02 一页看懂三个动画</a>。</p>
+
+
+<div class="codebar"><div class="cb-t">本页用到的代码</div><div class="cb-items"><a class="cb-i" href="src/anim_gbdt.html"><b>anim_gbdt</b><span>GBDT 逐轮补残差（动画源码）</span></a><a class="cb-i" href="src/models.html"><b>models</b><span>手写模型库（纯 NumPy）</span></a></div><a class="cb-all" href="code.html">全部代码 → 代码入口<span>42</span></a></div>
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-gbdt"><b>GBDT</b></a><span>一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。</span></div><div class="t-item"><a href="glossary.html#term-residual-gradient"><b>残差（梯度）</b></a><span>残差 = 真实值 − 当前预测值，也就是「还差多少」。梯度是它的方向版：往哪边补、补多大。</span></div><div class="t-item"><a href="glossary.html#term-learning-rate"><b>学习率</b></a><span>每一轮「补差」时，只补一部分而不是全补。步子小一点更稳，但要多走几轮。</span></div><div class="t-item"><a href="glossary.html#term-mse"><b>MSE</b></a><span>把每一次的误差（真实值 − 预测值）平方之后取平均。数字越小越好，0 = 全对。平方会重罚离谱的大错。</span></div><div class="t-item"><a href="glossary.html#term-ensemble"><b>集成学习</b></a><span>多个模型一起投票，比单个模型更稳。GBDT、随机森林都是这一类。</span></div><div class="t-item"><a href="glossary.html#term-noise"><b>噪声</b></a><span>数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。</span></div></div>
+<div class="pager">
+<a href="ch05.html"><span class="dir">◀ 上一页</span>动画 · 决策树挑问题</a>
+<a class="next" href="ch07.html"><span class="dir">下一页 ▶</span>选择偏差：审计样本的坑</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

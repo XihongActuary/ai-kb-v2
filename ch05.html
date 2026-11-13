@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>27 · 动画 · 决策树挑问题 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav on" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="27">
+<div class="ph-kicker">
+<span class="ph-no">27</span>
+<span class="ph-part">第 2 段 · 端到端</span>
+<span class="ph-idx" title="你在第 27 页">共 43 页</span>
+</div>
+<h1>动画 · 决策树怎么挑问题</h1>
+<p class="ph-lead">GLM 只会画直线。决策树换了一种完全不同的思路：<b>不写公式，只问问题</b>。
+一连串的「年龄小于 30 吗？」「里程超过两万吗？」问下来，人群就被分出了风险层次。</p>
+</header>
+<div class="toc"><div class="t">本页目录</div><a href="#sec2-1">这一页要建立的直觉：分裂收益</a><a href="#sec2-2">三个你一定会问的问题</a><a href="#wrap">收个尾：这个动画最终给出了什么</a></div>
+
+
+
+
+
+<div class="gof">
+  <div class="gof-h">本页要做的三件事</div><p class="gof-what">点开动画，看机器怎么挑出「该先问哪个问题」。它会把所有可能的问法都试一遍。</p>
+  <div class="gof-row"><span class="gof-k gof-goal">目标</span>
+    <div class="gof-v">看机器怎么挑出「该先问哪个问题」，把人群切出风险层次。</div></div>
+  <div class="gof-row"><span class="gof-k gof-out">输出</span>
+    <div class="gof-v">一次<a class="tl" href="glossary.html#term-decision-tree" title="决策树｜一串 if-else 问题：「年龄&lt;25？是→车值&gt;30万？否→…」走到底就得答案。">决策树</a>分裂的动画，外加「<a class="tl" href="glossary.html#term-impurity" title="不纯度｜衡量「一堆人混得有多乱」。全是一样的就不纯=0，好坏各一半就最乱。">不纯度</a>」这把尺子的解释。</div></div>
+  <div class="gof-row"><span class="gof-k gof-read">怎么读</span>
+    <div class="gof-v">看动画下方曲线找谷底——谷底就是这一层最能分组的问题；树的每条路径都能翻译成一句人话，所以监管沟通天然友好。</div></div>
+<div class="gof-row"><span class="gof-k gof-know">读完你会知道</span><div class="gof-v"><a class="tl" href="glossary.html#term-decision-tree" title="决策树｜一串 if-else 问题：「年龄&lt;25？是→车值&gt;30万？否→…」走到底就得答案。">决策树</a>每次挑能让两边各自最「纯」的那一刀。所谓纯，就是那一堆人好坏比例别各占一半。</div></div></div>
+
+<iframe class="anim-frame" src="anim_tree.html" title="决策树的一次分裂" loading="lazy"></iframe>
+<a class="anim-open" href="anim_tree.html" target="_blank">▶ 新窗口全屏播放（可单独分享给同事）</a>
+
+<h2 id="sec2-1">这一页要建立的直觉：<a class="tl" href="glossary.html#term-gain" title="分裂收益 Gain｜切一刀「值不值」的度量：切之前的混乱 − 切之后的加权混乱。差得越多，这一刀越值。">分裂收益</a></h2>
+<p>树每问一个问题之前，会把所有候选问题都试一遍——每一个候选切分点都算一次
+「切完之后两边红绿分开了多少」。衡量「混在一起的程度」的尺子叫<b><a class="tl" href="glossary.html#term-impurity" title="不纯度｜衡量「一堆人混得有多乱」。全是一样的就不纯=0，好坏各一半就最乱。">不纯度</a></b>（本库用<a class="tl" href="glossary.html#term-gini" title="基尼不纯度｜和熵一样的「混乱尺」，只是算法不同：随机抓两个人，他俩不一样的概率。0 = 全一样，0.…">基尼系数</a>）：</p>
+<div class="fx"><a class="tl" href="glossary.html#term-gini" title="基尼不纯度｜和熵一样的「混乱尺」，只是算法不同：随机抓两个人，他俩不一样的概率。0 = 全一样，0.…">基尼</a> = 2p(1−p)　　p = 组内高风险司机的占比
+<small>全红或全绿时 p=0 或 1，基尼=0（最纯）；五五开时 p=0.5，基尼=0.5（最混）</small></div>
+<p>动画下方的曲线就是每个候选问题的不纯度：<b>谷底就是这一层最会分组的问题</b>；
+曲线上那条红色虚线是「切之前有多乱」，<b>虚线到曲线的落差就是这一刀的收益 <a class="tl" href="glossary.html#term-gain" title="分裂收益 Gain｜切一刀「值不值」的度量：切之前的混乱 − 切之后的加权混乱。差得越多，这一刀越值。">Gain</a></b>。
+树的生长过程，就是「找谷底 → 切下去 → 在每一片里再找谷底」的递归。</p>
+<div class="note jade"><b>看晕了先看这里：</b>动画一共切三刀，第 2 刀只在<b>左半边</b>那
+20 人里找、第 3 刀只在<b>右半边</b>那 36 人里找（所以第 3 刀的线只画在竖线右边）。
+「第三刀到底切在哪」「收益 Gain 怎么算」，<a href="#howgain">这一页最后有一段全程手算</a>。</div>
+
+<h2 id="sec2-2">三个你一定会问的问题</h2>
+<h4 id="sec4-1" class="sub">切多细才算细？</h4>
+<p>什么时候停止分裂由<a class="tl" href="glossary.html#term-hyperparameter" title="超参数｜不是学出来的，是人提前定好的「旋钮」，比如树最多分几层、学多快。">超参数</a>决定：<code>max_depth</code>（最多问几层问题）、
+<code>min_samples_leaf</code>（一片<a class="tl" href="glossary.html#term-tree-depth-leaf-node" title="树深与叶子｜深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容…">叶子</a>里最少要有多少人）。本库用的是深度 4、<a class="tl" href="glossary.html#term-tree-depth-leaf-node" title="树深与叶子｜深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容…">叶子</a>至少 40 人。
+<b>限制树的大小不是为了省内存，是为了防背题</b>——不设限的树会把训练集里每个人
+都背下来，考试（测试集）一塌糊涂。</p>
+<h4 id="sec4-2" class="sub">为什么本案例里树反而打不过 <a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a>？</h4>
+<p>第 25 页的组合表：<a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a> <a class="tl" href="glossary.html#term-frequency" title="出险频率｜一年里平均出几次险。是个「次数」，所以用泊松那套工具。">频率</a>（②）<a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> 0.657 &lt; <a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a> <a class="tl" href="glossary.html#term-frequency" title="出险频率｜一年里平均出几次险。是个「次数」，所以用泊松那套工具。">频率</a>（①）0.753。
+因为本案例的频率规律接近线性，而单棵树的阶梯形逼近天生粗糙、还容易<a class="tl" href="glossary.html#term-overfitting" title="过拟合｜把训练题背得滚瓜烂熟，一换新题就崩。记住了噪声，没学到规律。">过拟合</a>。
+<b>树的优势场景是规律里真有拐点和交互时</b>——比如「年轻 且 开性能车」的组合风险陡增。
+本案例没埋这种交互，树就露了怯。这是好事：你亲眼看到了「模型没有免费午餐」。</p>
+<h4 id="sec4-3" class="sub">单棵树这么平庸，为什么业界都在用它？</h4>
+<p>因为<b>树是 <a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a> 的积木</b>。下一页你会看到：几百棵平庸的小树怎么叠加成一台
+高性能机器。单棵树的价值不在预测，在于它是一块可解释、可组合的砖。</p>
+
+<div class="quote q-talk"><span class="q-tag">说人话</span>
+<p>决策树是一个连续追问「是 / 否」的主持人和你玩二十个问题：
+<b>每个问题都挑「能把人群分得最开」的那个问</b>。它的全部聪明，就是会挑问题。</p></div>
+<div class="quote q-mgmt"><span class="q-tag">管理启示</span>
+<p>树的每条路径都能翻译成一句人话（「年龄≤30 且 年里程>3万 → 高风险」），
+所以监管沟通、总精答辩、向董事会解释，树模型是天然友好的。
+但要当心：<b>「能解释」和「可信」是两回事</b>——一条清晰的错误规则比一团模糊的正确公式更危险。</p></div>
+
+
+<h2 id="wrap">收个尾：这个动画最终给出了什么</h2>
+<div class="note jade"><b>它到底在解决什么问题：</b><b>一个公式都不写</b>，只靠一串「是 / 否」问题，把人群切出风险高低不同的组，而且每组都能翻译成一句人话。落到本案例：<b><a class="tl" href="glossary.html#term-loss-function" title="损失函数｜一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。">损失</a>额链用的就是单棵树</b>——组合①「频率 GLM × <a class="tl" href="glossary.html#term-loss-function" title="损失函数｜一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。">损失</a>单树」（<a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> 0.753）和组合③（AUC 0.885）里的那个「损失单树」。</div>
+
+<h4 id="sec4-4" class="sub">① 跑完之后，你手上多了什么东西</h4>
+
+<p>一棵<b>问 3 个问题</b>的树，和 4 片能翻译成人话的叶子：</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>第几刀</th><th>问的问题</th><th class="num">收益 Gain</th>
+    <th class="num">切到左边</th><th class="num">切到右边</th></tr>
+<tr><td><b>第 1 刀</b></td><td>年龄 ≤ 36 岁</td><td class='num'>0.1123</td><td class='num'>20 人 · 55% 高风险</td><td class='num'>36 人 · 6% 高风险</td></tr><tr><td><b>第 2 刀</b></td><td>年里程 ≤ 27,707 公里</td><td class='num'>0.1879</td><td class='num'>11 人 · 27% 高风险</td><td class='num'>9 人 · 89% 高风险</td></tr><tr><td><b>第 3 刀</b></td><td>年里程 ≤ 27,278 公里</td><td class='num'>0.0055</td><td class='num'>17 人 · 0% 高风险</td><td class='num'>19 人 · 10% 高风险</td></tr>
+</table></div>
+<div class="tbl-cap">起点：56 人里有 13 个高风险（23.2%），
+不纯度 0.3565。3 刀切出 4 片叶子，
+最纯的一片 17 人、高风险占比 <b>0%</b>，
+最脏的一片 9 人、<b>89%</b>——
+从「混在一起」变成了「能分开说」。</div>
+
+<h4 id="howgain" class="sub">最容易看晕的地方：第三刀切在哪 · 收益 Gain 怎么算</h4>
+<p><b>先说它切在哪。</b>第 1 刀（年龄 ≤ 36 岁）把 56 人切成两片：
+<b>左组 20 人</b>（55% 高风险）和<b>右组 36 人</b>（6% 高风险）。
+第 2 刀只在<b>左组那 20 人</b>里找，第 3 刀只在<b>右组那 36 人</b>里找——
+所以动画里第 3 刀那条横线<b>只画在竖线的右半边</b>，跟左半边的人毫无关系。
+三个认路的标志：右侧面板「正在切第几刀 · 哪一片」会实时写着「第 3 刀 · 右组 36 人」；
+画面上第 3 刀的线只占右半格；曲线区那句标题也写着「第 3 刀（右组 36 人）」。</p>
+<p><b>再说 Gain 怎么算。</b>下面这张表就是第三刀从头到尾的手算过程——
+全程只有加减乘除，没有任何黑箱。<b>记住一句话就够：收益 = 切之前有多乱 − 切之后有多乱。</b></p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>步骤</th><th>算式</th><th class="num">结果</th></tr>
+<tr><td>① 切之前（右组 36 人，其中 2 人高风险）</td><td>p = 2 / 36 = 0.056　Gini = 2p(1−p)</td><td class='num'>0.1049</td></tr><tr><td>② 切出左边（17 人，其中 0 人高风险）</td><td>p = 0 / 17 = 0.000　Gini = 2 × 0.000 × 1.000</td><td class='num'>0.0000</td></tr><tr><td>③ 切出右边（19 人，其中 2 人高风险）</td><td>p = 2 / 19 = 0.105　Gini = 2 × 0.105 × 0.895</td><td class='num'>0.1884</td></tr><tr><td>④ 按人数加权平均（切完之后）</td><td>(17 × 0.0000 + 19 × 0.1884) / 36</td><td class='num'>0.0994</td></tr><tr><td>⑤ <b>收益 = 切之前 − 切之后</b></td><td><b>0.1049 − 0.0994</b></td><td class='num'><b>0.0055</b></td></tr>
+</table></div>
+<div class="tbl-cap">动画里那条红色虚线就是「切之前」的 0.1049，
+绿线谷底就是「切之后」的 0.0994，<b>两条线之间的落差</b>就是 0.0055。</div>
+<p><b>为什么这么小？两个原因叠在一起：</b></p>
+<div class="steps">
+  <div class="step"><h4 id="sec4-5">天花板本来就低</h4>
+    <p>右组 36 人里只有 6% 是高风险，切之前的不纯度只有 0.1049。
+    <b>哪怕切成两片全纯，收益最多也就这么多。</b>第一刀面对的是 0.3565，
+    那是二十倍的空间。</p></div>
+  <div class="step"><h4 id="sec4-6">右边那一片反而更脏</h4>
+    <p>切完之后右边 0.1884 &gt; 切之前 0.1049——
+    <b>这一刀其实把高风险都赶到了一小撮人里，那一撮反而更混了</b>。
+    全靠左边 17 人「0% 高风险」那一片是纯的，才把加权平均值拉下来一点点。
+    <b>看起来分开了，其实没分出新信息。</b></p></div>
+</div>
+<div class="note jade"><b>对照着看第一刀，就明白「值不值」长什么样：</b>
+切之前 0.3565 → 切之后 0.2442，收益 0.1123；
+第二刀 0.4950 → 0.3071，收益 0.1879（三刀里最值的一刀）；
+第三刀 0.1049 → 0.0994，收益只有 0.0055。
+<b>三刀的落差画在同一张图上，肉眼就能比出来。</b></div>
+
+<p><b>一句话：</b>树交出来的不是公式，是<b>一份分组规则</b>——
+「年龄 ≤ 36 岁 且 年里程 &gt; 27,707 公里 → 高风险占比 89%」。
+这种东西可以直接拿去跟监管、跟总精、跟董事会对口径。</p>
+<div class="note red"><b>所以真实的树必须自带刹车：</b>
+第三刀这种「切了跟没切一样」的刀，肉眼很难看出来，得让代码替你踩——
+<code>min_gain</code>（收益低于某个值就不切）、<code>max_depth</code>（最多问几层）、
+<code>min_samples_leaf</code>（一片叶子里最少留多少人）。本库案例取的是深度 4、叶子至少 40 人。
+不刹车的后果：树会一直切到每个叶子里只剩几个人，<b>把巧合当成规律背下来</b>。</div>
+
+
+<h4 id="sec4-7" class="sub">② 最终的数学表达式，和怎么读它</h4>
+<details class="fold why"><summary>树凭什么知道「该问哪个问题」？</summary><div class="fold-body"><div class="fx">Gain(a, t) = Gini(父) − [ n_L/n · Gini(左) + n_R/n · Gini(右) ]　　Gini = 2p(1−p)　　p = 组内高风险占比</div><p class="explain">它把<b>所有候选问题都试一遍</b>，每个都算一次「切完之后两边是不是更不混了」，挑效果最好的那个问。衡量「混」的尺子是基尼系数 Gini = 2p(1−p)：全红或全绿时是 0（最纯），五五开时是 0.5（最混）。<b>换个说法更好记：基尼就是「在这组人里随便抓两个，他们恰好不一样」的概率。</b>切完两边各自的基尼按人数加权平均，比切之前小多少，就是这一刀的收益。</p><ul class="sym"><li><code>a, t</code> — 候选问题：哪个属性、切在什么值上</li><li><code>n_L, n_R</code> — 切完两边各有多少人，用来加权</li><li><code>Gini(·)</code> — 不纯度：0 = 全同一种人，0.5 = 五五开最混</li><li><code>Gain</code> — 这一刀的收益：不纯度下降了多少，越大越好</li></ul><p class="explain">注意这个准则<b>只关心「纯不纯」，不关心「对不对」</b>——它是纯贪心的：每一层只挑当前最优，不保证<a class="tl" href="glossary.html#term-local-global-minimum" title="局部最优 / 全局最优｜局部最优是当前这个小坑的最低点，跳出就更高；全局最优是整个山谷的最低点。">全局最优</a>。所以树天生容易把训练集的巧合背下来，必须靠 max_depth / <a class="tl" href="glossary.html#term-pruning-stopping-rule" title="剪枝与停止条件｜提前给树立规矩：最多几层、一片叶子最少几个人、收益低于多少就别再切。目的是不让它长疯。">min_samples_leaf</a> 勒住。案例代码里的 <a class="tl" href="glossary.html#term-pruning-stopping-rule" title="剪枝与停止条件｜提前给树立规矩：最多几层、一片叶子最少几个人、收益低于多少就别再切。目的是不让它长疯。">min_samples_leaf</a> = 40 就是干这个的。</p></div></details>
+
+<h4 id="sec4-8" class="sub">③ 代码在哪，每一段在干什么</h4>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>点开看代码（新窗口）</th><th>这段代码负责哪一步</th></tr>
+<tr><td><a class="codelink" href="src/anim_tree.html#L13-L19" target="_blank" rel="noopener">动画 · gini<span class="cl-ln">L13–19</span></a></td><td>那把尺子：数一数这组里有几个高风险，算出 p，再套 2p(1−p)。就这么短。</td></tr><tr><td><a class="codelink" href="src/anim_tree.html#L26-L34" target="_blank" rel="noopener">动画 · splitGain<span class="cl-ln">L26–34</span></a></td><td>试一刀：按 (属性, <a class="tl" href="glossary.html#term-threshold-cut-off" title="阈值（切点）｜把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。">阈值</a>) 把人分到左右两边，算加权不纯度和收益。里面那句 <code>L.length&lt;MINLEAF</code>（MINLEAF=5）就是<b>「叶子太小不许切」</b>——本页表格里那些数字都建立在这条约束上。</td></tr><tr><td><a class="codelink" href="src/models.html#L312-L346" target="_blank" rel="noopener">案例 · _best_split<span class="cl-ln">L312–346</span></a></td><td>案例里的工业版：先把连续变量<b><a class="tl" href="glossary.html#term-binning" title="分箱（离散化）｜把连续的数字切成几段（年龄 18–25、26–35…），每段当成一类。能扛住极端值，也更…">分箱</a>成 24 档</b>再扫（快得多），全程带样本权重 w，并且强制 <code>min_samples_leaf = 40</code>——低于 40 人的叶子一律不切。动画的 5 人是教学版，40 人才是能用的版本。</td></tr><tr><td><a class="codelink" href="src/models.html#L347-L363" target="_blank" rel="noopener">案例 · _build<span class="cl-ln">L347–363</span></a></td><td>递归生长：切一刀 → 在左右两片里各重复一遍 → 到深度上限或人不够就停。<b>树的全部结构就是这几行</b>。</td></tr><tr><td><a class="codelink" href="src/models.html#L377-L391" target="_blank" rel="noopener">案例 · export_rules<span class="cl-ln">L377–391</span></a></td><td>把树翻译成一行行「如果…那么…」的规则文本。这是树模型真正的杀手锏——<b>给监管和总精看的东西就出自这里</b>。</td></tr>
+</table></div>
+<p class="explain">三个动画放在一起看：<a href="x02.html">X02 一页看懂三个动画</a>。</p>
+
+
+<div class="codebar"><div class="cb-t">本页用到的代码</div><div class="cb-items"><a class="cb-i" href="src/anim_tree.html"><b>anim_tree</b><span>决策树怎么挑分裂点（动画源码）</span></a><a class="cb-i" href="src/models.html"><b>models</b><span>手写模型库（纯 NumPy）</span></a></div><a class="cb-all" href="code.html">全部代码 → 代码入口<span>42</span></a></div>
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-decision-tree"><b>决策树</b></a><span>一串 if-else 问题：「年龄<25？是→车值>30万？否→…」走到底就得答案。</span></div><div class="t-item"><a href="glossary.html#term-impurity"><b>不纯度</b></a><span>衡量「一堆人混得有多乱」。全是一样的就不纯=0，好坏各一半就最乱。</span></div><div class="t-item"><a href="glossary.html#term-gini"><b>Gini</b></a><span>和熵一样的「混乱尺」，只是算法不同：随机抓两个人，他俩不一样的概率。0 = 全一样，0.5 = 最乱。</span></div><div class="t-item"><a href="glossary.html#term-gain"><b>Gain</b></a><span>切一刀「值不值」的度量：切之前的混乱 − 切之后的加权混乱。差得越多，这一刀越值。</span></div><div class="t-item"><a href="glossary.html#term-tree-depth-leaf-node"><b>树深与叶子</b></a><span>深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容易把巧合当成规律。</span></div><div class="t-item"><a href="glossary.html#term-precision-purity"><b>精确率（圈选纯度）</b></a><span>你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。</span></div></div>
+<div class="pager">
+<a href="ch04.html"><span class="dir">◀ 上一页</span>动画 · Poisson GLM 迭代</a>
+<a class="next" href="ch06.html"><span class="dir">下一页 ▶</span>动画 · GBDT 逐轮补差</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

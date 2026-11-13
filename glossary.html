@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>41 · 术语表 · 中英双语 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav on" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="41">
+<div class="ph-kicker">
+<span class="ph-no">41</span>
+<span class="ph-part">第 3 段 · 附录</span>
+<span class="ph-idx" title="你在第 41 页">共 43 页</span>
+</div>
+<h1>术语表 · 中英双语大白话</h1>
+<p class="ph-lead">遇到看不懂的词，回来这里查。
+每个词都配了「一句话大白话」和「一个生活类比」——
+<b>没有任何一条是用术语解释术语的</b>。如果发现哪条你看不懂，那就是我们写错了。</p>
+</header>
+<div class="toc"><div class="t">本页目录</div><a href="#c-地基">地基先搞清这些词，后面才不悬空</a><a href="#c-数据与模型">数据与模型机器看到的东西，和它拿出来的东西</a><a href="#c-算法与训练">算法与训练机器是怎么「学会」的</a><a href="#c-评价与判断">评价与判断怎么知道它学得对不对、什么时候会骗你</a><a href="#c-本案例专有">本案例专有车险定价这个场景里才会遇到的词</a><a href="#c-业务与上线">业务与上线模型之外的事：怎么落地、怎么盯着</a></div>
+
+<div class="plain"><div class="p-row"><span class="p-q">这一页在讲什么</span><p>全库术语的中英双语大白话对照表，支持实时搜索。</p></div><div class="p-row"><span class="p-q">读完你会知道</span><p class="p-know">每条都配一句话白话和一个生活类比；看不懂的词不用背，回来查就行。</p></div></div>
+
+
+
+<div class="note jade"><b>怎么用这张表：</b>上面方框里输入中文或英文，实时过滤。
+<b>正文里凡是带虚线下划线的词，点一下就直接落到这一条的对应位置</b>，
+鼠标停在上面还会先浮出一句大白话解释，多数时候不必离开正在读的那页。
+每条末尾的链接可以跳到它「在本案例里被真正用到」的那一页——
+术语不悬空，看它怎么被用一次，比背十遍定义管用。</div>
+
+<div class="gsearch">
+<input id="q" type="text" placeholder="输入中文或英文，例如：IPW / 外推 / 过拟合 / GBDT">
+<span class="cnt" id="cnt"></span>
+</div>
+<h2 id="c-地基">地基<span class="cat-desc">先搞清这些词，后面才不悬空</span></h2><div class="gloss"><div class="g-item" id="term-ai" data-k="人工智能 Artificial Intelligence AI 人工智能 让机器去做「原本只有人才能做的判断」。是个大伞，下面罩着机器学习。">
+  <div class="g-head"><span class="g-abbr">AI</span><span class="g-zh">人工智能</span>
+    <span class="g-en">Artificial Intelligence</span><a class="g-anchor" href="#term-ai" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">让机器去做「原本只有人才能做的判断」。是个大伞，下面罩着机器学习。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 像「交通工具」这个词 —— 自行车、汽车、高铁都算，AI 也是这么个大词。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-ml" data-k="机器学习 Machine Learning ML 机器学习 不把规则写死，而是让机器自己从一堆过去的例子里「总结」出规律。">
+  <div class="g-head"><span class="g-abbr">ML</span><span class="g-zh">机器学习</span>
+    <span class="g-en">Machine Learning</span><a class="g-anchor" href="#term-ml" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">不把规则写死，而是让机器自己从一堆过去的例子里「总结」出规律。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 教小孩认猫：你不说「猫有尖耳朵」，而是给他看 100 张照片，他自己琢磨出来。</div>
+  <div class="g-pages">本案例出现在：<a href="b01.html">B01</a><a href="b07.html">B07</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-dl" data-k="深度学习 Deep Learning DL 深度学习 机器学习里的一个分支，用很多层「小计算器」叠起来，擅长处理图像、语音、文字这类复杂东西。">
+  <div class="g-head"><span class="g-abbr">DL</span><span class="g-zh">深度学习</span>
+    <span class="g-en">Deep Learning</span><a class="g-anchor" href="#term-dl" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">机器学习里的一个分支，用很多层「小计算器」叠起来，擅长处理图像、语音、文字这类复杂东西。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 普通的 ML 像一个人看表格；深度学习像一整个流水线车间，每层干一点粗活，最后拼出答案。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a></div>
+</div><div class="g-item" id="term-rl" data-k="强化学习 Reinforcement Learning RL 强化学习 不告诉它对错，只给它「加分/扣分」，让它在反复试错里自己摸索出最优做法。">
+  <div class="g-head"><span class="g-abbr">RL</span><span class="g-zh">强化学习</span>
+    <span class="g-en">Reinforcement Learning</span><a class="g-anchor" href="#term-rl" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">不告诉它对错，只给它「加分/扣分」，让它在反复试错里自己摸索出最优做法。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 训狗：做对了给零食，做错了不给。它不知道规则，但慢慢知道该怎么做。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a></div>
+</div><div class="g-item" id="term-supervised-learning" data-k="监督学习 Supervised Learning  监督学习 每个例子都带着「标准答案」，机器照着答案学。我们这个案例全是这一类。">
+  <div class="g-head"><span class="g-zh">监督学习</span>
+    <span class="g-en">Supervised Learning</span><a class="g-anchor" href="#term-supervised-learning" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">每个例子都带着「标准答案」，机器照着答案学。我们这个案例全是这一类。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 做带答案的习题册 —— 做完一对答案，就知道自己错在哪。</div>
+  <div class="g-pages">本案例出现在：<a href="b01.html">B01</a><a href="b07.html">B07</a></div>
+</div><div class="g-item" id="term-unsupervised-learning" data-k="无监督学习 Unsupervised Learning  无监督 没有标准答案，机器只负责把「长得像的」归成一堆。">
+  <div class="g-head"><span class="g-zh">无监督学习</span>
+    <span class="g-en">Unsupervised Learning</span><a class="g-anchor" href="#term-unsupervised-learning" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">没有标准答案，机器只负责把「长得像的」归成一堆。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 给你一屋子书，没告诉你分类标准，你自己按厚薄、颜色分成几摞。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a></div>
+</div><div class="g-item" id="term-semi-supervised-learning" data-k="半监督学习 Semi-supervised Learning  半监督 一部分例子有答案、另一部分没有，两边一起用来学。">
+  <div class="g-head"><span class="g-zh">半监督学习</span>
+    <span class="g-en">Semi-supervised Learning</span><a class="g-anchor" href="#term-semi-supervised-learning" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一部分例子有答案、另一部分没有，两边一起用来学。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 只背了 10 道例题，剩下的 100 道自己照着例题的思路推 —— 有答案的那 10 道是扶手。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a></div>
+</div><div class="g-item" id="term-dimensionality-reduction" data-k="降维 Dimensionality Reduction  降维 把一大堆特征压成少数几个，尽量不丢关键信息。">
+  <div class="g-head"><span class="g-zh">降维</span>
+    <span class="g-en">Dimensionality Reduction</span><a class="g-anchor" href="#term-dimensionality-reduction" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把一大堆特征压成少数几个，尽量不丢关键信息。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一张 200 页的体检报告，医生只给你看 3 张关键化验单 —— 页数少了，病没看丢。</div>
+  <div class="g-pages">本案例出现在：<a href="b11.html">B11</a></div>
+</div><div class="g-item" id="term-probability" data-k="概率 Probability  概率 一件事发生的可能性，写成 0 到 1 之间的一个数。0 是绝不可能，1 是一定发生。">
+  <div class="g-head"><span class="g-zh">概率</span>
+    <span class="g-en">Probability</span><a class="g-anchor" href="#term-probability" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一件事发生的可能性，写成 0 到 1 之间的一个数。0 是绝不可能，1 是一定发生。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 天气预报说降水概率 30% —— 不是「下三分之一的雨」，而是同样条件下十次里大约三次会下。</div>
+  <div class="g-pages">本案例出现在：<a href="b02.html">B02</a><a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-distribution" data-k="分布 Distribution  分布 把所有可能的结果、以及它们各自出现的机会，摆在一张图上。看形状就知道「常见什么样、罕见什么样」。">
+  <div class="g-head"><span class="g-zh">分布</span>
+    <span class="g-en">Distribution</span><a class="g-anchor" href="#term-distribution" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把所有可能的结果、以及它们各自出现的机会，摆在一张图上。看形状就知道「常见什么样、罕见什么样」。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 全班身高的分布图：大部分人挤在 165 上下，特别高和特别矮的都只有一两个。</div>
+  <div class="g-pages">本案例出现在：<a href="b02.html">B02</a><a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-expected-value" data-k="期望 Expected Value  期望 把所有可能的结果按概率加权平均出来的「长期平均值」。注意它不是「最可能出现的那个值」。">
+  <div class="g-head"><span class="g-zh">期望</span>
+    <span class="g-en">Expected Value</span><a class="g-anchor" href="#term-expected-value" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把所有可能的结果按概率加权平均出来的「长期平均值」。注意它不是「最可能出现的那个值」。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 掷骰子的期望是 3.5 点 —— 你永远掷不出 3.5，但掷一万次平均下来就是它。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-variance-standard-deviation" data-k="方差 / 标准差 Variance / Standard Deviation  方差 标准差 standard deviation 衡量一组数据有多分散。方差越大越散；标准差是方差开根号，好处是单位跟原始数据一样。">
+  <div class="g-head"><span class="g-zh">方差 / 标准差</span>
+    <span class="g-en">Variance / Standard Deviation</span><a class="g-anchor" href="#term-variance-standard-deviation" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">衡量一组数据有多分散。方差越大越散；标准差是方差开根号，好处是单位跟原始数据一样。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 两个班平均分都是 80：一个班全在 78–82 之间，另一个从 40 到 100 —— 平均分一样，方差天差地别。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-mean-median" data-k="均值 / 中位数 Mean / Median  均值 中位数 平均数 均值 = 全部加起来除以个数；中位数 = 排队站最中间那个。有极端值的时候，中位数更靠得住。">
+  <div class="g-head"><span class="g-zh">均值 / 中位数</span>
+    <span class="g-en">Mean / Median</span><a class="g-anchor" href="#term-mean-median" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">均值 = 全部加起来除以个数；中位数 = 排队站最中间那个。有极端值的时候，中位数更靠得住。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一个亿万富翁走进酒吧，在场所有人的「平均资产」立刻翻几十倍；但中位数几乎不动 —— 它只认排中间的那个人。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-correlation-vs-causation" data-k="相关与因果 Correlation vs Causation  相关 相关性 因果 因果推断 反事实 混杂 相关 = 两件事一起变；因果 = 一件导致了另一件。相关不等于因果，这是最容易栽跟头的地方。">
+  <div class="g-head"><span class="g-zh">相关与因果</span>
+    <span class="g-en">Correlation vs Causation</span><a class="g-anchor" href="#term-correlation-vs-causation" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">相关 = 两件事一起变；因果 = 一件导致了另一件。相关不等于因果，这是最容易栽跟头的地方。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 冰淇淋卖得多的日子溺水的人也多 —— 两者相关，但谁也不是对方的原因，真正的第三个因素是「天热」。</div>
+  <div class="g-pages">本案例出现在：<a href="ch07.html">CH07</a><a href="ch11.html">CH11</a></div>
+</div><div class="g-item" id="term-sample-population" data-k="样本与总体 Sample / Population  样本 总体 总体是你想知道的全部对象；样本是你实际拿到的那一小撮。用样本去猜总体，就总有猜错的风险。">
+  <div class="g-head"><span class="g-zh">样本与总体</span>
+    <span class="g-en">Sample / Population</span><a class="g-anchor" href="#term-sample-population" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">总体是你想知道的全部对象；样本是你实际拿到的那一小撮。用样本去猜总体，就总有猜错的风险。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 尝一口汤判断整锅咸不咸 —— 那一口是样本，整锅是总体。舀得越匀，判断越准。</div>
+  <div class="g-pages">本案例出现在：<a href="b02.html">B02</a><a href="ch07.html">CH07</a></div>
+</div></div><h2 id="c-数据与模型">数据与模型<span class="cat-desc">机器看到的东西，和它拿出来的东西</span></h2><div class="gloss"><div class="g-item" id="term-feature" data-k="特征 Feature  特征 描述一个对象的「可测量属性」。一行数据里除答案外的那些列。">
+  <div class="g-head"><span class="g-zh">特征</span>
+    <span class="g-en">Feature</span><a class="g-anchor" href="#term-feature" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">描述一个对象的「可测量属性」。一行数据里除答案外的那些列。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 相亲简历上的年龄、身高、收入、职业 —— 每一栏都是一个特征。</div>
+  <div class="g-pages">本案例出现在：<a href="b02.html">B02</a><a href="b03.html">B03</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-label-target" data-k="标签（答案） Label / Target  标签 我们想让机器预测的那个「真值」。有它才叫监督学习。">
+  <div class="g-head"><span class="g-zh">标签（答案）</span>
+    <span class="g-en">Label / Target</span><a class="g-anchor" href="#term-label-target" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">我们想让机器预测的那个「真值」。有它才叫监督学习。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 习题册最后几页的答案。考试时它被撕掉了 —— 那就是你要预测的东西。</div>
+  <div class="g-pages">本案例出现在：<a href="b02.html">B02</a><a href="ch02.html">CH02</a></div>
+</div><div class="g-item" id="term-training-set" data-k="训练集 Training Set  训练集 拿来「教」机器的那部分数据，答案一起给它看。">
+  <div class="g-head"><span class="g-zh">训练集</span>
+    <span class="g-en">Training Set</span><a class="g-anchor" href="#term-training-set" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">拿来「教」机器的那部分数据，答案一起给它看。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 平时做的练习题，边做边对答案。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-test-set" data-k="测试集 Test Set  测试集 机器从没见过的那部分数据，答案先藏起来，用来检验它是不是真学会了。">
+  <div class="g-head"><span class="g-zh">测试集</span>
+    <span class="g-en">Test Set</span><a class="g-anchor" href="#term-test-set" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">机器从没见过的那部分数据，答案先藏起来，用来检验它是不是真学会了。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 期末考试。题是新的，做完才对答案 —— 考好了才算真会。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-validation-set" data-k="验证集 Validation Set  验证集 Validation 从数据里另留的一份，用来在训练过程中调超参数（树多深、走多快），但不算进最终考试分数。">
+  <div class="g-head"><span class="g-zh">验证集</span>
+    <span class="g-en">Validation Set</span><a class="g-anchor" href="#term-validation-set" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">从数据里另留的一份，用来在训练过程中调超参数（树多深、走多快），但不算进最终考试分数。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 模拟考。做的过程中用来查漏补缺、调整复习策略，但高考分数不算它。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a></div>
+</div><div class="g-item" id="term-model" data-k="模型 Model  模型 一个「输入 → 输出」的固定套路。给它一个人的资料，它吐出一个数。">
+  <div class="g-head"><span class="g-zh">模型</span>
+    <span class="g-en">Model</span><a class="g-anchor" href="#term-model" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一个「输入 → 输出」的固定套路。给它一个人的资料，它吐出一个数。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一份评分表。填进年龄车型，算出一个分数 —— 这就是个模型。</div>
+  <div class="g-pages">本案例出现在：<a href="b03.html">B03</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-parameter-coefficient" data-k="参数（系数） Parameter / Coefficient  系数 参数 模型里那些需要「学」出来的数字。学模型 = 找这些数字。">
+  <div class="g-head"><span class="g-zh">参数（系数）</span>
+    <span class="g-en">Parameter / Coefficient</span><a class="g-anchor" href="#term-parameter-coefficient" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">模型里那些需要「学」出来的数字。学模型 = 找这些数字。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 菜谱里的「盐 3 克、糖 5 克」—— 这些数字决定味道，得反复试才知道。</div>
+  <div class="g-pages">本案例出现在：<a href="b03.html">B03</a><a href="b04.html">B04</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-hyperparameter" data-k="超参数 Hyperparameter  超参数 不是学出来的，是人提前定好的「旋钮」，比如树最多分几层、学多快。">
+  <div class="g-head"><span class="g-zh">超参数</span>
+    <span class="g-en">Hyperparameter</span><a class="g-anchor" href="#term-hyperparameter" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">不是学出来的，是人提前定好的「旋钮」，比如树最多分几层、学多快。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 烤箱的温度和时间 —— 不是菜的一部分，是你烤之前自己拧的。</div>
+  <div class="g-pages">本案例出现在：<a href="b06.html">B06</a><a href="ch05.html">CH05</a></div>
+</div><div class="g-item" id="term-dummy-variable-one-hot" data-k="哑变量（独热编码） Dummy Variable / One-Hot  哑变量 独热 one-hot 虚拟变量 把「车型=轿车/SUV/性能车」这种文字，变成几个 0/1 的列，机器才吃得下。">
+  <div class="g-head"><span class="g-zh">哑变量（独热编码）</span>
+    <span class="g-en">Dummy Variable / One-Hot</span><a class="g-anchor" href="#term-dummy-variable-one-hot" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把「车型=轿车/SUV/性能车」这种文字，变成几个 0/1 的列，机器才吃得下。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 多选题的答题卡：四个选项各占一格，选哪个就在哪格涂黑，其余留白。</div>
+  <div class="g-pages">本案例出现在：<a href="ch01.html">CH01</a><a href="ch09.html">CH09</a></div>
+</div><div class="g-item" id="term-feature-engineering" data-k="特征工程 Feature Engineering  特征工程 特征加工 造特征 把原始数据捯饬成模型能用的东西：算比率、加标记、分箱、做交互、补缺失。模型好不好，一半看这一步。">
+  <div class="g-head"><span class="g-zh">特征工程</span>
+    <span class="g-en">Feature Engineering</span><a class="g-anchor" href="#term-feature-engineering" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把原始数据捯饬成模型能用的东西：算比率、加标记、分箱、做交互、补缺失。模型好不好，一半看这一步。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 下厨前先把菜洗干净、切好、配好料 —— 同样的锅（模型），料备得好，菜就好吃。</div>
+  <div class="g-pages">本案例出现在：<a href="b10.html">B10</a><a href="b12.html">B12</a></div>
+</div><div class="g-item" id="term-random-seed" data-k="随机种子 Random Seed  随机种子 种子 random seed 随机种子固定 给随机数发生器一个固定的起点，保证每次跑出来的「随机」一模一样 —— 别人才能复现你的结果。">
+  <div class="g-head"><span class="g-zh">随机种子</span>
+    <span class="g-en">Random Seed</span><a class="g-anchor" href="#term-random-seed" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">给随机数发生器一个固定的起点，保证每次跑出来的「随机」一模一样 —— 别人才能复现你的结果。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 洗牌前先把牌按顺序摆好：洗出来的顺序看着随机，但每次都一样，方便复盘也方便对答案。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a><a href="ch12.html">CH12</a></div>
+</div><div class="g-item" id="term-outlier" data-k="异常值（离群点） Outlier  异常值 离群点 离群 极端值 明显偏离大部队的那些数据点。可能是真事（一个巨额赔案），也可能只是录错了。">
+  <div class="g-head"><span class="g-zh">异常值（离群点）</span>
+    <span class="g-en">Outlier</span><a class="g-anchor" href="#term-outlier" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">明显偏离大部队的那些数据点。可能是真事（一个巨额赔案），也可能只是录错了。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 全班都考 70–90 分，有个 5 分 —— 要么他真没考好，要么是答题卡涂错了。先查清楚再决定怎么处理。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a><a href="b10.html">B10</a></div>
+</div><div class="g-item" id="term-missing-value" data-k="缺失值 Missing Value  缺失值 缺失 补缺失 空值 某个字段没填。要么补（用均值、用模型猜），要么单开一列标记「这一格没填」—— 别假装它是 0。">
+  <div class="g-head"><span class="g-zh">缺失值</span>
+    <span class="g-en">Missing Value</span><a class="g-anchor" href="#term-missing-value" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">某个字段没填。要么补（用均值、用模型猜），要么单开一列标记「这一格没填」—— 别假装它是 0。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 体检表上「血压」那栏空着：你可以按同龄人的平均值补，也可以如实写「未测」，但不能当它是 0 血压。</div>
+  <div class="g-pages">本案例出现在：<a href="b10.html">B10</a></div>
+</div><div class="g-item" id="term-binning" data-k="分箱（离散化） Binning  分箱 离散化 分段 分档 分桶 把连续的数字切成几段（年龄 18–25、26–35…），每段当成一类。能扛住极端值，也更好向人解释。">
+  <div class="g-head"><span class="g-zh">分箱（离散化）</span>
+    <span class="g-en">Binning</span><a class="g-anchor" href="#term-binning" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把连续的数字切成几段（年龄 18–25、26–35…），每段当成一类。能扛住极端值，也更好向人解释。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 体检报告不写「血压 127」，写「正常 / 偏高 / 高」—— 分档之后医生好说、病人好懂。</div>
+  <div class="g-pages">本案例出现在：<a href="b10.html">B10</a><a href="ch09.html">CH09</a></div>
+</div><div class="g-item" id="term-interaction-term" data-k="交互特征 Interaction Term  交互特征 交互项 交叉特征 交互作用 两个特征「搭在一起」才起作用的效果，单看任何一个都看不出来。比如「年轻」配「高性能车」。">
+  <div class="g-head"><span class="g-zh">交互特征</span>
+    <span class="g-en">Interaction Term</span><a class="g-anchor" href="#term-interaction-term" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">两个特征「搭在一起」才起作用的效果，单看任何一个都看不出来。比如「年轻」配「高性能车」。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 单吃盐没事、单吃糖也没事，但咸甜口放在一起才出那个味 —— 味道在组合里，不在单个调料里。</div>
+  <div class="g-pages">本案例出现在：<a href="ch01.html">CH01</a><a href="b10.html">B10</a></div>
+</div></div><h2 id="c-算法与训练">算法与训练<span class="cat-desc">机器是怎么「学会」的</span></h2><div class="gloss"><div class="g-item" id="term-algorithm" data-k="算法 Algorithm  算法 「把参数找出来」的具体步骤。模型是成品，算法是制造它的工艺流程。">
+  <div class="g-head"><span class="g-zh">算法</span>
+    <span class="g-en">Algorithm</span><a class="g-anchor" href="#term-algorithm" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">「把参数找出来」的具体步骤。模型是成品，算法是制造它的工艺流程。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 模型是那盘菜，算法是菜谱上的操作步骤。同一盘菜可以有不同做法。</div>
+  <div class="g-pages">本案例出现在：<a href="b06.html">B06</a><a href="ch04.html">CH04</a></div>
+</div><div class="g-item" id="term-training-fitting" data-k="训练（拟合） Training / Fitting  训练 反复调整参数，让模型的输出尽量贴近已知答案的整个过程。">
+  <div class="g-head"><span class="g-zh">训练（拟合）</span>
+    <span class="g-en">Training / Fitting</span><a class="g-anchor" href="#term-training-fitting" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">反复调整参数，让模型的输出尽量贴近已知答案的整个过程。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 调琴。拧弦→听音→再拧→再听，直到音准。</div>
+  <div class="g-pages">本案例出现在：<a href="b04.html">B04</a><a href="ch04.html">CH04</a></div>
+</div><div class="g-item" id="term-loss-function" data-k="损失函数 Loss Function  损失 一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。">
+  <div class="g-head"><span class="g-zh">损失函数</span>
+    <span class="g-en">Loss Function</span><a class="g-anchor" href="#term-loss-function" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 射箭的环数。离靶心越远扣得越多，你的目标就是把扣分压到最低。</div>
+  <div class="g-pages">本案例出现在：<a href="b04.html">B04</a><a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-convergence" data-k="收敛 Convergence  收敛 改来改去，改进量越来越小，最后几乎不动了 —— 说明可以停了。">
+  <div class="g-head"><span class="g-zh">收敛</span>
+    <span class="g-en">Convergence</span><a class="g-anchor" href="#term-convergence" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">改来改去，改进量越来越小，最后几乎不动了 —— 说明可以停了。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 调温水龙头：一开始差很远，拧几次后每次只动一点点，最后手停住。</div>
+  <div class="g-pages">本案例出现在：<a href="ch04.html">CH04</a></div>
+</div><div class="g-item" id="term-glm" data-k="广义线性模型 Generalized Linear Model GLM GLM 广义线性模型 精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">
+  <div class="g-head"><span class="g-abbr">GLM</span><span class="g-zh">广义线性模型</span>
+    <span class="g-en">Generalized Linear Model</span><a class="g-anchor" href="#term-glm" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 算总价：单价×数量一项项加起来，最后打个折。每一项你都能说清楚是干嘛的。</div>
+  <div class="g-pages">本案例出现在：<a href="ch01.html">CH01</a><a href="ch04.html">CH04</a></div>
+</div><div class="g-item" id="term-poisson-regression" data-k="泊松回归 Poisson Regression  Poisson 泊松 专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。">
+  <div class="g-head"><span class="g-zh">泊松回归</span>
+    <span class="g-en">Poisson Regression</span><a class="g-anchor" href="#term-poisson-regression" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 预测一个月会下几天雨 —— 答案只能是 0、1、2…，不可能是 −3 天。</div>
+  <div class="g-pages">本案例出现在：<a href="ch01.html">CH01</a><a href="ch03.html">CH03</a><a href="ch04.html">CH04</a></div>
+</div><div class="g-item" id="term-irls" data-k="迭代重加权最小二乘 Iteratively Reweighted Least Squares IRLS IRLS 迭代重加权 GLM 的「训练算法」：先瞎猜一条线，看每个点差多少，按差距重新算一条，重复几次就到位了。">
+  <div class="g-head"><span class="g-abbr">IRLS</span><span class="g-zh">迭代重加权最小二乘</span>
+    <span class="g-en">Iteratively Reweighted Least Squares</span><a class="g-anchor" href="#term-irls" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">GLM 的「训练算法」：先瞎猜一条线，看每个点差多少，按差距重新算一条，重复几次就到位了。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 蒙眼画画：先画一笔，别人告诉你偏上还是偏下，你往对的方向挪一点，重复几轮就画准了。</div>
+  <div class="g-pages">本案例出现在：<a href="ch04.html">CH04</a></div>
+</div><div class="g-item" id="term-decision-tree" data-k="决策树 Decision Tree  决策树 一串 if-else 问题：「年龄<25？是→车值>30万？否→…」走到底就得答案。">
+  <div class="g-head"><span class="g-zh">决策树</span>
+    <span class="g-en">Decision Tree</span><a class="g-anchor" href="#term-decision-tree" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一串 if-else 问题：「年龄<25？是→车值>30万？否→…」走到底就得答案。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 二十个问题的猜谜游戏。每问一个，范围就缩小一半。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a><a href="ch05.html">CH05</a></div>
+</div><div class="g-item" id="term-impurity" data-k="不纯度 Impurity  不纯度 衡量「一堆人混得有多乱」。全是一样的就不纯=0，好坏各一半就最乱。">
+  <div class="g-head"><span class="g-zh">不纯度</span>
+    <span class="g-en">Impurity</span><a class="g-anchor" href="#term-impurity" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">衡量「一堆人混得有多乱」。全是一样的就不纯=0，好坏各一半就最乱。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一筐苹果全红 → 很纯；红绿各半 → 很乱。切分的目标就是让两边各自变纯。</div>
+  <div class="g-pages">本案例出现在：<a href="ch05.html">CH05</a></div>
+</div><div class="g-item" id="term-gbdt" data-k="梯度提升树 Gradient Boosting Decision Tree GBDT GBDT 梯度提升树 GBM 一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">
+  <div class="g-head"><span class="g-abbr">GBDT</span><span class="g-zh">梯度提升树</span>
+    <span class="g-en">Gradient Boosting Decision Tree</span><a class="g-anchor" href="#term-gbdt" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 学生做题：第一遍做完，老师圈出错题；第二遍只攻错题；再来第三遍。几轮下来满分。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a><a href="ch06.html">CH06</a><a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-residual-gradient" data-k="残差（梯度） Residual / Gradient  残差 梯度 残差 = 真实值 − 当前预测值，也就是「还差多少」。梯度是它的方向版：往哪边补、补多大。">
+  <div class="g-head"><span class="g-zh">残差（梯度）</span>
+    <span class="g-en">Residual / Gradient</span><a class="g-anchor" href="#term-residual-gradient" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">残差 = 真实值 − 当前预测值，也就是「还差多少」。梯度是它的方向版：往哪边补、补多大。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 还差 200 块才够付账 —— 那 200 块就是残差。「往东走」是方向，「走 200 米」是大小。</div>
+  <div class="g-pages">本案例出现在：<a href="ch06.html">CH06</a><a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-learning-rate" data-k="学习率 Learning Rate  学习率 每一轮「补差」时，只补一部分而不是全补。步子小一点更稳，但要多走几轮。">
+  <div class="g-head"><span class="g-zh">学习率</span>
+    <span class="g-en">Learning Rate</span><a class="g-anchor" href="#term-learning-rate" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">每一轮「补差」时，只补一部分而不是全补。步子小一点更稳，但要多走几轮。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 倒热水：一次倒满容易溢出来，分几次慢慢倒才稳。</div>
+  <div class="g-pages">本案例出现在：<a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-regularization" data-k="正则化 Regularization  正则化 给「系数太大」加罚款，逼模型别把某个特征的作用看得过重，防止学歪。">
+  <div class="g-head"><span class="g-zh">正则化</span>
+    <span class="g-en">Regularization</span><a class="g-anchor" href="#term-regularization" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">给「系数太大」加罚款，逼模型别把某个特征的作用看得过重，防止学歪。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 给小孩零花钱设上限 —— 防止他把钱全砸在一个玩具上。</div>
+  <div class="g-pages">本案例出现在：<a href="b06.html">B06</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-ensemble" data-k="集成学习 Ensemble  集成 多个模型一起投票，比单个模型更稳。GBDT、随机森林都是这一类。">
+  <div class="g-head"><span class="g-zh">集成学习</span>
+    <span class="g-en">Ensemble</span><a class="g-anchor" href="#term-ensemble" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">多个模型一起投票，比单个模型更稳。GBDT、随机森林都是这一类。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 三个臭皮匠。每个人都会犯错，但多数时候大家的共识比一个人准。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a><a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-gradient-descent" data-k="梯度下降 Gradient Descent  梯度下降 「往误差变小的方向一小步一小步挪」的通用动作。学习率决定每步跨多大。">
+  <div class="g-head"><span class="g-zh">梯度下降</span>
+    <span class="g-en">Gradient Descent</span><a class="g-anchor" href="#term-gradient-descent" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">「往误差变小的方向一小步一小步挪」的通用动作。学习率决定每步跨多大。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 雾天下山：看不见路，但脚下能感觉到哪个方向在慢慢变陡，就往那个反方向挪 —— 一步步走到谷底。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a><a href="ch04.html">CH04</a></div>
+</div><div class="g-item" id="term-epoch-batch-iteration" data-k="轮次 / 一批 / 一次更新 Epoch / Batch / Iteration  轮次 Epoch Batch 批次 一批 iteration Epoch = 全部数据完整过一遍；Batch = 一次更新拿出的那一小批；Iteration = 更新一次。">
+  <div class="g-head"><span class="g-zh">轮次 / 一批 / 一次更新</span>
+    <span class="g-en">Epoch / Batch / Iteration</span><a class="g-anchor" href="#term-epoch-batch-iteration" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">Epoch = 全部数据完整过一遍；Batch = 一次更新拿出的那一小批；Iteration = 更新一次。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 全班 1000 人、每批 100 人交作业：10 批交完算一轮，每收一批批改一次 —— 一轮要批 10 次。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a></div>
+</div><div class="g-item" id="term-stochastic-mini-batch" data-k="随机 / 小批量梯度下降 Stochastic / Mini-batch  随机梯度下降 小批量 每次用 1 条（快但抖）或一小批（稳且不慢）数据来估计该往哪挪。全量最稳但最慢。">
+  <div class="g-head"><span class="g-zh">随机 / 小批量梯度下降</span>
+    <span class="g-en">Stochastic / Mini-batch</span><a class="g-anchor" href="#term-stochastic-mini-batch" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">每次用 1 条（快但抖）或一小批（稳且不慢）数据来估计该往哪挪。全量最稳但最慢。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 请人估价：问 1 个人可能离谱，问全城最准但慢，问 30 个人是大多数时候的选择。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a></div>
+</div><div class="g-item" id="term-l1-l2-regularization" data-k="L1 / L2 正则化 L1 / L2 Regularization  L1 L2 Lasso Ridge 岭回归 套索 L1 罚到某些系数直接变成 0（等于顺手删特征）；L2 只是把大系数往 0 拉一点（整体变小但不清零）。">
+  <div class="g-head"><span class="g-zh">L1 / L2 正则化</span>
+    <span class="g-en">L1 / L2 Regularization</span><a class="g-anchor" href="#term-l1-l2-regularization" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">L1 罚到某些系数直接变成 0（等于顺手删特征）；L2 只是把大系数往 0 拉一点（整体变小但不清零）。</div>
+  <div class="g-ana"><b>打个比方 ·</b> L1 像「不用的东西直接扔掉」，L2 像「把钱包收紧一点但别扔」—— 一个断舍离，一个勒裤腰带。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a><a href="b06.html">B06</a></div>
+</div><div class="g-item" id="term-local-global-minimum" data-k="局部最优 / 全局最优 Local / Global Minimum  局部最优 全局最优 局部最优是当前这个小坑的最低点，跳出就更高；全局最优是整个山谷的最低点。">
+  <div class="g-head"><span class="g-zh">局部最优 / 全局最优</span>
+    <span class="g-en">Local / Global Minimum</span><a class="g-anchor" href="#term-local-global-minimum" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">局部最优是当前这个小坑的最低点，跳出就更高；全局最优是整个山谷的最低点。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 下山时脚下是个小水坑，你以为到底了，其实翻过前面那个山头还有个更深的坑。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a></div>
+</div><div class="g-item" id="term-early-stopping" data-k="提前停止 Early Stopping  early stopping 提前停止 早停 训练中一直盯着验证集，它好几轮不再变好就立刻停手，并保留那轮最好的参数。">
+  <div class="g-head"><span class="g-zh">提前停止</span>
+    <span class="g-en">Early Stopping</span><a class="g-anchor" href="#term-early-stopping" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">训练中一直盯着验证集，它好几轮不再变好就立刻停手，并保留那轮最好的参数。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 复习时发现模拟考成绩连续三套不再涨，就停笔去睡觉 —— 再刷只会把真题背熟。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a><a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-regression" data-k="回归（预测连续值） Regression  回归 要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。">
+  <div class="g-head"><span class="g-zh">回归（预测连续值）</span>
+    <span class="g-en">Regression</span><a class="g-anchor" href="#term-regression" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">要预测的结果是一个数字（保额、收入、温度），模型学的是「输入 → 数字」这条映射。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 给你一个人的车龄、驾龄、地区，让你猜他明年要交多少保费 —— 猜的就是一个number。</div>
+  <div class="g-pages">本案例出现在：<a href="b11.html">B11</a><a href="b12.html">B12</a><a href="b14.html">B14</a></div>
+</div><div class="g-item" id="term-classification" data-k="分类（预测类别） Classification  分类 要预测的结果是几个固定选项里的一个（会不会续保、是不是欺诈），模型学的是「打勾」。">
+  <div class="g-head"><span class="g-zh">分类（预测类别）</span>
+    <span class="g-en">Classification</span><a class="g-anchor" href="#term-classification" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">要预测的结果是几个固定选项里的一个（会不会续保、是不是欺诈），模型学的是「打勾」。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 看到一只动物，判它是猫还是狗 —— 答案只能从「猫 / 狗」里挑一个。</div>
+  <div class="g-pages">本案例出现在：<a href="b11.html">B11</a><a href="b12.html">B12</a></div>
+</div><div class="g-item" id="term-clustering" data-k="聚类（无标签分组） Clustering  聚类 K-Means KMeans 没有标准答案，模型自己按相似度把数据分成几堆，每堆起个名都不用你来定。">
+  <div class="g-head"><span class="g-zh">聚类（无标签分组）</span>
+    <span class="g-en">Clustering</span><a class="g-anchor" href="#term-clustering" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">没有标准答案，模型自己按相似度把数据分成几堆，每堆起个名都不用你来定。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 给一屋子人，不告诉你是男是女，你自己按身高、年龄分成几伙。</div>
+  <div class="g-pages">本案例出现在：<a href="b11.html">B11</a><a href="b12.html">B12</a></div>
+</div><div class="g-item" id="term-threshold-cut-off" data-k="阈值（切点） Threshold / Cut-off  阈值 切点 门槛 临界值 cut-off 分数线 把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。">
+  <div class="g-head"><span class="g-zh">阈值（切点）</span>
+    <span class="g-en">Threshold / Cut-off</span><a class="g-anchor" href="#term-threshold-cut-off" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 录取分数线定在 60 分还是 70 分，决定今年招多少人 —— 分数本身没变，变的是你划在哪。</div>
+  <div class="g-pages">本案例出现在：<a href="b08.html">B08</a><a href="ch10.html">CH10</a></div>
+</div><div class="g-item" id="term-tree-depth-leaf-node" data-k="树深与叶子 Tree Depth / Leaf Node  树深 树的深度 最大深度 叶子 叶节点 终端节点 叶子节点 深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容易把巧合当成规律。">
+  <div class="g-head"><span class="g-zh">树深与叶子</span>
+    <span class="g-en">Tree Depth / Leaf Node</span><a class="g-anchor" href="#term-tree-depth-leaf-node" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">深度 = 从根到叶子一共问了几个问题；叶子 = 走到底的那一片人。树越深分得越细，也越容易把巧合当成规律。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 猜谜允许问 20 个问题还是 3 个 —— 问得越多越准，但也越容易记住「这一次的答案」而不是规律。</div>
+  <div class="g-pages">本案例出现在：<a href="ch05.html">CH05</a></div>
+</div><div class="g-item" id="term-pruning-stopping-rule" data-k="剪枝与停止条件 Pruning / Stopping Rule  剪枝 停止条件 最小叶子 min_samples_leaf 最小样本 提前给树立规矩：最多几层、一片叶子最少几个人、收益低于多少就别再切。目的是不让它长疯。">
+  <div class="g-head"><span class="g-zh">剪枝与停止条件</span>
+    <span class="g-en">Pruning / Stopping Rule</span><a class="g-anchor" href="#term-pruning-stopping-rule" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">提前给树立规矩：最多几层、一片叶子最少几个人、收益低于多少就别再切。目的是不让它长疯。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 给果树剪枝 —— 不是不让它长，是剪掉乱长的枝条，果子才结得实。</div>
+  <div class="g-pages">本案例出现在：<a href="ch05.html">CH05</a><a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-random-forest-bagging" data-k="随机森林与 Bagging Random Forest / Bagging  随机森林 Bagging 自助法 bootstrap 装袋 造很多棵树，每棵只看一部分数据、一部分特征，最后投票。单棵容易偏，一群平均起来就稳了。">
+  <div class="g-head"><span class="g-zh">随机森林与 Bagging</span>
+    <span class="g-en">Random Forest / Bagging</span><a class="g-anchor" href="#term-random-forest-bagging" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">造很多棵树，每棵只看一部分数据、一部分特征，最后投票。单棵容易偏，一群平均起来就稳了。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 问 100 个人这头牛多重，各猜各的，取平均 —— 结果比任何一个人的答案都准。这就是「群体智慧」。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a><a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-neural-network" data-k="神经网络 Neural Network  神经网络 neural network 多层感知机 MLP 很多层「小计算器」叠起来的模型，每层只做一点简单加工。擅长图像、语音、文字，表格数据上未必更好。">
+  <div class="g-head"><span class="g-zh">神经网络</span>
+    <span class="g-en">Neural Network</span><a class="g-anchor" href="#term-neural-network" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">很多层「小计算器」叠起来的模型，每层只做一点简单加工。擅长图像、语音、文字，表格数据上未必更好。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 流水线车间：第一道工序挑零件，第二道打磨，第三道组装 —— 每层只干一点粗活，最后拼出成品。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a></div>
+</div><div class="g-item" id="term-svm-knn" data-k="支持向量机 · 最近邻 Support Vector Machine / K-Nearest Neighbors SVM / KNN SVM KNN 支持向量机 最近邻 近邻算法 K近邻 另外两类常见算法：SVM 找一条「分得最开」的线把两类隔开；KNN 看「你身边最近的几个人是谁」来决定你是谁。">
+  <div class="g-head"><span class="g-abbr">SVM / KNN</span><span class="g-zh">支持向量机 · 最近邻</span>
+    <span class="g-en">Support Vector Machine / K-Nearest Neighbors</span><a class="g-anchor" href="#term-svm-knn" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">另外两类常见算法：SVM 找一条「分得最开」的线把两类隔开；KNN 看「你身边最近的几个人是谁」来决定你是谁。</div>
+  <div class="g-ana"><b>打个比方 ·</b> SVM 像在两群人中间拉出最宽的一条隔离带；KNN 像「看你三个好朋友是谁，就猜你是哪一类人」。</div>
+  <div class="g-pages">本案例出现在：<a href="b07.html">B07</a><a href="b11.html">B11</a></div>
+</div><div class="g-item" id="term-cross-validation" data-k="交叉验证（K 折） Cross-Validation  交叉验证 K 折 k 折 K-fold k-fold 折交叉 把数据切成 K 份，轮流拿一份当考试、其余当练习，考 K 次取平均。比只切一次更稳、更不容易运气好。">
+  <div class="g-head"><span class="g-zh">交叉验证（K 折）</span>
+    <span class="g-en">Cross-Validation</span><a class="g-anchor" href="#term-cross-validation" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把数据切成 K 份，轮流拿一份当考试、其余当练习，考 K 次取平均。比只切一次更稳、更不容易运气好。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 与其只考一次期末，不如每月考一次、取十次的平均 —— 一次考砸不代表你不会。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a><a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-hyperparameter-search" data-k="超参数搜索 Hyperparameter Search  超参数搜索 网格搜索 随机搜索 grid search 调参 把几组候选超参数都试一遍（网格 = 全试，随机 = 抽着试），按验证集分数挑最好的那一组。">
+  <div class="g-head"><span class="g-zh">超参数搜索</span>
+    <span class="g-en">Hyperparameter Search</span><a class="g-anchor" href="#term-hyperparameter-search" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把几组候选超参数都试一遍（网格 = 全试，随机 = 抽着试），按验证集分数挑最好的那一组。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 调烤箱：温度和时间各试几种组合，烤出来最好吃的那组就记进菜谱。</div>
+  <div class="g-pages">本案例出现在：<a href="b06.html">B06</a><a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-baseline" data-k="基线 Baseline  基线 baseline 基准模型 参照组 一个「不动脑子也能做出来」的参照分数，比如全猜平均值。模型连它都打不过，那就别做了。">
+  <div class="g-head"><span class="g-zh">基线</span>
+    <span class="g-en">Baseline</span><a class="g-anchor" href="#term-baseline" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一个「不动脑子也能做出来」的参照分数，比如全猜平均值。模型连它都打不过，那就别做了。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 考试前先问一句：全选 C 能得多少分？那是基线。你的模型必须比它高，否则全是白忙。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a><a href="x01.html">X01</a></div>
+</div><div class="g-item" id="term-generalization" data-k="泛化能力 Generalization  泛化 泛化能力 模型在「从没见过的新数据」上还能不能打得一样好。这才是它真正的本事。">
+  <div class="g-head"><span class="g-zh">泛化能力</span>
+    <span class="g-en">Generalization</span><a class="g-anchor" href="#term-generalization" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">模型在「从没见过的新数据」上还能不能打得一样好。这才是它真正的本事。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 平时作业全对不算本事，换一套新题还能做对，才算真会。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a><a href="b13.html">B13</a></div>
+</div><div class="g-item" id="term-bias-variance-tradeoff" data-k="偏差-方差权衡 Bias-Variance Tradeoff  偏差-方差 方差-偏差 bias-variance 偏差 = 模型太死板，怎么练都偏；方差 = 模型太敏感，换批数据就变脸。两头都要压，而且常常此消彼长。">
+  <div class="g-head"><span class="g-zh">偏差-方差权衡</span>
+    <span class="g-en">Bias-Variance Tradeoff</span><a class="g-anchor" href="#term-bias-variance-tradeoff" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">偏差 = 模型太死板，怎么练都偏；方差 = 模型太敏感，换批数据就变脸。两头都要压，而且常常此消彼长。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 射箭：要么全偏在左上角（偏差大），要么散布得满天飞（方差大）—— 好射手得同时治这两个毛病。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a><a href="b13.html">B13</a></div>
+</div><div class="g-item" id="term-entropy-information-gain" data-k="熵与信息增益 Entropy / Information Gain  信息增益 熵 Entropy 交叉熵 熵 = 一堆东西有多混乱；信息增益 = 问完这个问题之后，混乱减少了多少。树每层都挑减少最多的那个问题。">
+  <div class="g-head"><span class="g-zh">熵与信息增益</span>
+    <span class="g-en">Entropy / Information Gain</span><a class="g-anchor" href="#term-entropy-information-gain" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">熵 = 一堆东西有多混乱；信息增益 = 问完这个问题之后，混乱减少了多少。树每层都挑减少最多的那个问题。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一抽屉袜子全混在一起最乱（熵最高）；按颜色分好之后，随手一拿就是一对（熵降到最低）。</div>
+  <div class="g-pages">本案例出现在：<a href="ch05.html">CH05</a></div>
+</div><div class="g-item" id="term-gini" data-k="基尼不纯度 Gini Impurity Gini 基尼 Gini 基尼系数 基尼不纯度 gini 和熵一样的「混乱尺」，只是算法不同：随机抓两个人，他俩不一样的概率。0 = 全一样，0.5 = 最乱。">
+  <div class="g-head"><span class="g-abbr">Gini</span><span class="g-zh">基尼不纯度</span>
+    <span class="g-en">Gini Impurity</span><a class="g-anchor" href="#term-gini" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">和熵一样的「混乱尺」，只是算法不同：随机抓两个人，他俩不一样的概率。0 = 全一样，0.5 = 最乱。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一筐果子随机抓两个，抓到一红一绿的概率 —— 全是红的就是 0，红绿各半就是 0.5。</div>
+  <div class="g-pages">本案例出现在：<a href="ch05.html">CH05</a><a href="x02.html">X02</a></div>
+</div><div class="g-item" id="term-gain" data-k="分裂收益 Gain Split Gain Gain 分裂收益 分裂增益 Gain split gain 切一刀「值不值」的度量：切之前的混乱 − 切之后的加权混乱。差得越多，这一刀越值。">
+  <div class="g-head"><span class="g-abbr">Gain</span><span class="g-zh">分裂收益 Gain</span>
+    <span class="g-en">Split Gain</span><a class="g-anchor" href="#term-gain" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">切一刀「值不值」的度量：切之前的混乱 − 切之后的加权混乱。差得越多，这一刀越值。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 把混在一起的扑克按花色分开，红黑各归各堆 —— 分开之后有多「清爽」，就是这一刀的收益。</div>
+  <div class="g-pages">本案例出现在：<a href="ch05.html">CH05</a></div>
+</div></div><h2 id="c-评价与判断">评价与判断<span class="cat-desc">怎么知道它学得对不对、什么时候会骗你</span></h2><div class="gloss"><div class="g-item" id="term-overfitting" data-k="过拟合 Overfitting  过拟合 把训练题背得滚瓜烂熟，一换新题就崩。记住了噪声，没学到规律。">
+  <div class="g-head"><span class="g-zh">过拟合</span>
+    <span class="g-en">Overfitting</span><a class="g-anchor" href="#term-overfitting" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把训练题背得滚瓜烂熟，一换新题就崩。记住了噪声，没学到规律。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 死记硬背历年真题，考试换了数字就不会了。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a><a href="ch01.html">CH01</a></div>
+</div><div class="g-item" id="term-auc" data-k="AUC（排序能力） Area Under the ROC Curve AUC AUC 随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">
+  <div class="g-head"><span class="g-abbr">AUC</span><span class="g-zh">AUC（排序能力）</span>
+    <span class="g-en">Area Under the ROC Curve</span><a class="g-anchor" href="#term-auc" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 老师挑好学生：闭着眼挑是 0.5，每次都挑中最优秀的是 1.0。</div>
+  <div class="g-pages">本案例出现在：<a href="b08.html">B08</a><a href="ch03.html">CH03</a><a href="ch09.html">CH09</a></div>
+</div><div class="g-item" id="term-lift" data-k="提升度（Lift） Lift  Lift 提升度 lift 模型圈出来的那批人里，好人的比例是「随便抓」的多少倍。">
+  <div class="g-head"><span class="g-zh">提升度（Lift）</span>
+    <span class="g-en">Lift</span><a class="g-anchor" href="#term-lift" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">模型圈出来的那批人里，好人的比例是「随便抓」的多少倍。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 在普通人群里捞好人是 10 个里捞 1 个；模型帮你锁定后变成 3 个里捞 1 个 —— 效率翻了 3 倍。</div>
+  <div class="g-pages">本案例出现在：<a href="b08.html">B08</a><a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-calibration" data-k="校准 Calibration  校准 模型说「这个人值 1000 元」，实际是不是真接近 1000 元。排序准 ≠ 数值准。">
+  <div class="g-head"><span class="g-zh">校准</span>
+    <span class="g-en">Calibration</span><a class="g-anchor" href="#term-calibration" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">模型说「这个人值 1000 元」，实际是不是真接近 1000 元。排序准 ≠ 数值准。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 体温计：能正确排出谁更烧，是排序；显示 38.5 度而真实就是 38.5 度，是校准。</div>
+  <div class="g-pages">本案例出现在：<a href="ch09.html">CH09</a><a href="ch11.html">CH11</a></div>
+</div><div class="g-item" id="term-recall" data-k="召回率 Recall  召回 真正该救的人里，你救到了百分之多少。漏掉的叫「漏网」。">
+  <div class="g-head"><span class="g-zh">召回率</span>
+    <span class="g-en">Recall</span><a class="g-anchor" href="#term-recall" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">真正该救的人里，你救到了百分之多少。漏掉的叫「漏网」。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 池塘里 100 条该捞的鱼，你捞上来 40 条 —— 召回率 40%。</div>
+  <div class="g-pages">本案例出现在：<a href="b08.html">B08</a><a href="ch10.html">CH10</a></div>
+</div><div class="g-item" id="term-precision-purity" data-k="精确率（圈选纯度） Precision / Purity  精确率 纯度 你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。">
+  <div class="g-head"><span class="g-zh">精确率（圈选纯度）</span>
+    <span class="g-en">Precision / Purity</span><a class="g-anchor" href="#term-precision-purity" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 你捞上来的 50 条里，只有 30 条是目标鱼 —— 纯度 60%。</div>
+  <div class="g-pages">本案例出现在：<a href="b08.html">B08</a><a href="ch10.html">CH10</a></div>
+</div><div class="g-item" id="term-extrapolation-ood" data-k="外推（训练域外） Extrapolation / OOD  外推 OOD 域外 给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。">
+  <div class="g-head"><span class="g-zh">外推（训练域外）</span>
+    <span class="g-en">Extrapolation / OOD</span><a class="g-anchor" href="#term-extrapolation-ood" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 只见过猫的狗识别器，你塞张老虎照片进去 —— 它会自信地给出一个答案，但没意义。</div>
+  <div class="g-pages">本案例出现在：<a href="ch09.html">CH09</a></div>
+</div><div class="g-item" id="term-data-leakage" data-k="数据泄漏 Data Leakage  数据泄漏 数据泄露 泄漏 泄露 训练时用了「真正在用的时候根本拿不到」的信息，于是离线分数虚高、一上线就掉。">
+  <div class="g-head"><span class="g-zh">数据泄漏</span>
+    <span class="g-en">Data Leakage</span><a class="g-anchor" href="#term-data-leakage" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">训练时用了「真正在用的时候根本拿不到」的信息，于是离线分数虚高、一上线就掉。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 考试前把答案抄在手心 —— 你考了满分，但那不代表你会做这道题。</div>
+  <div class="g-pages">本案例出现在：<a href="b05.html">B05</a><a href="ch02.html">CH02</a></div>
+</div><div class="g-item" id="term-standardization-normalization" data-k="标准化 / 归一化 Standardization / Normalization  标准化 归一化 StandardScaler 把不同量纲的特征拉到相近的尺度上，比如都变成「均值 0、标准差 1」。树模型一般不需要。">
+  <div class="g-head"><span class="g-zh">标准化 / 归一化</span>
+    <span class="g-en">Standardization / Normalization</span><a class="g-anchor" href="#term-standardization-normalization" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把不同量纲的特征拉到相近的尺度上，比如都变成「均值 0、标准差 1」。树模型一般不需要。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 把「身高 1.7 米」和「收入 30000 元」都换算成年级排名再比较 —— 单位不同没法直接比。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a></div>
+</div><div class="g-item" id="term-ks" data-k="KS 值 Kolmogorov-Smirnov KS KS 好人和坏人累计分布之间最大的那段差。越大说明模型越能把两类分开。">
+  <div class="g-head"><span class="g-abbr">KS</span><span class="g-zh">KS 值</span>
+    <span class="g-en">Kolmogorov-Smirnov</span><a class="g-anchor" href="#term-ks" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">好人和坏人累计分布之间最大的那段差。越大说明模型越能把两类分开。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 按成绩排名后画两条堆：好学生堆在前段、差生堆在后段，两条堆拉开的距离就是 KS。</div>
+  <div class="g-pages">本案例出现在：<a href="b08.html">B08</a></div>
+</div><div class="g-item" id="term-shap" data-k="SHAP 可解释性 SHapley Additive exPlanations SHAP SHAP 给每个特征算一个「这次预测被它推高/拉低了多少」的数值，用来回答「它凭什么这么判」。">
+  <div class="g-head"><span class="g-abbr">SHAP</span><span class="g-zh">SHAP 可解释性</span>
+    <span class="g-en">SHapley Additive exPlanations</span><a class="g-anchor" href="#term-shap" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">给每个特征算一个「这次预测被它推高/拉低了多少」的数值，用来回答「它凭什么这么判」。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 分红算工钱：按各人的边际贡献把总金额拆开，谁出了力、出了多少力，白纸黑字写清楚。</div>
+  <div class="g-pages">本案例出现在：<a href="ch09.html">CH09</a></div>
+</div><div class="g-item" id="term-underfitting" data-k="欠拟合 Underfitting  欠拟合 连训练数据都没学会，训练集验证集一起差 —— 是模型太简单或数据太脏，不是练得不够。">
+  <div class="g-head"><span class="g-zh">欠拟合</span>
+    <span class="g-en">Underfitting</span><a class="g-anchor" href="#term-underfitting" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">连训练数据都没学会，训练集验证集一起差 —— 是模型太简单或数据太脏，不是练得不够。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 用一根直尺去比划一条弯的线，画到哪都是歪的 —— 不是你手抖，是工具不对。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a></div>
+</div><div class="g-item" id="term-deviance" data-k="偏差（广义） Deviance  Deviance deviance 模型偏差 专门用来评价「次数类」模型好坏的一把尺，越小越好。相当于回归里的误差平方和。">
+  <div class="g-head"><span class="g-zh">偏差（广义）</span>
+    <span class="g-en">Deviance</span><a class="g-anchor" href="#term-deviance" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">专门用来评价「次数类」模型好坏的一把尺，越小越好。相当于回归里的误差平方和。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 和「环数」一样，只是这把尺专门为射箭比赛定制，别的比赛不适用。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a><a href="ch04.html">CH04</a></div>
+</div><div class="g-item" id="term-mse" data-k="均方误差 MSE Mean Squared Error MSE MSE 均方误差 mse 误差平方 把每一次的误差（真实值 − 预测值）平方之后取平均。数字越小越好，0 = 全对。平方会重罚离谱的大错。">
+  <div class="g-head"><span class="g-abbr">MSE</span><span class="g-zh">均方误差 MSE</span>
+    <span class="g-en">Mean Squared Error</span><a class="g-anchor" href="#term-mse" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把每一次的误差（真实值 − 预测值）平方之后取平均。数字越小越好，0 = 全对。平方会重罚离谱的大错。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 打靶：每箭离靶心的距离平方后求平均。偶尔一箭飞出靶子，会被平方放大成很重的一笔扣分。</div>
+  <div class="g-pages">本案例出现在：<a href="ch06.html">CH06</a><a href="b14.html">B14</a><a href="x02.html">X02</a></div>
+</div><div class="g-item" id="term-rmse" data-k="均方根误差 RMSE Root Mean Squared Error RMSE RMSE 均方根误差 rmse MSE 开个根号。单位回到原始尺度 —— 你预测的是「元」，RMSE 说出来也是「元」，好向人解释。">
+  <div class="g-head"><span class="g-abbr">RMSE</span><span class="g-zh">均方根误差 RMSE</span>
+    <span class="g-en">Root Mean Squared Error</span><a class="g-anchor" href="#term-rmse" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">MSE 开个根号。单位回到原始尺度 —— 你预测的是「元」，RMSE 说出来也是「元」，好向人解释。</div>
+  <div class="g-ana"><b>打个比方 ·</b> MSE 的单位是「平方元」，没法跟人讲；开个根号变回「元」，你就能说「平均差 300 块钱」。</div>
+  <div class="g-pages">本案例出现在：<a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-mae" data-k="平均绝对误差 MAE Mean Absolute Error MAE MAE 平均绝对误差 mae 把每一次的误差取绝对值再平均。不像 MSE 那样重罚大错，所以对极端值更宽容。">
+  <div class="g-head"><span class="g-abbr">MAE</span><span class="g-zh">平均绝对误差 MAE</span>
+    <span class="g-en">Mean Absolute Error</span><a class="g-anchor" href="#term-mae" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把每一次的误差取绝对值再平均。不像 MSE 那样重罚大错，所以对极端值更宽容。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 同样是打靶，MAE 只看每箭平均偏多远 —— 一箭飞出去也就算飞出去那点距离，不会翻倍惩罚你。</div>
+  <div class="g-pages">本案例出现在：<a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-r-squared" data-k="决定系数 R² R-squared R² R² R2 决定系数 R平方 模型比「直接猜平均值」好多少，写成 0 到 1 之间的数。1 = 完美，0 = 跟猜平均值一样，负数 = 还不如猜平均值。">
+  <div class="g-head"><span class="g-abbr">R²</span><span class="g-zh">决定系数 R²</span>
+    <span class="g-en">R-squared</span><a class="g-anchor" href="#term-r-squared" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">模型比「直接猜平均值」好多少，写成 0 到 1 之间的数。1 = 完美，0 = 跟猜平均值一样，负数 = 还不如猜平均值。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 老师说「我不看分数，只看你比全班平均分高多少」—— R² 就是把这句话翻译成一个数。</div>
+  <div class="g-pages">本案例出现在：<a href="b14.html">B14</a><a href="ch06.html">CH06</a></div>
+</div><div class="g-item" id="term-accuracy-confusion-matrix-f1" data-k="准确率（混淆矩阵 · F1） Accuracy / Confusion Matrix / F1  准确率 混淆矩阵 F1 F1 分数 查准 准确率 = 猜对的比例；混淆矩阵 = 把「该抓抓了 / 该抓没抓 / 不该抓抓了 / 不该抓没抓」四格列清楚；F1 = 把「抓得全」和「抓得准」合成一个数。">
+  <div class="g-head"><span class="g-zh">准确率（混淆矩阵 · F1）</span>
+    <span class="g-en">Accuracy / Confusion Matrix / F1</span><a class="g-anchor" href="#term-accuracy-confusion-matrix-f1" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">准确率 = 猜对的比例；混淆矩阵 = 把「该抓抓了 / 该抓没抓 / 不该抓抓了 / 不该抓没抓」四格列清楚；F1 = 把「抓得全」和「抓得准」合成一个数。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 体检的四格表：真有病查出、真有病漏掉、没病误判、没病判对 —— 只看「准确率」会被大量健康人刷高。</div>
+  <div class="g-pages">本案例出现在：<a href="b08.html">B08</a><a href="ch10.html">CH10</a></div>
+</div><div class="g-item" id="term-roc" data-k="ROC 曲线 Receiver Operating Characteristic ROC ROC 把阈值从松到紧扫一遍，画出「抓得全」与「抓错」的对照曲线。曲线下面的面积就是 AUC。">
+  <div class="g-head"><span class="g-abbr">ROC</span><span class="g-zh">ROC 曲线</span>
+    <span class="g-en">Receiver Operating Characteristic</span><a class="g-anchor" href="#term-roc" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把阈值从松到紧扫一遍，画出「抓得全」与「抓错」的对照曲线。曲线下面的面积就是 AUC。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 把录取分数线从 300 划到 700，每划一次记下「招了多少真才、误招了多少」，连起来就是这条线。</div>
+  <div class="g-pages">本案例出现在：<a href="b08.html">B08</a></div>
+</div><div class="g-item" id="term-robustness" data-k="稳健性 Robustness  稳健性 robust robustness 换个数据、换个假设、换个模型，结论还站得住吗？站得住就叫稳健。">
+  <div class="g-head"><span class="g-zh">稳健性</span>
+    <span class="g-en">Robustness</span><a class="g-anchor" href="#term-robustness" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">换个数据、换个假设、换个模型，结论还站得住吗？站得住就叫稳健。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一张桌子你推一下不晃、站上去也不晃、换个地面还不晃 —— 这才叫结实。</div>
+  <div class="g-pages">本案例出现在：<a href="ch08.html">CH08</a><a href="ch11.html">CH11</a></div>
+</div><div class="g-item" id="term-feature-importance" data-k="特征重要性 Feature Importance  特征重要性 变量重要性 重要性 排个序，看哪个特征对预测的贡献最大。注意：它只说明「模型用了谁」，不说明「谁导致了结果」。">
+  <div class="g-head"><span class="g-zh">特征重要性</span>
+    <span class="g-en">Feature Importance</span><a class="g-anchor" href="#term-feature-importance" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">排个序，看哪个特征对预测的贡献最大。注意：它只说明「模型用了谁」，不说明「谁导致了结果」。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一锅汤里盐放得多、糖放得少 —— 重要性告诉你盐的影响大，但不等于好喝全靠盐。</div>
+  <div class="g-pages">本案例出现在：<a href="ch09.html">CH09</a></div>
+</div><div class="g-item" id="term-psi" data-k="群体稳定性指数 PSI Population Stability Index PSI PSI 群体稳定性 稳定性指数 比较「训练时的人群分布」和「现在的人群分布」差多少。通常超过 0.25 就该报警，0.1 以内算稳定。">
+  <div class="g-head"><span class="g-abbr">PSI</span><span class="g-zh">群体稳定性指数 PSI</span>
+    <span class="g-en">Population Stability Index</span><a class="g-anchor" href="#term-psi" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">比较「训练时的人群分布」和「现在的人群分布」差多少。通常超过 0.25 就该报警，0.1 以内算稳定。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 年初客户平均 35 岁、现在平均 50 岁 —— 人变了，当年那套规则就不一定还管用。</div>
+  <div class="g-pages">本案例出现在：<a href="ch13.html">CH13</a></div>
+</div><div class="g-item" id="term-drift" data-k="漂移 Drift  漂移 drift 分布漂移 概念漂移 上线之后，数据的分布或者「输入 → 结果」的关系慢慢变了。模型没坏，是世界变了。">
+  <div class="g-head"><span class="g-zh">漂移</span>
+    <span class="g-en">Drift</span><a class="g-anchor" href="#term-drift" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">上线之后，数据的分布或者「输入 → 结果」的关系慢慢变了。模型没坏，是世界变了。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 同一件衣服去年合身、今年穿不进 —— 衣服没变，是你变了。</div>
+  <div class="g-pages">本案例出现在：<a href="ch13.html">CH13</a></div>
+</div><div class="g-item" id="term-noise" data-k="噪声 Noise  噪声 噪音 白噪声 噪声地板 信噪比 数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">
+  <div class="g-head"><span class="g-zh">噪声</span>
+    <span class="g-en">Noise</span><a class="g-anchor" href="#term-noise" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 收音机的沙沙声 —— 你再怎么调，也不可能把沙沙声当成节目听清楚。</div>
+  <div class="g-pages">本案例出现在：<a href="ch06.html">CH06</a><a href="b05.html">B05</a></div>
+</div><div class="g-item" id="term-logistic-regression" data-k="逻辑回归 Logistic Regression  逻辑回归 logistic logit 预测「是 / 否」概率的经典模型。形式跟线性模型一样，只是最后套一层变换把输出压到 0–1 之间。">
+  <div class="g-head"><span class="g-zh">逻辑回归</span>
+    <span class="g-en">Logistic Regression</span><a class="g-anchor" href="#term-logistic-regression" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">预测「是 / 否」概率的经典模型。形式跟线性模型一样，只是最后套一层变换把输出压到 0–1 之间。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 打分卡：各项加分加起来得总分，再换算成一个「通过的概率」—— 每项加多少分你都看得懂。</div>
+  <div class="g-pages">本案例出现在：<a href="b11.html">B11</a><a href="b12.html">B12</a></div>
+</div></div><h2 id="c-本案例专有">本案例专有<span class="cat-desc">车险定价这个场景里才会遇到的词</span></h2><div class="gloss"><div class="g-item" id="term-pure-premium" data-k="纯保费 Pure Premium  纯保费 刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。">
+  <div class="g-head"><span class="g-zh">纯保费</span>
+    <span class="g-en">Pure Premium</span><a class="g-anchor" href="#term-pure-premium" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一碗面的成本价：面粉钱 + 汤料钱，没算房租和老板要赚的。</div>
+  <div class="g-pages">本案例出现在：<a href="ch01.html">CH01</a><a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-frequency" data-k="出险频率 Frequency  频率 一年里平均出几次险。是个「次数」，所以用泊松那套工具。">
+  <div class="g-head"><span class="g-zh">出险频率</span>
+    <span class="g-en">Frequency</span><a class="g-anchor" href="#term-frequency" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一年里平均出几次险。是个「次数」，所以用泊松那套工具。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 问「这个人一年会感冒几次」—— 答案是 0、1、2 这种个数，不是金额。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-severity" data-k="案均损失 Severity  案均 Severity 已知出险了的前提下，一次平均赔多少钱。只在出过险的人身上算。">
+  <div class="g-head"><span class="g-zh">案均损失</span>
+    <span class="g-en">Severity</span><a class="g-anchor" href="#term-severity" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">已知出险了的前提下，一次平均赔多少钱。只在出过险的人身上算。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 问「感冒一次要花多少医药费」—— 前提是他确实感冒了，没感冒的人不算进来。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-zero-inflated" data-k="零膨胀 Zero-Inflated  零膨胀 数据里绝大多数是 0（大部分人一年不出险），0 多到会把普通模型带偏。">
+  <div class="g-head"><span class="g-zh">零膨胀</span>
+    <span class="g-en">Zero-Inflated</span><a class="g-anchor" href="#term-zero-inflated" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">数据里绝大多数是 0（大部分人一年不出险），0 多到会把普通模型带偏。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 全班 90% 的人考 0 分 —— 平均分被拖得毫无参考价值。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-heavy-tail" data-k="重尾 Heavy Tail  重尾 极少数人赔得极多，金额大到能把所有指标搅乱。">
+  <div class="g-head"><span class="g-zh">重尾</span>
+    <span class="g-en">Heavy Tail</span><a class="g-anchor" href="#term-heavy-tail" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">极少数人赔得极多，金额大到能把所有指标搅乱。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一个亿万富翁走进酒吧，在场所有人的「平均资产」立刻翻几十倍。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-tweedie" data-k="Tweedie 分布 Tweedie Distribution Tweedie Tweedie 一种能同时处理「大量 0」和「极少数巨额」的分布，车险定价的正统工具。本库未实现，只讲思路。">
+  <div class="g-head"><span class="g-abbr">Tweedie</span><span class="g-zh">Tweedie 分布</span>
+    <span class="g-en">Tweedie Distribution</span><a class="g-anchor" href="#term-tweedie" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">一种能同时处理「大量 0」和「极少数巨额」的分布，车险定价的正统工具。本库未实现，只讲思路。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 一把既能量头发丝、又能量电线杆的尺子 —— 普通尺子只能量一头，所以它很贵但很值。</div>
+  <div class="g-pages">本案例出现在：<a href="ch03.html">CH03</a></div>
+</div><div class="g-item" id="term-selection-bias" data-k="选择偏差 Selection Bias  选择偏差 你手上只有被承保的人的赔付记录，被拒的人根本没数据 —— 于是你的「已知世界」是歪的。">
+  <div class="g-head"><span class="g-zh">选择偏差</span>
+    <span class="g-en">Selection Bias</span><a class="g-anchor" href="#term-selection-bias" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">你手上只有被承保的人的赔付记录，被拒的人根本没数据 —— 于是你的「已知世界」是歪的。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 只统计来店里买东西的人有多满意，就下结论说所有人满意 —— 不满意的人早就不来了。</div>
+  <div class="g-pages">本案例出现在：<a href="ch07.html">CH07</a></div>
+</div><div class="g-item" id="term-ipw" data-k="逆概率加权 Inverse Probability Weighting IPW IPW 逆概率加权 被抽中概率低的人，算平均时给他更大的权重，把被抽歪的样本掰回来。">
+  <div class="g-head"><span class="g-abbr">IPW</span><span class="g-zh">逆概率加权</span>
+    <span class="g-en">Inverse Probability Weighting</span><a class="g-anchor" href="#term-ipw" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">被抽中概率低的人，算平均时给他更大的权重，把被抽歪的样本掰回来。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 调查只问到 1 个老人，但他的意见要代表 100 个没被问到的老人 —— 给他 100 倍权重。</div>
+  <div class="g-pages">本案例出现在：<a href="ch08.html">CH08</a></div>
+</div><div class="g-item" id="term-dr" data-k="双重稳健 Doubly Robust DR 双重稳健 先用模型把所有人预测一遍，再用审计样本的实际数据把模型的偏差补回来。两条腿走路，断一条还能站。">
+  <div class="g-head"><span class="g-abbr">DR</span><span class="g-zh">双重稳健</span>
+    <span class="g-en">Doubly Robust</span><a class="g-anchor" href="#term-dr" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">先用模型把所有人预测一遍，再用审计样本的实际数据把模型的偏差补回来。两条腿走路，断一条还能站。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 先用地图估路程，再用实际走过的几段校准地图。地图错了有实测兜底，实测少了有地图兜底。</div>
+  <div class="g-pages">本案例出现在：<a href="ch08.html">CH08</a></div>
+</div><div class="g-item" id="term-audit-sample" data-k="审计样本 Audit Sample  审计 从被拒的人里抽一小部分，人工去查他们真实风险是多少。昂贵但能救命。">
+  <div class="g-head"><span class="g-zh">审计样本</span>
+    <span class="g-en">Audit Sample</span><a class="g-anchor" href="#term-audit-sample" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">从被拒的人里抽一小部分，人工去查他们真实风险是多少。昂贵但能救命。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 体检抽查 —— 不可能人人做全套，抽一小批做详细检查，用来判断整体。</div>
+  <div class="g-pages">本案例出现在：<a href="ch07.html">CH07</a><a href="ch08.html">CH08</a></div>
+</div><div class="g-item" id="term-proxy-variable" data-k="代理变量 Proxy Variable  代理变量 看似和风险相关、实际只是「和信息难不难拿到」相关的变量。本案例里的渠道就是典型。">
+  <div class="g-head"><span class="g-zh">代理变量</span>
+    <span class="g-en">Proxy Variable</span><a class="g-anchor" href="#term-proxy-variable" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">看似和风险相关、实际只是「和信息难不难拿到」相关的变量。本案例里的渠道就是典型。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 用「住在哪个小区」判断一个人有没有钱 —— 相关，但小区不代表能力，换个城市就失灵。</div>
+  <div class="g-pages">本案例出现在：<a href="ch11.html">CH11</a></div>
+</div><div class="g-item" id="term-wrongly-rejected" data-k="错杀 Wrongly Rejected  错杀 真实风险明明够低，却被规则拒掉的人。本案例一共 2,259 个。">
+  <div class="g-head"><span class="g-zh">错杀</span>
+    <span class="g-en">Wrongly Rejected</span><a class="g-anchor" href="#term-wrongly-rejected" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">真实风险明明够低，却被规则拒掉的人。本案例一共 2,259 个。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 安检把一位没带任何东西的老奶奶拦下了 —— 规则没错，但这次用错了人。</div>
+  <div class="g-pages">本案例出现在：<a href="index.html">INDEX</a><a href="ch10.html">CH10</a></div>
+</div><div class="g-item" id="term-false-positive" data-k="误伤 False Positive / 误伤  误伤 模型说他是好人，其实真实风险偏高。救错人的代价。">
+  <div class="g-head"><span class="g-zh">误伤</span>
+    <span class="g-en">False Positive / 误伤</span><a class="g-anchor" href="#term-false-positive" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">模型说他是好人，其实真实风险偏高。救错人的代价。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 你担保朋友进了公司，结果他表现不好 —— 担保人跟着挨批。这就是误伤的代价。</div>
+  <div class="g-pages">本案例出现在：<a href="ch10.html">CH10</a></div>
+</div></div><h2 id="c-业务与上线">业务与上线<span class="cat-desc">模型之外的事：怎么落地、怎么盯着</span></h2><div class="gloss"><div class="g-item" id="term-end-to-end" data-k="端到端 End-to-End  端到端 end-to-end 从「业务问题」一路走到「上线结果」的完整链路，中间每一环都自己打通，不甩给下一个人。">
+  <div class="g-head"><span class="g-zh">端到端</span>
+    <span class="g-en">End-to-End</span><a class="g-anchor" href="#term-end-to-end" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">从「业务问题」一路走到「上线结果」的完整链路，中间每一环都自己打通，不甩给下一个人。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 从种麦子到端上面包全自己干 —— 中间任一环掉链子，最后那口面包都不对。</div>
+  <div class="g-pages">本案例出现在：<a href="index.html">INDEX</a><a href="b10.html">B10</a></div>
+</div><div class="g-item" id="term-deployment" data-k="上线与部署 Deployment  上线 部署 上线部署 把训练好的模型接进真实业务流程，让它开始给真实的人打分。这之后的每一个错误都要付真金白银。">
+  <div class="g-head"><span class="g-zh">上线与部署</span>
+    <span class="g-en">Deployment</span><a class="g-anchor" href="#term-deployment" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把训练好的模型接进真实业务流程，让它开始给真实的人打分。这之后的每一个错误都要付真金白银。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 驾校练得再好，真上路那一刻才算数。练车场和马路的区别，就是离线和在线的区别。</div>
+  <div class="g-pages">本案例出现在：<a href="ch12.html">CH12</a><a href="ch13.html">CH13</a></div>
+</div><div class="g-item" id="term-shadow-mode-canary" data-k="影子模式与灰度 Shadow Mode / Canary  影子模式 灰度 灰度发布 shadow mode 影子跑 影子 = 模型只打分不决策，跟线上规则并行跑着对答案；灰度 = 先放一小部分真实流量给它做决策。">
+  <div class="g-head"><span class="g-zh">影子模式与灰度</span>
+    <span class="g-en">Shadow Mode / Canary</span><a class="g-anchor" href="#term-shadow-mode-canary" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">影子 = 模型只打分不决策，跟线上规则并行跑着对答案；灰度 = 先放一小部分真实流量给它做决策。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 新司机先坐副驾跟着开（影子），再在空旷路段自己开一段（灰度），最后才上主干道。</div>
+  <div class="g-pages">本案例出现在：<a href="ch12.html">CH12</a></div>
+</div><div class="g-item" id="term-a-b" data-k="A/B 测试 A/B Test A/B A/B AB 测试 A/B 测试 对照组 实验组 分流试验 把人随机分成两组，一组用老办法、一组用新模型，比一比谁的结果真的更好。这是唯一能证明「有用」的办法。">
+  <div class="g-head"><span class="g-abbr">A/B</span><span class="g-zh">A/B 测试</span>
+    <span class="g-en">A/B Test</span><a class="g-anchor" href="#term-a-b" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">把人随机分成两组，一组用老办法、一组用新模型，比一比谁的结果真的更好。这是唯一能证明「有用」的办法。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 两块试验田，一块施新肥、一块不施，收割时比产量 —— 除此之外都是嘴炮。</div>
+  <div class="g-pages">本案例出现在：<a href="s05.html">S05</a><a href="ch12.html">CH12</a></div>
+</div><div class="g-item" id="term-monitoring" data-k="上线后监控 Monitoring  监控 上线后监控 监控指标 上线只是开始：每天盯住分数分布、人群构成和真实结果，偏了就报警，该回滚就回滚。">
+  <div class="g-head"><span class="g-zh">上线后监控</span>
+    <span class="g-en">Monitoring</span><a class="g-anchor" href="#term-monitoring" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">上线只是开始：每天盯住分数分布、人群构成和真实结果，偏了就报警，该回滚就回滚。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 新车也要定期保养、盯着仪表盘 —— 不看仪表盘，等发动机响了才知道出事。</div>
+  <div class="g-pages">本案例出现在：<a href="ch13.html">CH13</a></div>
+</div><div class="g-item" id="term-underwriting" data-k="核保与承保 Underwriting  核保 承保 承保口径 underwriting 核保 = 判断这个人能不能保、按什么条件保；承保 = 最终接下这笔业务。被拒掉的人从此就没有数据了。">
+  <div class="g-head"><span class="g-zh">核保与承保</span>
+    <span class="g-en">Underwriting</span><a class="g-anchor" href="#term-underwriting" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">核保 = 判断这个人能不能保、按什么条件保；承保 = 最终接下这笔业务。被拒掉的人从此就没有数据了。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 进门先量体温再决定让不让进 —— 量体温是核保，放进来是承保，被拦在门外的人你再也观察不到。</div>
+  <div class="g-pages">本案例出现在：<a href="ch07.html">CH07</a></div>
+</div><div class="g-item" id="term-rejection" data-k="拒保 Rejection  拒保 拒绝承保 拒掉的 被拒 按规则把这个人挡在门外。挡对了省钱，挡错了就是「错杀」—— 本案例的主角就是被挡错的那批人。">
+  <div class="g-head"><span class="g-zh">拒保</span>
+    <span class="g-en">Rejection</span><a class="g-anchor" href="#term-rejection" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">按规则把这个人挡在门外。挡对了省钱，挡错了就是「错杀」—— 本案例的主角就是被挡错的那批人。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 安检把所有带金属的人都拦下 —— 拦对了是安全，拦错了就是误伤一个戴金属腰带扣的老奶奶。</div>
+  <div class="g-pages">本案例出现在：<a href="ch07.html">CH07</a><a href="ch10.html">CH10</a></div>
+</div><div class="g-item" id="term-channel" data-k="渠道 Channel  渠道 保单是从哪儿卖出去的（代理人、电销、网销、银保）。它常常只是「信息好不好拿到」的替身，不是风险本身。">
+  <div class="g-head"><span class="g-zh">渠道</span>
+    <span class="g-en">Channel</span><a class="g-anchor" href="#term-channel" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">保单是从哪儿卖出去的（代理人、电销、网销、银保）。它常常只是「信息好不好拿到」的替身，不是风险本身。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 同样一杯咖啡，在机场卖和在街角卖差三倍价 —— 这个差价反映的是「地点」，不是咖啡好不好。</div>
+  <div class="g-pages">本案例出现在：<a href="ch11.html">CH11</a></div>
+</div><div class="g-item" id="term-loss-ratio-combined-ratio" data-k="赔付率与综合成本率 Loss Ratio / Combined Ratio  赔付率 综合成本率 成本率 损失率 赔付率 = 赔出去的钱 ÷ 收进来的保费；综合成本率 = 赔付率 + 费用率。超过 100% 就是承保亏损。">
+  <div class="g-head"><span class="g-zh">赔付率与综合成本率</span>
+    <span class="g-en">Loss Ratio / Combined Ratio</span><a class="g-anchor" href="#term-loss-ratio-combined-ratio" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">赔付率 = 赔出去的钱 ÷ 收进来的保费；综合成本率 = 赔付率 + 费用率。超过 100% 就是承保亏损。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 开面馆：面粉汤料的钱 ÷ 营业额 = 赔付率；再加上房租人工 = 综合成本率。超过 100% 就是卖一碗亏一碗。</div>
+  <div class="g-pages">本案例出现在：<a href="s03.html">S03</a></div>
+</div><div class="g-item" id="term-rate-factor" data-k="费率因子 Rate Factor  费率因子 定价因子 费率因子 定价公式里的每一根「杠杆」，比如年龄、车型、地区。每根都要能讲出业务道理，不能只是跑出来显著。">
+  <div class="g-head"><span class="g-zh">费率因子</span>
+    <span class="g-en">Rate Factor</span><a class="g-anchor" href="#term-rate-factor" title="复制这一条的链接">#</a></div>
+  <div class="g-plain">定价公式里的每一根「杠杆」，比如年龄、车型、地区。每根都要能讲出业务道理，不能只是跑出来显著。</div>
+  <div class="g-ana"><b>打个比方 ·</b> 打车费 = 起步价 + 里程 × 单价 + 时段系数 —— 里程和时段就是两根因子，每根你都能说出为什么。</div>
+  <div class="g-pages">本案例出现在：<a href="ch01.html">CH01</a><a href="ch09.html">CH09</a></div>
+</div></div>
+<a class="g-back" id="gback" href="index.html">↩ 回到刚才那一页</a>
+<script>
+var q=document.getElementById("q"), cnt=document.getElementById("cnt");
+var items=[].slice.call(document.querySelectorAll(".g-item"));
+function run(){
+  var v=(q.value||"").trim().toLowerCase(), n=0;
+  items.forEach(function(it){
+    var hit = !v || it.getAttribute("data-k").toLowerCase().indexOf(v)>=0;
+    it.style.display = hit ? "" : "none";
+    if(hit) n++;
+  });
+  cnt.textContent = v ? ("命中 "+n+" 条") : ("共 "+items.length+" 条");
+}
+q.addEventListener("input", run);
+run();
+
+// 从正文点术语跳进来时：滚到那一条并高亮，同时给一个「回到刚才那一页」的出口
+(function(){
+  var back=document.getElementById("gback");
+  function focus(){
+    if(!location.hash) return;
+    var el=null;
+    try{ el=document.querySelector(location.hash); }catch(e){}
+    if(!el) return;
+    items.forEach(function(it){ it.classList.remove("hit"); });
+    el.classList.add("hit");
+    el.scrollIntoView({block:"center"});
+    back.style.display="inline-block";
+  }
+  focus();
+  window.addEventListener("hashchange", focus);
+  back.addEventListener("click", function(e){
+    // 有来路就原路返回，直接打开本页时退回知识地图
+    if(history.length>1){ e.preventDefault(); history.back(); }
+  });
+})();
+</script>
+
+<div class="quote q-talk"><span class="q-tag">说人话</span>
+<p>如果你把这张表从头读到尾，你会发现一件有意思的事：
+<b>机器学习里真正难的词不超过十个，剩下都是同一件事换了个说法。</b>
+之所以看着唬人，是因为每个领域都给同一件事起了自己的名字——
+精算叫「费率因子」，统计叫「回归系数」，机器学习叫「特征权重」，说的是同一个东西。</p></div>
+
+<div class="quote q-warn"><span class="q-tag">特别提醒</span>
+<p>记住一条防身技巧：<b>任何解释里出现「本质上」「某种意义上」「简单来说」却越说越绕的，
+基本可以判定为作者自己也没搞懂。</b>遇到这种，换一本书看，别怀疑自己。</p></div>
+
+
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-mean-median"><b>均值 / 中位数</b></a><span>均值 = 全部加起来除以个数；中位数 = 排队站最中间那个。有极端值的时候，中位数更靠得住。</span></div><div class="t-item"><a href="glossary.html#term-sample-population"><b>样本与总体</b></a><span>总体是你想知道的全部对象；样本是你实际拿到的那一小撮。用样本去猜总体，就总有猜错的风险。</span></div><div class="t-item"><a href="glossary.html#term-loss-ratio-combined-ratio"><b>赔付率与综合成本率</b></a><span>赔付率 = 赔出去的钱 ÷ 收进来的保费；综合成本率 = 赔付率 + 费用率。超过 100% 就是承保亏损。</span></div><div class="t-item"><a href="glossary.html#term-correlation-vs-causation"><b>相关与因果</b></a><span>相关 = 两件事一起变；因果 = 一件导致了另一件。相关不等于因果，这是最容易栽跟头的地方。</span></div><div class="t-item"><a href="glossary.html#term-probability"><b>概率</b></a><span>一件事发生的可能性，写成 0 到 1 之间的一个数。0 是绝不可能，1 是一定发生。</span></div><div class="t-item"><a href="glossary.html#term-variance-standard-deviation"><b>方差 / 标准差</b></a><span>衡量一组数据有多分散。方差越大越散；标准差是方差开根号，好处是单位跟原始数据一样。</span></div></div>
+<div class="pager">
+<a href="a01.html"><span class="dir">◀ 上一页</span>常见算法速查</a>
+<a class="next" href="code.html"><span class="dir">下一页 ▶</span>代码入口 · 全部源码</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

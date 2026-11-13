@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动画 · <a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a> 逐轮拟合 —— 一群「成绩一般的学生」怎么补出一条好曲线</title>
+<style>
+:root{--paper:#f5f1e6;--ink:#2b2a26;--red:#b53d2e;--amber:#9a6f12;--jade:#2f6b5a;--grey:#8a8578;--line:#ddd5c2;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--paper);color:var(--ink);padding:22px 26px 34px;}
+h1{font-family:"Songti SC","SimSun",serif;font-size:21px;font-weight:normal;letter-spacing:1px;}
+.sub{font-size:13px;color:var(--grey);margin:4px 0 16px;}
+.stage{display:flex;gap:18px;flex-wrap:wrap;}
+.panel{background:#fbf8ef;border:1px solid var(--line);border-radius:12px;padding:14px;}
+#cv{display:block;background:#fff;border-radius:8px;}
+#cvT{display:block;background:#fff;border-radius:8px;margin-top:12px;}
+.side{width:280px;display:flex;flex-direction:column;gap:12px;}
+.side h3{font-family:"Songti SC","SimSun",serif;font-size:14.5px;font-weight:normal;color:var(--jade);letter-spacing:2px;}
+.row{display:flex;justify-content:space-between;font-size:13.5px;padding:6px 10px;background:#fff;border-radius:8px;border:1px solid var(--line);}
+.row b{font-variant-numeric:tabular-nums;color:var(--red);}
+.caption{font-size:13.5px;line-height:1.8;min-height:132px;padding:10px 14px;background:#fff;border:1px dashed var(--line);border-radius:10px;}
+.caption b{color:var(--red);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+button{font-family:inherit;font-size:13.5px;padding:7px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+button:hover{border-color:var(--red);color:var(--red);}
+button.main{background:var(--red);border-color:var(--red);color:#fff;}
+button.main:hover{opacity:.88;color:#fff;}
+select{font-family:inherit;font-size:13px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:#fff;}
+.legend{font-size:12px;color:var(--grey);line-height:1.9;}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:5px;vertical-align:3px;}
+@media (max-width:900px){.side{width:100%;}}
+
+.guide{background:#fbf8ef;border:1px solid #ddd5c2;border-radius:12px;
+  padding:14px 20px 12px;margin:2px 0 16px;}
+.guide .g-t{font-family:"Songti SC","SimSun",serif;font-size:15px;color:#2f6b5a;
+  letter-spacing:2px;margin-bottom:8px;}
+.guide ul{margin:0;padding-left:20px;}
+.guide li{font-size:13.8px;line-height:1.85;color:#55524a;}
+.guide li b{color:#2b2a26;}
+.guide .g-term{margin-top:8px;padding-top:8px;border-top:1px dashed #ddd5c2;
+  font-size:13px;color:#8a8578;line-height:1.8;}
+.guide .g-term b{color:#b53d2e;}
+.modebar{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap;}
+button.mode{background:#2f6b5a;border-color:#2f6b5a;color:#fff;font-size:13px;padding:6px 14px;}
+button.mode:hover{opacity:.88;color:#fff;}
+.prog{height:5px;background:#efe9d8;border-radius:3px;overflow:hidden;margin:0 0 10px;}
+.prog-bar{height:100%;width:0;background:#b53d2e;border-radius:3px;transition:width .3s;}
+.three-box{background:#e6efe9;border:1px solid #c4d8cd;border-radius:12px;
+  padding:16px 22px;margin:24px 0 6px;}
+.three-box .t-t{font-family:"Songti SC","SimSun",serif;font-size:15px;color:#2f6b5a;
+  letter-spacing:2px;margin-bottom:8px;}
+.three-box ol{margin:0;padding-left:20px;}
+.three-box li{font-size:14.5px;line-height:1.85;margin-bottom:4px;color:#2b2a26;}
+.back-link{font-size:13px;margin-top:10px;}
+
+/* 移动端：canvas 是固定宽，必须等比缩放，否则溢出屏幕 */
+canvas { max-width: 100%; height: auto; }
+@media (max-width: 860px) {
+  body { padding: 14px 12px 24px; }
+  h1 { font-size: 18px; }
+  .side { width: 100%; }
+  .panel { padding: 10px; }
+}
+
+a.tl{color:inherit;text-decoration:none;cursor:help;border-bottom:1px dotted rgba(47,107,90,.6);}a.tl:hover{color:#b53d2e;border-bottom-color:#b53d2e;background:#f7e8e4;border-radius:2px;}
+</style>
+</head>
+<body>
+<h1>GBDT 逐轮拟合 —— 一群「成绩一般的学生」怎么补出一条好曲线</h1>
+<div class="sub">墨色虚线是真相，红色实线是模型当前的水平。每一轮，小树只负责补「现在还差的那一块」。</div>
+
+<div class="guide">
+<div class="g-t">先看懂这张图 · 30 秒</div>
+<ul>
+<li><b>横轴</b>：司机年龄。<b>纵轴</b>：风险高低（越高越危险）。</li>
+<li><b>墨色虚线</b>：真相 —— 这个案例里真实规律是个「两头高、中间低」的 U 形
+（年纪很轻和年纪很大的都更危险，中年最安全）。<b>模型并不知道这条线长什么样</b>，它只看得到点。</li>
+<li><b>红色实线</b>：模型目前的水平。一开始它贴着地面，因为还什么都没学到。</li>
+<li><b>灰色圆圈</b>：现在的预测离真相还差多少 —— 差得越多圈越大。</li>
+<li><b>下方的小方块</b>：这一轮新加的那棵小树在干什么。
+<span style="color:#2f6b5a"><b>绿色</b></span> = 往上补，
+<span style="color:#b53d2e"><b>红色</b></span> = 往下压，方块越高表示补得越多。</li>
+<li><b>你会看到什么</b>：红色实线一轮一轮往上抬、往虚线上贴，八轮后台阶基本贴住虚线。
+<br><span style="color:#8a8578">注意：红线是<b>一段一段的台阶</b>，不是平滑曲线 —— 因为每一棵树只能给出「<a class="tl" href="glossary.html#term-binning" title="分箱（离散化）｜把连续的数字切成几段（年龄 18–25、26–35…），每段当成一类。能扛住极端值，也更…">分段</a>常数」。
+台阶越多越细，越接近连续的线。这不是画错了，这正是树模型本来的样子。</span></li>
+</ul>
+<div class="g-term"><b>顺手记两个词：</b>
+<b><a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">GBDT</a></b> 的全名是「<a class="tl" href="glossary.html#term-gbdt" title="梯度提升树｜一棵树不够，就一棵一棵往上加：新树只负责「补前一轮漏掉的部分」，累加起来就很强。">梯度提升树</a>」—— 名字很唬人，意思就是
+<b>一棵树不够，就让第二棵专门去补第一棵漏掉的部分</b>，然后第三棵、第四棵……
+<b><a class="tl" href="glossary.html#term-learning-rate" title="学习率｜每一轮「补差」时，只补一部分而不是全补。步子小一点更稳，但要多走几轮。">学习率</a></b>是「每次只补一部分」的比例，这里设的是 <b>0.45</b> —— 方块的高度是这一段<b>想补</b>多少，
+实际只补它的 45%。一次补太猛容易走过头，补得太慢又要很多轮。
+<b>最后留意第 8 轮：</b>那时误差已经低于数据本身的<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声</a>，再练下去就开始背<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声</a>了 —— 该收手。</div>
+</div>
+
+<div class="stage">
+<div class="panel"><canvas id="cv" width="560" height="352"></canvas><canvas id="cvT" width="560" height="150"></canvas></div>
+<div class="side">
+  <div class="modebar"><button class="mode" id="bMode">当前：大白话 ▸ 点这里换术语</button></div>
+  <div class="prog"><div class="prog-bar" id="progBar"></div></div>
+  <h3>当前这一轮</h3>
+  <div class="row"><span class="lb" data-p="第几轮（共 8 轮）" data-t="轮次 m">第几轮（共 8 轮）</span><b id="vround">–</b></div>
+  <div class="row"><span class="lb" data-p="整体还差多少（越小越好）" data-t="整体误差 MSE（越小越好）">整体还差多少（越小越好）</span><b id="vmse">–</b></div>
+  <div class="row"><span class="lb" data-p="这一轮补了多少" data-t="本轮增量（学习率后）">这一轮补了多少</span><b id="vstep">–</b></div>
+  <div class="row"><span class="lb" data-p="这棵小树分成几段" data-t="本轮叶子数">这棵小树分成几段</span><b id="vleaf">–</b></div>
+  <div class="row"><span class="lb" data-p="已经加了几棵小树" data-t="累计弱学习器数量">已经加了几棵小树</span><b id="vtrees">–</b></div>
+  <div class="caption" id="cap"></div>
+  <div class="ctrl">
+    <button class="main" id="bPlay">播放</button>
+    <button id="bPrev">上一步</button>
+    <button id="bNext">下一步</button>
+    <button id="bReset">重置</button>
+    <select id="spd"><option value="1800" selected>慢速</option><option value="800">常速</option><option value="380">快速</option></select>
+  </div>
+  <div class="legend">
+    <i style="background:#2b2a26;height:2px"></i>真相（U 形规律）<br>
+    <i style="background:#b53d2e"></i>模型当前的累计预测<br>
+    <i style="background:rgba(138,133,120,.9);border-radius:50%;width:9px;height:9px"></i>灰圈 = 这一点还差多少（圈越大差得越多）
+  </div>
+</div>
+</div>
+
+<script>
+"use strict";
+/* ---------------- 真实数据：U 形规律 + 噪声（GLM 最怕的形状） ---------------- */
+var rng=(function(){var s=920241;return function(){s=(s*1103515245+12345)>>>0;return s/4294967296;};})();
+var N=80, X=[], Y=[];
+function truth(x){ return 1.0+0.55*Math.pow((x-50)/22,2); }   // 中间低两头高的 U 形
+for(var i=0;i<N;i++){
+  var x=18+rng()*64;                       // 年龄 18~82
+  var y=truth(x)+(rng()-0.5)*0.34;
+  X.push(x); Y.push(y);
+}
+/* ---------------- GBDT：真实算法（回归树 + 一阶梯度） ---------------- */
+var LR=0.45, MAXD=2;                     // 学习率 / 树深
+function meanOf(idxs,res){ var m=0; idxs.forEach(function(i){m+=res[i];}); return m/idxs.length; }
+function sseOf(idxs,res){ var m=meanOf(idxs,res),s=0; idxs.forEach(function(i){s+=Math.pow(res[i]-m,2);}); return s; }
+function fitStump(res){
+  /* 深度 2 的回归树：找两刀，让叶子内的残差平方和最小 */
+  var idx=X.map(function(_,i){return i;});
+  function bestSplit(idxs){
+    var bs=null;
+    for(var j=0;j<idxs.length;j++){
+      for(var k2=j+1;k2<idxs.length;k2++){
+        var thr=(X[idxs[j]]+X[idxs[k2]])/2;
+        var L=[],R=[];
+        idxs.forEach(function(i){ (X[i]<=thr?L:R).push(i); });
+        if(L.length<5||R.length<5) continue;
+        var sse=sseOf(L,res)+sseOf(R,res);
+        if(!bs||sse<bs.sse) bs={thr:thr,sse:sse,L:L,R:R};
+      }
+    }
+    return bs;
+  }
+  /* 关键：每个节点的 sse0 必须是它自己的残差平方和，否则「改善不足则停」的判据恒真 */
+  function mk(idxs){ return {idxs:idxs,sse0:sseOf(idxs,res),leaf:meanOf(idxs,res),thr:undefined}; }
+  var root=mk(idx);
+  function grow(node,depth){
+    if(depth>=MAXD) return;
+    var bs=bestSplit(node.idxs);
+    if(!bs) return;
+    if(bs.sse>=node.sse0*0.98) return;      // 这一刀只能削掉不到 2% 的误差，不值得切
+    node.thr=bs.thr;
+    node.l=mk(bs.L); node.r=mk(bs.R);
+    grow(node.l,depth+1); grow(node.r,depth+1);
+  }
+  grow(root,0);
+  return root;
+}
+function stumpPredict(root,x){
+  var n=root;
+  while(n.thr!==undefined){ n = x<=n.thr ? n.l : n.r; }
+  return n.leaf;
+}
+function leafCount(n){ return n.thr===undefined?1:leafCount(n.l)+leafCount(n.r); }
+/* 累计预测 = 前 k 棵树的补丁之和；直接走树结构，对任意年龄都能求值 */
+function Fsum(k,x){ var s=0; for(var m=0;m<k;m++) s+=LR*stumpPredict(trees[m],x); return s; }
+var rounds=[{F:X.map(function(){return 0;})}];    // 第 0 轮：从 0 起步（教学版）
+var trees=[];
+var M=8;
+for(var r=0;r<M;r++){
+  var Fp=rounds[rounds.length-1].F;
+  var res=Y.map(function(y,i){return y-Fp[i];});
+  var tree=fitStump(res);
+  trees.push(tree);
+  var Fn=X.map(function(_,i){return Fp[i]+LR*stumpPredict(tree,X[i]);});
+  rounds.push({F:Fn});
+}
+function mse(F){ var s=0; for(var i=0;i<N;i++) s+=Math.pow(Y[i]-F[i],2); return s/N; }
+
+/* ---------------- 绘图 ---------------- */
+var cv=document.getElementById("cv"), ctx=cv.getContext("2d");
+var cvT=document.getElementById("cvT"), ctx2=cvT.getContext("2d");
+var PAD=40, PW=cv.width-PAD-16, PH=cv.height-PAD-36, YMAX=2.45;
+function sx(x){ return PAD+(x-16)/(84-16)*PW; }
+function sy(y){ return cv.height-36-(y/YMAX)*PH; }
+function draw(k){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.font="12px 'Microsoft YaHei'"; ctx.fillStyle="#8a8578";
+  ctx.strokeStyle="#ddd5c2";
+  [0,0.5,1,1.5,2.0].forEach(function(gy){
+    ctx.beginPath(); ctx.moveTo(PAD,sy(gy)); ctx.lineTo(cv.width-16,sy(gy)); ctx.stroke();
+    ctx.fillText(gy,16,sy(gy)+4);
+  });
+  for(var gx=20;gx<=80;gx+=10){ ctx.fillText(gx,sx(gx)-8,cv.height-22); }
+  ctx.fillText("风险（相对值）",PAD-26,18); ctx.fillText("年龄（岁）",cv.width-76,cv.height-6);
+  /* 残差灰圈（相对当前 F）：离真相差得越多，圈越大 */
+  var F=rounds[k].F;
+  for(var i=0;i<N;i++){
+    var rr=2.6+3.6*Math.min(1,Math.abs(Y[i]-F[i])/2.0);
+    ctx.beginPath(); ctx.arc(sx(X[i]),sy(Y[i]),rr,0,7);
+    ctx.strokeStyle="rgba(138,133,120,.32)"; ctx.lineWidth=1.3; ctx.stroke();
+  }
+  /* 真相 */
+  ctx.beginPath();
+  for(var px=0;px<=PW;px+=3){ var x=16+px/PW*(84-16);
+    if(px===0) ctx.moveTo(sx(x),sy(truth(x))); else ctx.lineTo(sx(x),sy(truth(x))); }
+  ctx.setLineDash([6,4]); ctx.strokeStyle="#2b2a26"; ctx.lineWidth=1.8; ctx.stroke(); ctx.setLineDash([]);
+  /* 累计预测：沿 x 走树求值，得到真正的阶梯（旧写法按数组下标乱取，画出来是锯刺） */
+  ctx.beginPath();
+  for(var p2=0;p2<=PW;p2+=2){ var x2=16+p2/PW*(84-16), yv=Math.max(0,Fsum(k,x2));
+    if(p2===0) ctx.moveTo(sx(x2),sy(yv)); else ctx.lineTo(sx(x2),sy(yv)); }
+  ctx.strokeStyle="#b53d2e"; ctx.lineWidth=2.6; ctx.stroke();
+  /* 数据点 */
+  for(var j=0;j<N;j++){
+    ctx.beginPath(); ctx.arc(sx(X[j]),sy(Y[j]),2.6,0,7);
+    ctx.fillStyle="rgba(47,107,90,.5)"; ctx.fill();
+  }
+  /* 下方：这一轮小树的阶梯形状 */
+  ctx2.clearRect(0,0,cvT.width,cvT.height);
+  ctx2.font="12px 'Microsoft YaHei'";
+  if(k>0){
+    var tr=trees[k-1];
+    var levels=[]; (function walk(n,lo,hi,d){ if(n.thr===undefined){levels.push({leaf:n.leaf,lo:lo,hi:hi,d:d});return;} walk(n.l,lo,n.thr,d+1); walk(n.r,n.thr,hi,d+1); })(tr,16,84,0);
+    var maxAbs=0.001; levels.forEach(function(l){maxAbs=Math.max(maxAbs,Math.abs(l.leaf));});
+    var H2=cvT.height-34, mid=H2/2+10;
+    levels.forEach(function(l){
+      var x1=sx(l.lo), x2=sx(l.hi);
+      var yv=mid-(l.leaf/maxAbs)*mid*0.86;
+      ctx2.fillStyle=l.leaf>=0?"rgba(47,107,90,.55)":"rgba(181,61,46,.55)";
+      ctx2.fillRect(x1,Math.min(yv,mid),x2-x1,Math.abs(mid-yv));
+      ctx2.strokeStyle="#8a8578"; ctx2.strokeRect(x1,Math.min(yv,mid),x2-x1,Math.abs(mid-yv));
+    });
+    ctx2.strokeStyle="#ddd5c2"; ctx2.beginPath(); ctx2.moveTo(PAD,mid); ctx2.lineTo(cvT.width-16,mid); ctx2.stroke();
+    ctx2.fillStyle="#8a8578";
+    ctx2.fillText("这一轮小树长这样：绿=往上补，红=往下压（高度=补多少）",PAD-6,cvT.height-6);
+  } else {
+    ctx2.fillStyle="#8a8578";
+    ctx2.fillText("第 0 轮还没有小树 —— 模型现在只会说「大家都是 0」",PAD,cvT.height/2);
+  }
+}
+/* ---------------- 文案与控件 ---------------- */
+var CAP_PLAIN=[
+"第 0 轮 · 什么都还不会：模型只会说「大家风险都一样」，是一条贴地的直线。灰圈就是它离真相的全部差距，误差 <b>1.914</b>。",
+"第 1 轮 · 第一棵小树上场：它按年龄切了 <b>4 段</b>（看下方四个色块），两头补得多、中年补得少 —— 才一棵树，它已经「看」出两头更危险了。",
+"第 2 轮 · 接着补：还是 4 段，但每个方块都比上一轮矮 —— 能补的差距在变小。误差降到 <b>0.603</b>。",
+"第 3 轮 · 误差降到 <b>0.194</b>：红线整体抬起来了，两头已经明显高过中间，U 形有了雏形。",
+"第 4 轮 · 这棵只切成 <b>3 段</b>：中间那一段已经够准，不值得再切一刀。树长什么样是数据说了算，不是事先定死的。",
+"第 5 轮 · 中间的补丁只剩 +0.04，几乎不用动了；两头还在往上抬。误差 <b>0.028</b>。",
+"第 6 轮 · 第一次出现<b>红色方块</b>（46–59 岁那一小段）：中间补多了，这棵树负责往下压回来 —— GBDT 会加，也会减。",
+"第 7 轮 · 每段补丁都在 0.1 以下，进入精修。误差 <b>0.010</b>，红线和虚线已经快贴在一起。",
+"第 8 轮 · <b>可以收手了</b>：误差 0.0084，已经低于数据本身的噪声水平（0.0096）。再往下算，模型记住的就不是规律，而是噪声 —— 这就是「什么时候停」的答案。"
+];
+var MODE="plain";
+var CAP0=[
+"第 0 轮 · 初始化：累积预测 F₀(x)≡0。此处 MSE = 1.914，即模型与观测的全部差距。",
+"第 1 轮 · 拟合第一棵回归树（深度 2）：按年龄切成 4 个叶区域，叶值取各区域残差均值。两端叶值显著高于中段，说明单层 CART 已捕获 U 形的粗略轮廓。",
+"第 2 轮 · 第二轮残差再拟合：叶子还是 4 片，但各叶片值均小于上一轮 —— 待拟合的残差在收缩。MSE → 0.603。",
+"第 3 轮 · MSE → 0.194：累积预测的阶梯已呈现两端高、中间低的结构。",
+"第 4 轮 · 本轮树只有 3 片叶子：中段残差已被前几轮吸收，继续分裂带来的 SSE 下降不足 2%，触发提前停止 —— 树的结构由数据决定。",
+"第 5 轮 · 中段叶值仅 +0.04，接近饱和；两端仍在抬升。MSE → 0.028。",
+"第 6 轮 · 首次出现负叶值（46–59 岁分段 −0.03）：中段累计预测已过冲，本轮修正方向反转。梯度提升同时支持正负增量。",
+"第 7 轮 · 各叶片值均小于 0.1，进入收敛尾段。MSE → 0.010。",
+"第 8 轮 · 应当早停：MSE 0.0084 已低于扰动项本身方差（σ²≈0.0096）。继续迭代会开始拟合噪声 —— 这是早停（early stopping）的经验判据。"
+];
+function show(k){
+  k=Math.max(0,Math.min(rounds.length-1,k)); cur=k;
+  draw(k);
+  var F=rounds[k].F, m=mse(F);
+  document.getElementById("vround").textContent=k+" / "+(rounds.length-1);
+  document.getElementById("vmse").textContent=m.toFixed(4);
+  document.getElementById("vtrees").textContent=k+" 棵";
+  document.getElementById("vleaf").textContent=k===0?"—":leafCount(trees[k-1])+" 段";
+  document.getElementById("vstep").textContent=k===0?"—":
+    (function(){ var Fp=rounds[k-1].F, mx=0;
+      for(var i=0;i<N;i++) mx=Math.max(mx,Math.abs(F[i]-Fp[i]));
+      return "最大 "+(mx).toFixed(3); })();
+  document.getElementById("cap").innerHTML=((MODE==="plain"?CAP_PLAIN:CAP0)[k])||CAP0[k]||"";
+  var pb=document.getElementById("progBar");
+  if(pb) pb.style.width=(k/(rounds.length-1)*100)+"%";
+}
+var cur=0,timer=null;
+function stop(){ if(timer){clearInterval(timer);timer=null;document.getElementById("bPlay").textContent="播放";} }
+document.getElementById("bPlay").onclick=function(){
+  if(timer){stop();return;}
+  if(cur>=rounds.length-1) show(0);
+  this.textContent="暂停";
+  timer=setInterval(function(){ if(cur>=rounds.length-1){stop();return;} show(cur+1); },+document.getElementById("spd").value);
+};
+document.getElementById("bNext").onclick=function(){stop();show(cur+1);};
+document.getElementById("bPrev").onclick=function(){stop();show(cur-1);};
+document.getElementById("bReset").onclick=function(){stop();show(0);};
+document.getElementById("spd").onchange=function(){ if(timer){stop();document.getElementById("bPlay").click();} };
+
+/* ---------- 白话 ⇄ 术语 切换（后加的外壳，不改算法） ---------- */
+function applyMode(){
+  var els=document.querySelectorAll(".lb");
+  for(var i=0;i<els.length;i++){
+    var v=(MODE==="plain")?els[i].getAttribute("data-p"):els[i].getAttribute("data-t");
+    if(v) els[i].textContent=v;
+  }
+  var b=document.getElementById("bMode");
+  if(b) b.textContent=(MODE==="plain")?"当前：大白话 ▸ 点这里换术语"
+                                     :"当前：术语 ▸ 点这里换大白话";
+}
+document.getElementById("bMode").onclick=function(){
+  MODE=(MODE==="plain")?"term":"plain"; applyMode(); show0();
+};
+applyMode();
+
+function show0(){ show(cur); }
+show(0);
+</script>
+<div class="three-box">
+<div class="t-t">看完你该记住的三句话</div>
+<ol>
+<li>一棵平庸的树不够用，那就<b>让第二棵专补第一棵的错</b>，再来第三棵。</li>
+<li>每一棵树都很笨，但<b>加起来能追上很复杂的形状</b> —— 这就是「三个臭皮匠」。</li>
+<li>每次只补一点点（这叫学习率），<b>慢，但不会走过头</b>。</li>
+<li>树不是越多越好：<b>误差降到数据本身的噪声水平就该收手</b>（这个例子里第 8 轮就该停手）。
+再往下练，练的是噪声 —— 这就是<b>过拟合</b>，详见 <a href="b05.html">基础篇 B5</a>。</li>
+</ol>
+<div class="back-link">← 回到 <a href="ch06.html">第 28 页</a>看完整讲解 ·
+不懂的词查 <a href="glossary.html">术语表</a></div>
+</div>
+</body>
+</html>

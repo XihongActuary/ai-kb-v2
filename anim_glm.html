@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动画 · <a class="tl" href="glossary.html#term-poisson-regression" title="泊松回归｜专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。">Poisson</a> <a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a> 的 <a class="tl" href="glossary.html#term-irls" title="迭代重加权最小二乘｜GLM 的「训练算法」：先瞎猜一条线，看每个点差多少，按差距重新算一条，重复几次就到位了。">IRLS</a> 迭代 —— 机器是怎么「猜」出那条线的</title>
+<style>
+:root{--paper:#f5f1e6;--ink:#2b2a26;--red:#b53d2e;--amber:#9a6f12;--jade:#2f6b5a;--grey:#8a8578;--line:#ddd5c2;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--paper);color:var(--ink);padding:22px 26px 34px;}
+h1{font-family:"Songti SC","SimSun",serif;font-size:21px;font-weight:normal;letter-spacing:1px;}
+.sub{font-size:13px;color:var(--grey);margin:4px 0 16px;}
+.stage{display:flex;gap:18px;flex-wrap:wrap;}
+.panel{background:#fbf8ef;border:1px solid var(--line);border-radius:12px;padding:14px;}
+#cv{display:block;background:#fff;border-radius:8px;}
+.side{width:270px;display:flex;flex-direction:column;gap:12px;}
+.side h3{font-family:"Songti SC","SimSun",serif;font-size:14.5px;font-weight:normal;color:var(--jade);letter-spacing:2px;}
+.row{display:flex;justify-content:space-between;font-size:13.5px;padding:6px 10px;background:#fff;border-radius:8px;border:1px solid var(--line);}
+.row b{font-variant-numeric:tabular-nums;color:var(--red);}
+.caption{font-size:13.5px;line-height:1.8;min-height:96px;padding:10px 14px;background:#fff;border:1px dashed var(--line);border-radius:10px;}
+.caption b{color:var(--red);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:2px;}
+button{font-family:inherit;font-size:13.5px;padding:7px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+button:hover{border-color:var(--red);color:var(--red);}
+button.main{background:var(--red);border-color:var(--red);color:#fff;}
+button.main:hover{opacity:.88;color:#fff;}
+select{font-family:inherit;font-size:13px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:#fff;}
+.klist{display:flex;flex-wrap:wrap;gap:6px;}
+.kdot{width:26px;height:26px;border-radius:6px;border:1px solid var(--line);background:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;color:var(--grey);cursor:pointer;}
+.kdot.cur{background:var(--red);border-color:var(--red);color:#fff;}
+.kdot.done{color:var(--ink);}
+@media (max-width:860px){.side{width:100%;}}
+
+.guide{background:#fbf8ef;border:1px solid #ddd5c2;border-radius:12px;
+  padding:14px 20px 12px;margin:2px 0 16px;}
+.guide .g-t{font-family:"Songti SC","SimSun",serif;font-size:15px;color:#2f6b5a;
+  letter-spacing:2px;margin-bottom:8px;}
+.guide ul{margin:0;padding-left:20px;}
+.guide li{font-size:13.8px;line-height:1.85;color:#55524a;}
+.guide li b{color:#2b2a26;}
+.guide .g-term{margin-top:8px;padding-top:8px;border-top:1px dashed #ddd5c2;
+  font-size:13px;color:#8a8578;line-height:1.8;}
+.guide .g-term b{color:#b53d2e;}
+.modebar{display:flex;gap:8px;align-items:center;margin:0 0 10px;flex-wrap:wrap;}
+button.mode{background:#2f6b5a;border-color:#2f6b5a;color:#fff;font-size:13px;padding:6px 14px;}
+button.mode:hover{opacity:.88;color:#fff;}
+.prog{height:5px;background:#efe9d8;border-radius:3px;overflow:hidden;margin:0 0 10px;}
+.prog-bar{height:100%;width:0;background:#b53d2e;border-radius:3px;transition:width .3s;}
+.three-box{background:#e6efe9;border:1px solid #c4d8cd;border-radius:12px;
+  padding:16px 22px;margin:24px 0 6px;}
+.three-box .t-t{font-family:"Songti SC","SimSun",serif;font-size:15px;color:#2f6b5a;
+  letter-spacing:2px;margin-bottom:8px;}
+.three-box ol{margin:0;padding-left:20px;}
+.three-box li{font-size:14.5px;line-height:1.85;margin-bottom:4px;color:#2b2a26;}
+.back-link{font-size:13px;margin-top:10px;}
+
+/* 移动端：canvas 是固定宽，必须等比缩放，否则溢出屏幕 */
+canvas { max-width: 100%; height: auto; }
+@media (max-width: 860px) {
+  body { padding: 14px 12px 24px; }
+  h1 { font-size: 18px; }
+  .side { width: 100%; }
+  .panel { padding: 10px; }
+}
+
+a.tl{color:inherit;text-decoration:none;cursor:help;border-bottom:1px dotted rgba(47,107,90,.6);}a.tl:hover{color:#b53d2e;border-bottom-color:#b53d2e;background:#f7e8e4;border-radius:2px;}
+</style>
+</head>
+<body>
+<h1>Poisson GLM 的 IRLS 迭代 —— 机器是怎么「猜」出那条线的</h1>
+<div class="sub">红色曲线每改一次，就离数据更近一点。这不是魔法，是同一套动作重复七次：猜 → 看差距 → 修正。</div>
+
+<div class="guide">
+<div class="g-t">先看懂这张图 · 30 秒</div>
+<ul>
+<li><b>横轴</b>：司机的年龄，左边年轻、右边年长。</li>
+<li><b>纵轴</b>：这一年出了几次险，0 次在最底下。</li>
+<li><b>每一个绿点</b>：一个真实的司机，点越高说明他出险次数越多。</li>
+<li><b>那条红线</b>：模型当前的猜测 ——「这个年纪的人，平均会出几次险」。</li>
+<li><b>你会看到什么</b>：红线一开始是条平平的水平线（等于瞎猜「人人都一样」），
+然后一步比一步贴近绿点，改到第 7 步就基本不动了。</li>
+</ul>
+<div class="g-term"><b>顺手记三个词：</b>
+这条线叫 <b><a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a></b>（<a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">广义线性模型</a>）——其实就是你熟悉的<a class="tl" href="glossary.html#term-rate-factor" title="费率因子｜定价公式里的每一根「杠杆」，比如年龄、车型、地区。每根都要能讲出业务道理，不能只是跑出来…">费率因子</a>模型；
+找这条线的办法叫 <b><a class="tl" href="glossary.html#term-irls" title="迭代重加权最小二乘｜GLM 的「训练算法」：先瞎猜一条线，看每个点差多少，按差距重新算一条，重复几次就到位了。">IRLS</a></b>，意思就是「猜一次、看差距、挪一点，重复到不动」；
+「<b>偏差 Deviance</b>」就是猜错的扣分，越小越好。</div>
+</div>
+
+<div class="stage">
+<div class="panel"><canvas id="cv" width="560" height="442"></canvas></div>
+<div class="side">
+  <div class="modebar"><button class="mode" id="bMode">当前：大白话 ▸ 点这里换术语</button></div>
+  <div class="prog"><div class="prog-bar" id="progBar"></div></div>
+  <h3>当前这一步</h3>
+  <div class="row"><span class="lb" data-p="基准风险（40 岁的人出几次）" data-t="截距 β₀（基准风险）">基准风险（40 岁的人出几次）</span><b id="vb0">–</b></div>
+  <div class="row"><span class="lb" data-p="年龄的影响（每大一岁变多少）" data-t="斜率 β₁（年龄效应）">年龄的影响（每大一岁变多少）</span><b id="vb1">–</b></div>
+  <div class="row"><span class="lb" data-p="猜错的扣分（越小越好）" data-t="偏差 Deviance（越小越好）">猜错的扣分（越小越好）</span><b id="vdev">–</b></div>
+  <div class="row"><span>这一步的改进量</span><b id="vimp">–</b></div>
+  <div class="caption" id="cap"></div>
+  <div class="ctrl">
+    <button class="main" id="bPlay">播放</button>
+    <button id="bPrev">上一步</button>
+    <button id="bNext">下一步</button>
+    <button id="bReset">重置</button>
+    <select id="spd"><option value="2000" selected>慢速</option><option value="900">常速</option><option value="450">快速</option></select>
+  </div>
+  <div class="klist" id="klist"></div>
+</div>
+</div>
+
+<script>
+"use strict";
+/* ---------------- 真实数据：Poisson 生成，不是示意图 ---------------- */
+var rng = (function(){ var s = 20261003; return function(){ s=(s*1103515245+12345)>>>0; return s/4294967296; };})();
+var N=46, X=[], Y=[];
+var B0T=-0.55, B1T=-0.028;              // 真实规律：年龄越大，出险越少
+for(var i=0;i<N;i++){
+  var age=19+Math.floor(rng()*56);       // 19~74
+  var lam=Math.exp(B0T+B1T*(age-40));
+  var y=0, L=Math.exp(-lam);             // Knuth 泊松采样
+  var p=1,k=0; do{k++; p*=rng();}while(p>L); y=k-1;
+  X.push(age); Y.push(y);
+}
+/* ---------------- IRLS：真实算法，不是演示假动作 ---------------- */
+function irlsStep(b0,b1){
+  // 一次 Newton–Raphson 更新：猜 mu → 算工作响应 z → 加权最小二乘
+  var Sxx=0,Sxz=0,Sx=0,Sz=0,Sz2=0,n=X.length;
+  for(var i=0;i<n;i++){
+    var eta=b0+b1*(X[i]-40);
+    eta=Math.max(Math.min(eta,4),-4);
+    var mu=Math.exp(eta);
+    var w=mu;                              // Poisson 的权重就是 mu 本身
+    var z=eta+(Y[i]-mu)/mu;                // 工作响应：把「看差距」翻译成数字
+    Sxx+=w*(X[i]-40)*(X[i]-40); Sxz+=w*(X[i]-40)*z;
+    Sx+=w*(X[i]-40); Sz+=w*z; Sz2+=w*z*z;
+  }
+  var Sw=n*Sxx-Sx*Sx;                      // → 2×2 加权最小二乘的解
+  if(Math.abs(Sw)<1e-10) return [b0,b1];
+  var nb0=(Sxx*Sz-Sx*Sxz)/Sw;
+  var nb1=(n*Sxz-Sx*Sz)/Sw;
+  return [nb0,nb1];
+}
+function deviance(b0,b1){
+  var d=0;
+  for(var i=0;i<X.length;i++){
+    var mu=Math.exp(b0+b1*(X[i]-40)), y=Y[i];
+    if(y>0) d+=2*(y*Math.log(y/mu)-(y-mu)); else d+=2*mu;
+  }
+  return d;
+}
+var steps=[{b0:0,b1:0}];                   // 第 0 步：啥都不知道，猜「人人都一样」
+for(var s=0;s<7;s++){
+  var p=steps[steps.length-1];
+  var q=irlsStep(p.b0,p.b1);
+  steps.push({b0:q[0],b1:q[1]});
+}
+steps.forEach(function(st){ st.dev=deviance(st.b0,st.b1); });
+
+/* ---------------- 绘图 ---------------- */
+var cv=document.getElementById("cv"), ctx=cv.getContext("2d");
+var PAD=44, PW=cv.width-PAD-14, PH=cv.height-PAD-46;
+/* y 轴上界必须跟着数据走：本批数据里有人出险 3 次，写死 2.4 会把这些点画到画布外看不见 */
+var YMAX=(function(){ var m=0; for(var i=0;i<N;i++) m=Math.max(m,Y[i]); return m+0.6; })();
+function sx(age){ return PAD+(age-16)/(78-16)*PW; }
+function sy(y){ return cv.height-46-(y/YMAX)*PH; }
+function draw(k){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.font="12px 'Microsoft YaHei'";
+  ctx.fillStyle="#8a8578";
+  ctx.strokeStyle="#ddd5c2"; ctx.lineWidth=1;
+  for(var gy=0;gy<=Math.floor(YMAX);gy++){
+    ctx.beginPath(); ctx.moveTo(PAD,sy(gy)); ctx.lineTo(cv.width-14,sy(gy)); ctx.stroke();
+    ctx.fillText(gy+" 次",10,sy(gy)+4);
+  }
+  for(var gx=20;gx<=70;gx+=10){
+    ctx.fillText(gx,sx(gx)-8,cv.height-28);
+    ctx.beginPath(); ctx.moveTo(sx(gx),sy(0)); ctx.lineTo(sx(gx),PAD-16);
+    ctx.strokeStyle="#eee7d4"; ctx.stroke(); ctx.strokeStyle="#ddd5c2";
+  }
+  ctx.fillText("出险次数",14,PAD-24); ctx.fillText("年龄（岁）",cv.width-96,cv.height-8);
+  /* 散点（纵向抖动仅防重叠，位置是真实数据） */
+  for(var i=0;i<N;i++){
+    var j=((i*37)%9-4)/4*5;
+    ctx.beginPath(); ctx.arc(sx(X[i]),sy(Y[i])+j*0.6,3.4,0,7);
+    ctx.fillStyle="rgba(47,107,90,.55)"; ctx.fill();
+  }
+  /* 历史曲线淡出 + 当前曲线 */
+  for(var s2=0;s2<k;s2++){
+    curve(s2,"rgba(181,61,46,.14)");
+  }
+  curve(k,"#b53d2e",2.6);
+  if(k>0){
+    var a=steps[k-1],b=steps[k];
+    ctx.setLineDash([4,4]); ctx.strokeStyle="rgba(138,133,120,.8)";
+    ctx.beginPath(); ctx.moveTo(sx(40),sy(Math.exp(a.b0))); ctx.lineTo(sx(40),sy(Math.exp(b.b0))); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle="#8a8578";
+    ctx.fillText("这一步的整体修正↑",sx(42),sy((Math.exp(a.b0)+Math.exp(b.b0))/2));
+  }
+  function curve(si,style,lw){
+    ctx.beginPath();
+    for(var px=0;px<=PW;px+=3){
+      var age=16+px/PW*(78-16);
+      var m=Math.exp(steps[si].b0+steps[si].b1*(age-40));
+      if(px===0) ctx.moveTo(sx(age),sy(Math.min(m,2.4))); else ctx.lineTo(sx(age),sy(Math.min(m,2.4)));
+    }
+    ctx.strokeStyle=style; ctx.lineWidth=lw||1.2; ctx.stroke();
+  }
+}
+/* ---------------- 状态与控件 ---------------- */
+var cur=0, timer=null;
+var CAP_PLAIN=[
+"第 0 步 · 还没开始猜：模型现在认为「所有人风险都一样」，所以画了一条平平的横线。明显不对 —— 年轻人明明出险更多。",
+"第 1 步 · 第一次改：机器把所有人的差距收集起来，发现「年轻人被低估了」，于是把线拉斜了一大截。",
+"第 2 步 · 再改一次：线继续往绿点靠。扣分明显变小了 —— 这说明方向改对了。",
+"第 3 步 · 改得越来越小：形状已经像样了。越接近答案，每次能改的就越少。",
+"第 4 步 · 快到位了：「年纪越大越安全」这条规律基本画准。",
+"第 5 步 · 几乎不动了：扣分的改进量已经小到小数点后两位。",
+"第 6 步 · 可以收工：再改也没意义了，这就叫收敛。",
+"第 7 步 · 完成：这条线就是模型给出的定价曲线。它的斜率还能直接翻译成业务话 —— 年龄每涨一岁，出险率大约降 3%。"
+];
+var MODE="plain";
+var CAP=[
+"第 0 步 · 瞎猜起步：β₀=0，β₁=0 → 模型认为「所有年龄的人出险都一样多」。水平线，明显不对。",
+"第 1 步 · 第一次看差距：把每个点的「实际出险 − 当前猜测」收集起来（工作响应 z），用年龄加权一算，斜率猛地拉下来一大截。",
+"第 2 步 · 再看一遍差距：整体水平继续下压。注意偏差在变小 —— 这就是「方向对了」的证据。",
+"第 3 步 · 修正越来越小：曲线形状已经像样了。IRLS 的特点：越接近答案，步子越小。",
+"第 4 步 · 接近收敛：年轻人高风险、年长者低风险的规律基本画准。",
+"第 5 步 · 步子已经很小：偏差的改进量进入了小数点后两位。",
+"第 6 步 · 步子几乎为零：可以停了 —— 这就是「收敛」。",
+"第 7 步 · 完成：这条曲线就是模型给出的定价曲线。回归系数还能直接解读：β₁≈−0.03，意思是「年龄每涨一岁，出险率约降 3%」。"
+];
+function fmt(x,d){ return (x>=0?"+":"")+x.toFixed(d); }
+function show(k){
+  cur=Math.max(0,Math.min(steps.length-1,k));
+  var st=steps[cur];
+  draw(cur);
+  document.getElementById("vb0").textContent=st.b0.toFixed(3);
+  document.getElementById("vb1").textContent=(st.b1*1).toFixed(4);
+  document.getElementById("vdev").textContent=st.dev.toFixed(2);
+  document.getElementById("vimp").textContent=cur===0?"—":
+    (steps[cur-1].dev-st.dev>=0?"−":"+")+Math.abs(steps[cur-1].dev-st.dev).toFixed(2);
+  document.getElementById("cap").innerHTML=((MODE==="plain"?CAP_PLAIN:CAP)[cur])||CAP[cur]||"";
+  var pb=document.getElementById("progBar");
+  if(pb) pb.style.width=(cur/(steps.length-1)*100)+"%";
+  var kl=document.getElementById("klist"); kl.innerHTML="";
+  for(var i=0;i<steps.length;i++){
+    var d=document.createElement("div");
+    d.className="kdot"+(i===cur?" cur":(i<cur?" done":""));
+    d.textContent=i; d.onclick=function(){ show(+this.textContent); stop(); };
+    kl.appendChild(d);
+  }
+}
+function stop(){ if(timer){ clearInterval(timer); timer=null; document.getElementById("bPlay").textContent="播放"; } }
+document.getElementById("bPlay").onclick=function(){
+  if(timer){ stop(); return; }
+  if(cur>=steps.length-1) show(0);
+  this.textContent="暂停";
+  timer=setInterval(function(){
+    if(cur>=steps.length-1){ stop(); return; }
+    show(cur+1);
+  },+document.getElementById("spd").value);
+};
+document.getElementById("bNext").onclick=function(){ stop(); show(cur+1); };
+document.getElementById("bPrev").onclick=function(){ stop(); show(cur-1); };
+document.getElementById("bReset").onclick=function(){ stop(); show(0); };
+document.getElementById("spd").onchange=function(){ if(timer){ stop(); document.getElementById("bPlay").click(); } };
+
+/* ---------- 白话 ⇄ 术语 切换（后加的外壳，不改算法） ---------- */
+function applyMode(){
+  var els=document.querySelectorAll(".lb");
+  for(var i=0;i<els.length;i++){
+    var v=(MODE==="plain")?els[i].getAttribute("data-p"):els[i].getAttribute("data-t");
+    if(v) els[i].textContent=v;
+  }
+  var b=document.getElementById("bMode");
+  if(b) b.textContent=(MODE==="plain")?"当前：大白话 ▸ 点这里换术语"
+                                     :"当前：术语 ▸ 点这里换大白话";
+}
+document.getElementById("bMode").onclick=function(){
+  MODE=(MODE==="plain")?"term":"plain"; applyMode(); show0();
+};
+applyMode();
+
+function show0(){ show(cur); }
+show(0);
+</script>
+<div class="three-box">
+<div class="t-t">看完你该记住的三句话</div>
+<ol>
+<li>机器学习不是一次算对，是<b>先瞎猜，再一步步改</b>。</li>
+<li>每改一次扣分就少一点；改到<b>少不动了</b>就该停 —— 这叫收敛。</li>
+<li>最后那条线的斜率能直接翻译成业务话：<b>年龄每涨一岁，出险率大约降 3%</b>。
+这正是 GLM 至今还被精算师偏爱的原因 —— 它算出来的东西能讲给人听。</li>
+</ol>
+<div class="back-link">← 回到 <a href="ch04.html">第 26 页</a>看完整讲解 ·
+不懂的词查 <a href="glossary.html">术语表</a></div>
+</div>
+</body>
+</html>

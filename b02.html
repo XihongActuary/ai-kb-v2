@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>06 · 数据长什么样：一行一个人 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav on" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="06">
+<div class="ph-kicker">
+<span class="ph-no">06</span>
+<span class="ph-part">第 1 段 · 理论</span>
+<span class="ph-idx" title="你在第 6 页">共 43 页</span>
+</div>
+<h1>数据长什么样：一行一个人</h1>
+<p class="ph-lead">机器学习吃的不是「知识」，是一张表。
+看懂这张表的结构，后面的大部分术语就自动明白了。</p>
+</header>
+<div class="toc"><div class="t">本页目录</div>
+<a href="#table">一张表的解剖</a>
+<a href="#xy">X 和 y：已知条件和答案</a>
+<a href="#missing">本案例最要命的地方：答案缺失</a>
+</div>
+<div class="mlkb"><span class="ml-k">往深了学 · 机器学习知识库</span><a href="../ml-kb/onepage.html" target="_blank" rel="noopener">一文读懂机器学习</a></div>
+<div class="plain"><div class="p-row"><span class="p-q">这一页在讲什么</span><p>机器学习吃的那张表长什么样。以及本案例最要命的一个坑：被拒保的人根本没有出险记录。</p></div><div class="p-row"><span class="p-q">读完你会知道</span><p class="p-know">一行一个人、一列一个属性；数据里的 −1 表示「不知道」，不是「零」。这一字之差能毁掉模型。</p></div></div>
+<h2 id="table">一张表的解剖</h2>
+<div class="sv wide"><svg viewBox="0 0 644 244" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+<rect x="10" y="10" width="624" height="34" rx="4" fill="#2f6b5a" opacity="0.1"/>
+<text x="322" y="32" font-size="13" fill="#2f6b5a" text-anchor="middle">一行 = 一个人　一列 = 一个属性</text>
+<text x="30" y="68" font-size="12" fill="#8a8578">driver_id</text>
+<text x="130" y="68" font-size="12" fill="#8a8578">年龄</text>
+<text x="210" y="68" font-size="12" fill="#8a8578">车型</text>
+<text x="300" y="68" font-size="12" fill="#8a8578">车值(万)</text>
+<text x="400" y="68" font-size="12" fill="#8a8578">年里程</text>
+<text x="490" y="68" font-size="12" fill="#8a8578">渠道</text>
+<text x="580" y="68" font-size="12.5" fill="#b53d2e">出险次数</text>
+<line x1="20" y1="76" x2="624" y2="76" stroke="#ddd5c2"/>
+<text x="30" y="98" font-size="12" fill="#2b2a26">D00001</text>
+<text x="130" y="98" font-size="12" fill="#2b2a26">34</text>
+<text x="210" y="98" font-size="12" fill="#2b2a26">轿车</text>
+<text x="300" y="98" font-size="12" fill="#2b2a26">18.2</text>
+<text x="400" y="98" font-size="12" fill="#2b2a26">15,500</text>
+<text x="490" y="98" font-size="12" fill="#2b2a26">代理</text>
+<text x="580" y="98" font-size="12.5" fill="#b53d2e">0</text>
+<text x="30" y="124" font-size="12" fill="#2b2a26">D00002</text>
+<text x="130" y="124" font-size="12" fill="#2b2a26">27</text>
+<text x="210" y="124" font-size="12" fill="#2b2a26">SUV</text>
+<text x="300" y="124" font-size="12" fill="#2b2a26">31.0</text>
+<text x="400" y="124" font-size="12" fill="#2b2a26">22,800</text>
+<text x="490" y="124" font-size="12" fill="#2b2a26">线上</text>
+<text x="580" y="124" font-size="12.5" fill="#b53d2e">2</text>
+<text x="30" y="150" font-size="12" fill="#2b2a26">D00003</text>
+<text x="130" y="150" font-size="12" fill="#2b2a26">52</text>
+<text x="210" y="150" font-size="12" fill="#2b2a26">轿车</text>
+<text x="300" y="150" font-size="12" fill="#2b2a26">12.4</text>
+<text x="400" y="150" font-size="12" fill="#2b2a26">8,900</text>
+<text x="490" y="150" font-size="12" fill="#2b2a26">直销</text>
+<text x="580" y="150" font-size="12.5" fill="#b53d2e">0</text>
+<rect x="20" y="166" width="500" height="40" rx="6" fill="#2f6b5a" opacity="0.08" stroke="#2f6b5a" stroke-dasharray="4 3"/>
+<rect x="544" y="166" width="76" height="40" rx="6" fill="#b53d2e" opacity="0.08" stroke="#b53d2e" stroke-dasharray="4 3"/>
+<text x="270" y="191" font-size="12.5" fill="#2f6b5a" text-anchor="middle">← 特征 X：机器的输入</text>
+<text x="582" y="191" font-size="12.5" fill="#b53d2e" text-anchor="middle">← 标签 y</text>
+<text x="270" y="228" font-size="12" fill="#8a8578" text-anchor="middle">已知条件</text>
+<text x="582" y="228" font-size="12" fill="#8a8578" text-anchor="middle">标准答案</text>
+</svg><div class="fig-cap">左边六列是「已知条件」，右边一列是「答案」。机器学习干的事，就是学会从左边推出右边。</div></div>
+
+<h2 id="xy">X 和 y：已知条件和答案</h2>
+<p>这张表在机器学习的语言里，被切成两半：</p>
+<div class="tbl-wrap"><table class="tbl"><tr><th>符号</th><th>本案例里是什么</th><th>打个比方</th></tr><tr><td><b>X（特征）</b></td><td>每个人的已知条件：年龄、车型、车值、里程、渠道</td><td>考试时的<b>题目</b></td></tr><tr><td><b>y（标签）</b></td><td>我们想知道的那个真值：这一年出了几次险、赔了多少钱</td><td>习题册最后几页的<b>答案</b></td></tr></table></div>
+<p>有 <code>y</code> 的学习叫<b><a class="tl" href="glossary.html#term-supervised-learning" title="监督学习｜每个例子都带着「标准答案」，机器照着答案学。我们这个案例全是这一类。">监督学习</a></b>（有人对答案），没有 <code>y</code>、只把长得像的归成一堆叫<b><a class="tl" href="glossary.html#term-unsupervised-learning" title="无监督学习｜没有标准答案，机器只负责把「长得像的」归成一堆。">无监督</a>学习</b>。
+我们这个案例从头到尾都是<a class="tl" href="glossary.html#term-supervised-learning" title="监督学习｜每个例子都带着「标准答案」，机器照着答案学。我们这个案例全是这一类。">监督学习</a>。</p>
+
+<h2 id="missing">本案例最要命的地方：答案<a class="tl" href="glossary.html#term-missing-value" title="缺失值｜某个字段没填。要么补（用均值、用模型猜），要么单开一列标记「这一格没填」—— 别假装它是…">缺失</a></h2>
+<p>现在请你注意一件会毁掉整个任务的事：</p>
+<div class="note red"><b>被拒保的 8,800 个人，是没有 <code>y</code> 的。</b>
+他们从没被承保，所以系统里根本不存在他们的出险记录。<br><br>
+在数据里，这一列被记成 <code>-1</code>。<b>请务必分清：</b>
+<code>-1</code> 的意思是「这个人我们不知道」，<b>不是</b>「这个人一次险都没出过」。
+如果你手滑把它当成 0，等于宣称「所有被拒保的人都是完美司机」—— 那模型会学出一个荒唐的结论。</div>
+<p>这件事带来一个连锁后果，也决定了整个案例的难度：</p>
+<ul>
+<li>我们只能用<b>已承保的 11,200 人</b>来训练模型；</li>
+<li>却要拿它去给<b>8,800 个没见过的人</b>打分；</li>
+<li>而这两拨人<b>不是同一类人</b> —— 被拒的那批，恰恰是规则认为「有问题」的那批。</li>
+</ul>
+<p>这就是本案例真正的挑战所在。整件事的困难，不是算法难，是<b>训练数据和用它的地方不一样</b>。
+后面第 31 页「<a class="tl" href="glossary.html#term-extrapolation-ood" title="外推（训练域外）｜给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。">外推</a>风险」会专门讲这里翻的车。</p>
+
+<div class="note jade"><b>看完这一页，你只需要记住三句话</b><ol><li>数据就是一张表：<b>一行一个对象，一列一个属性</b>。</li><li>表里分两半：<b>X 是已知条件，y 是标准答案</b>。学模型就是学会从 X 推 y。</li><li>本案例的 <code>-1</code> 表示<b>「不知道」而不是「零」</b> —— 这一字之差会毁掉整个模型。</li></ol></div>
+<div class="codebar"><div class="cb-t">本页用到的代码</div><div class="cb-items"><a class="cb-i" href="src/gen_data.html"><b>gen_data</b><span>造数据：把业务机制写进代码</span></a></div><a class="cb-all" href="code.html">全部代码 → 代码入口<span>42</span></a></div>
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-feature"><b>特征</b></a><span>描述一个对象的「可测量属性」。一行数据里除答案外的那些列。</span></div><div class="t-item"><a href="glossary.html#term-label-target"><b>标签（答案）</b></a><span>我们想让机器预测的那个「真值」。有它才叫监督学习。</span></div><div class="t-item"><a href="glossary.html#term-training-set"><b>训练集</b></a><span>拿来「教」机器的那部分数据，答案一起给它看。</span></div><div class="t-item"><a href="glossary.html#term-test-set"><b>测试集</b></a><span>机器从没见过的那部分数据，答案先藏起来，用来检验它是不是真学会了。</span></div><div class="t-item"><a href="glossary.html#term-rejection"><b>拒保</b></a><span>按规则把这个人挡在门外。挡对了省钱，挡错了就是「错杀」—— 本案例的主角就是被挡错的那批人。</span></div><div class="t-item"><a href="glossary.html#term-supervised-learning"><b>监督学习</b></a><span>每个例子都带着「标准答案」，机器照着答案学。我们这个案例全是这一类。</span></div></div>
+<div class="pager">
+<a href="b01.html"><span class="dir">◀ 上一页</span>机器学习到底在干什么</a>
+<a class="next" href="b03.html"><span class="dir">下一页 ▶</span>模型是什么：一个会算数的套路</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

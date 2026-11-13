@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>我们拒掉的 2,259 个好司机</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f1e6;">
+<section style="max-width:677px;margin:0 auto;padding:28px 22px 48px;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#2b2a26;font-size:16px;line-height:1.9;">
+
+  <p style="text-align:center;letter-spacing:4px;color:#8a8578;font-size:13px;margin:0 0 6px;">西红精算 · 用数据讲保险</p>
+  <h1 style="font-family:Georgia,'Songti SC',serif;font-size:25px;font-weight:normal;text-align:center;line-height:1.6;margin:6px 0 4px;">我们拒掉的<br>2,259 个好司机</h1>
+  <p style="text-align:center;color:#8a8578;font-size:13.5px;margin:0 0 26px;">一次用机器学习找错杀的完整实战 · 上篇</p>
+
+  <section style="border-left:4px solid #b53d2e;padding:4px 0 4px 16px;margin:0 0 22px;">
+    <p style="margin:6px 0;font-size:15.5px;color:#55524a;">想象一个场景：8,800 个人来买你的车险，被核保规则拒了。后来我们拿到了一份「上帝视角」的数据，回头一看——其中 <b style="color:#b53d2e;">2,259 个人</b>的真实成本，比我们已承保客户的中位数还要低。</p>
+    <p style="margin:6px 0;font-size:15.5px;color:#55524a;">他们不是运气不好。他们是被一套<b>讲得通、但带着偏见</b>的规则，系统性地误杀了。</p>
+  </section>
+
+  <p style="margin:14px 0;">这篇文章讲我们怎么用机器学习把他们找回来。但更想讲的，是过程中机器三次「差点骗过我们」的地方——因为那三处，才是机器学习走进保险公司时真正的坎。</p>
+
+  <section style="background:#efe9d8;border-radius:10px;padding:16px 18px;margin:24px 0;">
+    <p style="margin:0 0 8px;font-size:13.5px;color:#8a8578;letter-spacing:2px;">▼ 先看结论</p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      <tr>
+        <td style="padding:10px 6px;text-align:center;border-bottom:1px solid #ddd5c2;"><span style="font-family:Georgia,serif;font-size:22px;color:#b53d2e;">14.8%</span><br><span style="font-size:12px;color:#8a8578;">代理渠道错杀率</span></td>
+        <td style="padding:10px 6px;text-align:center;border-bottom:1px solid #ddd5c2;"><span style="font-family:Georgia,serif;font-size:22px;color:#b53d2e;">34.4%</span><br><span style="font-size:12px;color:#8a8578;">线上渠道错杀率</span></td>
+        <td style="padding:10px 6px;text-align:center;border-bottom:1px solid #ddd5c2;"><span style="font-family:Georgia,serif;font-size:22px;color:#b53d2e;">0.885</span><br><span style="font-size:12px;color:#8a8578;">模型排序 AUC</span></td>
+      </tr>
+      <tr>
+        <td style="padding:10px 6px;text-align:center;"><span style="font-family:Georgia,serif;font-size:22px;color:#2f6b5a;">−3.2%</span><br><span style="font-size:12px;color:#8a8578;">双重稳健估计偏差</span></td>
+        <td style="padding:10px 6px;text-align:center;"><span style="font-family:Georgia,serif;font-size:22px;color:#2f6b5a;">38.7 万元</span><br><span style="font-size:12px;color:#8a8578;">最优圈选年增益</span></td>
+        <td style="padding:10px 6px;text-align:center;"><span style="font-family:Georgia,serif;font-size:22px;color:#2f6b5a;">62 万元</span><br><span style="font-size:12px;color:#8a8578;">保守方案首年净增益</span></td>
+      </tr>
+    </table>
+  </section>
+
+  <h2 style="font-family:Georgia,'Songti SC',serif;font-size:19.5px;font-weight:normal;border-left:4px solid #b53d2e;padding-left:12px;margin:34px 0 12px;">一、同一个公式，两种行话</h2>
+
+  <p style="margin:12px 0;">很多人以为机器学习是另一个世界的东西。其实你上个月做费率因子的时候，已经在用它了。</p>
+
+  <p style="margin:12px 0;">精算的写法：<b>风险 = 基准 × 年龄因子 × 车型因子 × 区域因子</b>。机器学习的写法：<b>log(期望出险) = β₀ + β₁年龄 + β₂车型 + β₃区域</b>。两边取个指数——exp(β₁) 就是你的年龄因子，就是相对风险。</p>
+
+  <p style="margin:12px 0;">不是类比，<b>是同一个东西</b>。区别只有一个：系数怎么来。你的流程是挑变量、拟合、看显著性、凭经验调；机器的流程是在同一个框架里自动搜，再用统一的分数评价好坏。工具一样，工作流不一样。</p>
+
+  <section style="background:#e6efe9;border-radius:10px;padding:14px 18px;margin:20px 0;">
+    <p style="margin:0;font-size:13.5px;letter-spacing:3px;color:#2f6b5a;">说人话</p>
+    <p style="margin:6px 0 0;font-size:15.5px;">机器学习没有把 GLM 扔掉。它只是加了三个新习惯：<b>留考卷（训练集/测试集）、统一打分（损失函数）、允许模型自己找拐弯（非线性）。</b></p>
+  </section>
+
+  <h2 style="font-family:Georgia,'Songti SC',serif;font-size:19.5px;font-weight:normal;border-left:4px solid #b53d2e;padding-left:12px;margin:34px 0 12px;">二、最值钱的一个负号</h2>
+
+  <p style="margin:12px 0;">整个案例最关键的字符，是数据里的一个 <b style="color:#b53d2e;">−1</b>。</p>
+
+  <p style="margin:12px 0;">被拒保的人，出险次数记作 −1。意思是「<b>没有记录</b>」，而不是「零出险」。他们恰恰因为被拒了，所以没有记录。模型是靠出险记录学会估价的——而它偏偏要给这批「没有记录」的人打分。</p>
+
+  <p style="margin:12px 0;">如果有人把 −1 当 0 喂给模型，等于告诉它：这 8,800 个人都没出过险。模型会立刻学出「拒保人群零风险」，然后建议你把他们的保费降到底。这个错误<b>不会报错</b>，报表看起来还特别合理。</p>
+
+  <p style="margin:12px 0;">翻译「好司机」也是一次立场声明。我们定义为：真实期望纯保费 ≤ 承保人群中位数（1,063 元）。按这个定义，8,800 件拒保件里藏着 2,259 件错杀——占拒保件 25.7%。</p>
+
+  <p style="margin:12px 0;">而错杀率在渠道之间完全不是一回事：<b>代理 14.8%、直销 15.6%、线上 34.4%</b>。线上是代理的 2.3 倍。原因不复杂：核保规则对线上渠道多加了一层「信息不全」的惩罚——线上材料不全，核保只能硬扣分。渠道改变的是「信息好不好取得」，不是「这个人开车的风险」。</p>
+
+  <section style="background:#f6ecd6;border-radius:10px;padding:14px 18px;margin:20px 0;">
+    <p style="margin:0;font-size:13.5px;letter-spacing:3px;color:#9a6f12;">管理启示</p>
+    <p style="margin:6px 0 0;font-size:15.5px;">凡是「模型要给没经历过结果的人群打分」的项目——拒保件复核、新渠道客群、新地区拓客——立项书里如果没人回答「标签从哪来」，这个项目八成会在半年后无声无息地死掉，而且死前一直在出「看起来很美」的报表。</p>
+  </section>
+
+  <h2 style="font-family:Georgia,'Songti SC',serif;font-size:19.5px;font-weight:normal;border-left:4px solid #b53d2e;padding-left:12px;margin:34px 0 12px;">三、第一次翻车：模型和闭眼猜打平</h2>
+
+  <p style="margin:12px 0;">模型第一次上场就摔了跤：直接用纯保费建模，两个模型（回归和树）的误差都是「闭着眼睛猜平均值」的 100.1% 和 100.3%——不但没赢，还微弱地输了。</p>
+
+  <p style="margin:12px 0;">这不是模型笨，是考卷错了。纯保费这个变量由两种机制混成：<b>一大半是零</b>（没出险），<b>极少数大得离谱</b>（单笔十几万的巨灾赔款）。误差指标会被那一笔巨灾绑架——模型为了拉平它，把其余 19,999 个人全带偏了。而巨灾本来就不可能被预测。</p>
+
+  <p style="margin:12px 0;">解法是精算人的老本行：<b>拆</b>。纯保费 = 出险频率 × 案均损失。频率用计数模型，损失先取对数。拆开之后，同样的模型把「圈最低 20% 里真正好司机的占比」从随机猜的 50% 提到了 <b style="color:#b53d2e;">96.6%</b>。</p>
+
+  <h2 style="font-family:Georgia,'Songti SC',serif;font-size:19.5px;font-weight:normal;border-left:4px solid #b53d2e;padding-left:12px;margin:34px 0 12px;">四、第二次翻车：漂亮的数字在换地方用之后崩了</h2>
+
+  <p style="margin:12px 0;">模型在承保人群里纯度 96.6%。我们拿着它去给 8,800 个拒保件打分——这批人，模型一个标签都没见过。</p>
+
+  <p style="margin:12px 0;">同一个模型、同一个指标：<b>96.6% → 77.7%（近点）→ 62.2%（全部）</b>。掉了 18.9 个百分点。</p>
+
+  <p style="margin:12px 0;">有意思的是排序没崩：外推人群上 AUC 还有 0.833。崩的是校准——预测均值比真值虚高三成多。<b>模型依然知道「谁比谁好」，但它对「好到什么程度」的判断全是猜的。</b>所以落地方案只用它排序，绝不用它的绝对数值定价。</p>
+
+  <p style="margin:12px 0;">还有更隐蔽的。初版数据里性能车只有 18 件进入承保——模型就学出「性能车风险低」，把 798 件性能车拒保件全推进「最值得救」的一档，那一档误伤率 88.6%，而业务报表上召回率看着完全正常。根因不在模型，在规则：<b>核保把某一类人整体挡在了训练数据之外，模型对他们说的话都是猜的。</b></p>
+
+  <section style="background:#f7e8e4;border-radius:10px;padding:14px 18px;margin:20px 0;">
+    <p style="margin:0;font-size:13.5px;letter-spacing:3px;color:#b53d2e;">特别提醒</p>
+    <p style="margin:6px 0 0;font-size:15.5px;">模型是个只在你家小区开过车的司机。放到陌生城市，它的方向盘还是稳的（排序没崩），但它的「还有几公里到」已经全是猜的（校准崩了）。</p>
+  </section>
+
+  <h2 style="font-family:Georgia,'Songti SC',serif;font-size:19.5px;font-weight:normal;border-left:4px solid #b53d2e;padding-left:12px;margin:34px 0 12px;">五、第三次翻车：「看起来更好」的那个模型</h2>
+
+  <p style="margin:12px 0;">我们故意做了一个对照组：模型 B 把「渠道」也放进特征。结果它全面碾压模型 A——圈出的人多一倍，召回率高出一倍多。</p>
+
+  <p style="margin:12px 0;">三刀下去就露馅了：</p>
+
+  <p style="margin:12px 0;"><b>第一刀，排序。</b>按预测分档，A 和 B 每一档的真实成本几乎重合——B 没有更会挑人。</p>
+
+  <p style="margin:12px 0;"><b>第二刀，校准。</b>B 的预测刻度整体被压低约 8%——它把「线上渠道」学成了低风险信号。刻度低了，同一条阈值线就圈出更多人。<b>召回翻倍不是能力翻倍，是门槛偷偷下调了。</b></p>
+
+  <p style="margin:12px 0;"><b>第三刀，对齐规模再比。</b>都圈最低 20%，A 圈内真实均值 1,048 元，B 圈内 1,034 元。差 14 元，噪声级别。</p>
+
+  <p style="margin:12px 0;">所以最终方案是 A。<b>判断一个变量该不该进模型，标准不是「它和赔款有没有统计相关」，而是「它有没有因果意义」。</b>检验方法就一句：同一个人换条渠道来买，他的真实风险会变吗？</p>
+
+  <h2 style="font-family:Georgia,'Songti SC',serif;font-size:19.5px;font-weight:normal;border-left:4px solid #b53d2e;padding-left:12px;margin:34px 0 12px;">六、钱在哪：倒 U 曲线</h2>
+
+  <p style="margin:12px 0;">模型的价值最终要落进业务账。这里有个精算口径的坑：综合成本率已经把预期赔款算进去了，所以毛利的正确口径是<b>保费 − 成本率 × 真实赔款</b>——先算「保费×(1−成本率)」再减一遍赔款，等于扣两次，所有档位「永远亏损」。</p>
+
+  <p style="margin:12px 0;">把人工复核当成一笔投资来算（每件复核成本 40 元），增益曲线是一个<b>倒 U</b>：圈得太少，模型的信息浪费了；圈得太多，人工白花。峰值在圈 4,400 件的位置——<b>年增益约 38.7 万元</b>，相当于每 1 元复核成本换回约 2 元毛利。</p>
+
+  <p style="margin:12px 0;">而第一年我们建议只做「近点 + 最高优先级」的 985 件试点：少救，但把「救错了吗」变成可测量的数据。<b>第一年真正买下的不是 62 万净增益，是一条学习曲线。</b></p>
+
+  <h2 style="font-family:Georgia,'Songti SC',serif;font-size:19.5px;font-weight:normal;border-left:4px solid #b53d2e;padding-left:12px;margin:34px 0 12px;">七、写在最后</h2>
+
+  <p style="margin:12px 0;">这次实战里，机器一共三次差点骗过我们：指标被巨灾绑架、外推人群上纯度崩落、对照组「看起来更好」。三次都不是算法的错误，三次都被<b>更笨的问题</b>拦住了——考卷对吗？这群人模型见过吗？两个模型的尺子对齐了吗？</p>
+
+  <p style="margin:12px 0;">机器学习走进保险公司，最难的从来不是算得快，是<b>把业务问题翻译干净、把看不见的人当真、把漂亮的数字 questioned 到底</b>。这三件事，机器不会替你做。</p>
+
+  <section style="background:#efe9d8;border-radius:10px;padding:16px 18px;margin:26px 0 10px;">
+    <p style="margin:0 0 6px;font-size:13.5px;letter-spacing:3px;color:#8a8578;">补充说明</p>
+    <p style="margin:0;font-size:13.5px;color:#55524a;line-height:1.8;">本文案例基于模拟数据（20,000 个虚拟司机的完整承保-拒保-审计数据集），「真实风险」由模拟器生成，因此能公平评判模型的对错；所有模型为手写实现，代码与数据可完全复现。文中的双重稳健估计、逆概率加权等方法适用于真实业务的拒保件复核、理赔抽检、渠道质量评估等场景——数字不可直接引用，方法可以。</p>
+  </section>
+
+  <section style="background:#e6efe9;border-radius:10px;padding:16px 18px;margin:16px 0;">
+    <p style="margin:0 0 6px;font-size:13.5px;letter-spacing:3px;color:#2f6b5a;">完整的交互版</p>
+    <p style="margin:0;font-size:14px;line-height:1.9;">我们把这个案例做成了 13 页的可交互知识库：三套可以逐帧播放的动画（GLM 怎么迭代、决策树怎么挑问题、GBDT 怎么逐轮补差）、全部九张评估图、以及可以直接复用的代码与数据。在知识星球「用数据看保险的精算师们」后台回复可获得入口。</p>
+  </section>
+
+  <p style="text-align:center;color:#8a8578;font-size:13px;margin:30px 0 0;">西红精算 · 著有《长凳上的宇宙》<br>用数据讲保险 · 用真心做科普</p>
+
+</section>
+</body>
+</html>

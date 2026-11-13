@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>32 · 业务账与圈选阈值 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav on" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="32">
+<div class="ph-kicker">
+<span class="ph-no">32</span>
+<span class="ph-part">第 2 段 · 端到端</span>
+<span class="ph-idx" title="你在第 32 页">共 43 页</span>
+</div>
+<h1>业务账与圈选阈值</h1>
+<p class="ph-lead">指标是模型的事，<b>决策是业务的事</b>。这一页回答老板真正会问的问题：
+模型圈出来的人，怎么用？圈多少？值多少钱？</p>
+</header>
+<div class="toc"><div class="t">本页目录</div><a href="#rule">先立规矩：什么口径下才叫「赚钱」</a><a href="#band">分档体检：模型排的序到底有没有含金量</a><a href="#thr">圈谁：把人工复核当投资来算</a><a href="#howgain">「相对随机的增益」这一列，是怎么算出来的</a></div>
+
+
+
+
+
+<div class="gof">
+  <div class="gof-h">本页要做的三件事</div><p class="gof-what">圈谁去复核最划算？圈太少漏掉利润，圈太多白花人工——中间有个最优点。</p>
+  <div class="gof-row"><span class="gof-k gof-goal">目标</span>
+    <div class="gof-v">把模型圈出来的人，变成一笔老板能看懂的账——圈谁、圈多少、值多少钱。</div></div>
+  <div class="gof-row"><span class="gof-k gof-out">输出</span>
+    <div class="gof-v"><a class="tl" href="glossary.html#term-binning" title="分箱（离散化）｜把连续的数字切成几段（年龄 18–25、26–35…），每段当成一类。能扛住极端值，也更…">分档</a><a class="tl" href="glossary.html#term-precision-purity" title="精确率（圈选纯度）｜你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。">纯度</a>表，加一条倒 U 形的「最优圈选规模」曲线。</div></div>
+  <div class="gof-row"><span class="gof-k gof-read">怎么读</span>
+    <div class="gof-v">最优<a class="tl" href="glossary.html#term-threshold-cut-off" title="阈值（切点）｜把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。">阈值</a>既不是最严、也不是全圈，落在倒 U 的平台区就行；别纠结精确最优点，那给了落地试错的空间。</div></div>
+<div class="gof-row"><span class="gof-k gof-know">读完你会知道</span><div class="gof-v">倒 U 曲线：圈 4,400 件时增益最大。<a class="tl" href="glossary.html#term-threshold-cut-off" title="阈值（切点）｜把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。">阈值</a>要贴着「盈亏平衡」定，不是贴着中位数定。</div></div></div>
+
+<h2 id="rule">先立规矩：什么口径下才叫「赚钱」</h2>
+<p>假设年保费 3,000 元、<a class="tl" href="glossary.html#term-loss-ratio-combined-ratio" title="赔付率与综合成本率｜赔付率 = 赔出去的钱 ÷ 收进来的保费；综合成本率 = 赔付率 + 费用率。超过 10…">综合成本率</a> 75%。第一个坑就在这里：
+<b><a class="tl" href="glossary.html#term-loss-ratio-combined-ratio" title="赔付率与综合成本率｜赔付率 = 赔出去的钱 ÷ 收进来的保费；综合成本率 = 赔付率 + 费用率。超过 10…">综合成本率</a>已经把预期赔款算进去了</b>，所以毛利的正确口径是增量：</p>
+<div class="fx">救回一单的毛利 = 保费 − COR × 该单真实赔款 = 3,000 − 75% × 972 ≈ 2,271 元
+<small>错误做法：先算 3,000×(1−75%) 再减一遍赔款——赔款被扣两次，
+所有档位「永远亏损」，整套分析作废</small></div>
+<div class="explain">「该单真实赔款」用每档的真实均值（模拟器上帝视角）。
+现实里没有上帝视角，用<a class="tl" href="glossary.html#term-audit-sample" title="审计样本｜从被拒的人里抽一小部分，人工去查他们真实风险是多少。昂贵但能救命。">审计</a>样本 + 第 30 页的 DR 估计来填——
+这也是业务账和<a class="tl" href="glossary.html#term-correlation-vs-causation" title="相关与因果｜相关 = 两件事一起变；因果 = 一件导致了另一件。相关不等于因果，这是最容易栽跟头的地方。">因果推断</a>的接口。</div>
+
+<h2 id="band"><a class="tl" href="glossary.html#term-binning" title="分箱（离散化）｜把连续的数字切成几段（年龄 18–25、26–35…），每段当成一类。能扛住极端值，也更…">分档</a>体检：模型排的序到底有没有含金量</h2>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>档位（按预测从低到高）</th><th class="num">件数</th><th class="num">真实均值</th>
+  <th class="num">好司机占比</th><th class="num">单均毛利（元）</th></tr>
+<tr><td>最低 0%–5%</td><td class="num">440</td><td class="num">1,001</td><td class="num">72.5%</td><td class="num">2,249</td></tr><tr><td>最低 5%–10%</td><td class="num">440</td><td class="num">1,044</td><td class="num">64.1%</td><td class="num">2,217</td></tr><tr><td>最低 10%–20%</td><td class="num">880</td><td class="num">1,074</td><td class="num">55.9%</td><td class="num">2,194</td></tr><tr><td>最低 20%–30%</td><td class="num">880</td><td class="num">1,106</td><td class="num">42.8%</td><td class="num">2,170</td></tr><tr><td>最低 30%–50%</td><td class="num">1,760</td><td class="num">1,160</td><td class="num">28.5%</td><td class="num">2,130</td></tr><tr><td>最低 50%–100%</td><td class="num">4,400</td><td class="num">1,339</td><td class="num">6.5%</td><td class="num">1,995</td></tr>
+</table></div>
+<div class="tbl-cap">每一档真实成本、好司机浓度单调递变——排序是真实含金量，不是<a class="tl" href="glossary.html#term-overfitting" title="过拟合｜把训练题背得滚瓜烂熟，一换新题就崩。记住了噪声，没学到规律。">过拟合</a>的表演。</div>
+<div class="fig"><img src="img/fig2_03_lift.png" alt=""><div class="fig-cap">分档<a class="tl" href="glossary.html#term-precision-purity" title="精确率（圈选纯度）｜你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。">纯度</a>（柱）与真实成本（线）同步单调变化。注意最后两列：即便最差的一档（真实均值 1,339 元）仍然赚钱，因为盈亏平衡线是 保费/COR = 4,000 元——问题从来不是「哪档赚钱」，而是「哪档最值得花人工去确认」。</div></div>
+
+<h2 id="thr">圈谁：把人工复核当投资来算</h2>
+<p>假设每件复核成本 40 元（0.5 小时 × 80 元/小时）。同一个人工预算，
+投给多少人、投给谁，收益完全不同：</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th class="num">预测阈值（元）</th><th class="num">圈出件数</th>
+  <th class="num">圈内真实均值</th><th class="num">相对随机的增益（元）</th></tr>
+<tr><td class="num">1,018</td><td class="num">440</td><td class="num">1,001</td><td class="num">72,823</td></tr><tr><td class="num">1,108</td><td class="num">880</td><td class="num">1,023</td><td class="num">131,529</td></tr><tr><td class="num">1,231</td><td class="num">1,760</td><td class="num">1,048</td><td class="num">229,054</td></tr><tr><td class="num">1,335</td><td class="num">2,640</td><td class="num">1,068</td><td class="num">305,376</td></tr><tr><td class="num">1,538</td><td class="num">4,400</td><td class="num">1,105</td><td class="num hl">387,474</td></tr><tr><td class="num">1,793</td><td class="num">6,160</td><td class="num">1,140</td><td class="num">377,592</td></tr><tr><td class="num">5,028</td><td class="num">8,800</td><td class="num">1,222</td><td class="num">0</td></tr>
+</table></div>
+
+<h2 id="howgain">「相对随机的增益」这一列，是怎么算出来的</h2>
+<p>上面那张表最后一列是本库的核心数字，但它是怎么来的、为什么这么定义，值得拆开看一遍。
+先说白话：<b>它不是模型「多赚了多少保费」，而是同一笔人工预算，
+模型挑的人比闭着眼随机挑的人，少赔了多少钱。</b></p>
+
+<div class="quote q-talk"><span class="q-tag">说人话</span>
+<p>你有 4,400 个复核名额。给谁？给模型挑的那 4,400 个，还是抽签抽 4,400 个？
+两种做法都要花一样的 4,400 次人工。<b>差额，就是模型值多少钱。</b>
+不这么比的话，你会把「保费规模本来就大」误算成模型的功劳。</p></div>
+
+<details class="fold why"><summary>展开：这个数就是这么乘出来的</summary><div class="fold-body"><div class="fx">增益 = n × (PREM − COR × t_model) − n × (PREM − COR × t̄)<br>　　 = <b>n × COR × ( t̄ − t_model )</b></div><p class="explain">把同一个 n 件预算花两遍。第一遍让模型挑，赚 n×(保费 − COR×模型圈内的真实均赔)；第二遍闭眼随机挑，赚 n×(保费 − COR×全体拒保件的真实均赔)。两个相减，保费项完全一样，被抵消掉了。</p><ul class="sym"><li><code>n</code> — 这一档圈出的件数（如峰值 4,400 件）</li><li><code>PREM</code> — 单件年保费 3,000 元</li><li><code>COR</code> — 赔款占保费的比例 0.75（综合成本率里的赔付部分）</li><li><code>t_model</code> — 模型挑出的这 n 人的真实均赔（如峰值 1,105 元）</li><li><code>t̄</code> — 全体 8,800 件拒保的真实均赔 1,222 元——随机挑一件就是这个数</li></ul><p class="explain">把峰值代进去：4,400 × 0.75 × (1,222 − 1,105) ≈ 386,100 元，与库里的 387,474 元一致（差的那一点来自真实均值取整到 1 元）。</p></div></details>
+
+<p><b>注意减号两边那个 PREM，它被完全约掉了。</b>这不是巧合，是这套算法的要害：</p>
+<div class="explain">模型的价值<b>一分钱也不来自「把业务做大了」</b>——保费是规模带来的，
+随机挑也一样拿得到。它<b>只来自「挑人挑得比随机准」</b>，也就是那个风险差 (t̄ − t_model)。
+这就是为什么这一列必须叫「相对随机」：不设这个基准，每个档位都是正的、都是几百万，
+看起来模型好坏都一样，决策就做不出来了。</div>
+
+<h3 id="sec3-1">换个视角：把每个人的贡献一个个加起来</h3>
+<div class="fx">增益 = Σ<sub>被圈的每个人 i</sub> COR × ( t̄ − t<sub>i</sub> )</div>
+<p>也就是说，<b>每个人对这笔账的贡献，只取决于他真实赔款比「随机那个人」低多少</b>：</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>被圈的这个人</th><th class="num">他的真实赔款</th>
+  <th class="num">相对随机的差</th><th class="num">他的贡献（元）</th><th>判断</th></tr>
+<tr><td>被<a class="tl" href="glossary.html#term-wrongly-rejected" title="错杀｜真实风险明明够低，却被规则拒掉的人。本案例一共 2,259 个。">错杀</a>的好司机（本库的主角）</td><td class="num">972</td><td class="num">+250</td><td class="num" style="color:#2f6b5a">+187.5</td><td><b>该圈</b>：他比随机好</td></tr><tr><td>拒保人群的平均水平（随机挑一个）</td><td class="num">1,222</td><td class="num">+0</td><td class="num" style="color:#8a8578">+0.0</td><td>圈不圈都一样</td></tr><tr><td>确实高风险的（规则没冤枉他）</td><td class="num">1,500</td><td class="num">-278</td><td class="num" style="color:#b53d2e">-208.5</td><td><b>不该圈</b>：圈他反而亏</td></tr>
+</table></div>
+<div class="tbl-cap">贡献可能为负——<b>圈错人是真的会亏钱的</b>，不是「圈多了只是边际收益递减」。</div>
+
+<p>由此可以推出「最优圈选」在理论上是什么：<b>只圈真实赔款低于 t̄ = 1,222 元的人</b>，
+一个都别多圈。可惜这在现实里做不到——<b>被拒保的人没有理赔记录，t<sub>i</sub> 恰恰是观测不到的那个数</b>
+（这正是第 29 页<a class="tl" href="glossary.html#term-selection-bias" title="选择偏差｜你手上只有被承保的人的赔付记录，被拒的人根本没数据 —— 于是你的「已知世界」是歪的。">选择偏差</a>的根源）。所以只能用预测值 pred 排序去近似它。
+而预测是有<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声</a>的：<b>圈得越靠后，预测越接近瞎猜，就越接近随机，贡献就越接近 0</b>。
+增益曲线为什么是个倒 U？根就在这里——不是什么玄学，是<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声</a>吃掉了模型的排序优势。</p>
+
+<h3 id="sec3-2">照着本库的数，把整条曲线重算一遍</h3>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th class="num">圈选分位</th><th class="num">件数 n</th><th class="num">圈内真实均赔</th>
+  <th class="num">单件比随机低</th><th class="num">单件贡献</th>
+  <th class="num">重算：n×COR×差</th><th class="num">库里的值</th></tr>
+<tr><td class="num">5%</td><td class="num">440</td><td class="num">1,001</td><td class="num">221</td><td class="num">165.8</td><td class="num">72,930</td><td class="num">72,823</td></tr><tr><td class="num">10%</td><td class="num">880</td><td class="num">1,023</td><td class="num">199</td><td class="num">149.2</td><td class="num">131,340</td><td class="num">131,529</td></tr><tr><td class="num">20%</td><td class="num">1,760</td><td class="num">1,048</td><td class="num">174</td><td class="num">130.5</td><td class="num">229,680</td><td class="num">229,054</td></tr><tr><td class="num">30%</td><td class="num">2,640</td><td class="num">1,068</td><td class="num">154</td><td class="num">115.5</td><td class="num">304,920</td><td class="num">305,376</td></tr><tr><td class="num">50%</td><td class="num">4,400</td><td class="num">1,105</td><td class="num">117</td><td class="num">87.8</td><td class="num">386,100</td><td class="num hl">387,474</td></tr><tr><td class="num">70%</td><td class="num">6,160</td><td class="num">1,140</td><td class="num">82</td><td class="num">61.5</td><td class="num">378,840</td><td class="num">377,592</td></tr><tr><td class="num">100%</td><td class="num">8,800</td><td class="num">1,222</td><td class="num">0</td><td class="num">0.0</td><td class="num">0</td><td class="num">0</td></tr>
+</table></div>
+<div class="tbl-cap">倒数两列并排就是为了让你验算：公式复现出来的数和库里跑出来的数对得上
+（峰值处差 1,374 元，
+来自真实均值取整到 1 元）。<br>
+两股力量方向相反、相乘才有峰值：<b>件数 n 一路在涨，单件贡献一路在跌</b>
+（165.8 → 87.8 → 0）。前半段「人多」盖过了「薄」，后半段「薄」盖过了「人多」，于是成倒 U。
+把这个表复制进 Excel、换成自己的数就能直接用。</div>
+
+<p>代码就两处（点开是新窗口、带行号）：
+<a class="codelink" href="src/steps_678.html#L281-L281" target="_blank" rel="noopener">保费与成本率常数<span class="cl-ln">L281</span></a> 和
+<a class="codelink" href="src/steps_678.html#L356-L372" target="_blank" rel="noopener">扫阈值算增益<span class="cl-ln">L356–372</span></a>。
+后面那段就干一件事：先算随机基准的单件毛利，再算模型圈出的单件毛利，
+相减乘件数，七个分位扫一遍取最大。</p>
+
+<div class="fig"><img src="img/fig2_04_threshold.png" alt=""><div class="fig-cap">增益曲线是一个倒 U：圈得太少（信息浪费）和圈得太多（人工白花）都会掉收益。峰值在圈 4,400 件处，年增益约 387,474 元。</div></div>
+<p>三个决策要点：</p>
+<p><b>一，最优阈值不是「最严」。</b>圈 440 件（最严）增益只有 72,823 元，
+不到峰值的两成。<b>排序好的模型值得用足，不是惜用。</b></p>
+<p><b>二，也不是「全圈」。</b>圈满 8,800 件等于没有圈，增益归零——人工成本白花，
+模型的价值被自己的滥用清空。</p>
+<p><b>三，峰值附近其实很平。</b>圈 4,400 到 6,160 件增益几乎不变（387,474 vs 377,592）。
+实务含义：<b>不必纠结精确的最优点，落在平台上就行</b>——这给了落地试错的空间。</p>
+
+<div class="quote q-talk"><span class="q-tag">说人话</span>
+<p>模型负责把人从便宜到贵排成一队，<b>业务决定队伍里往前数多少个</b>。
+倒 U 曲线告诉你：这个数既不是 0 也不是全部，中间有个最划算的位置。</p></div>
+<div class="quote q-mgmt"><span class="q-tag">管理启示</span>
+<p>「模型圈了多少人」不是 KPI，「每元复核成本换回多少毛利」才是。
+本案例峰值处 1 元复核成本约换回 2 元毛利——
+这类「性价比」数字应当出现在每一次模型汇报的第一页，<a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> 反而该往后放。</p></div>
+
+<div class="codebar"><div class="cb-t">本页用到的代码</div><div class="cb-items"><a class="cb-i" href="src/steps_678.html"><b>steps_678</b><span>流水线第 6–8 步（真正的战场）</span></a></div><a class="cb-all" href="code.html">全部代码 → 代码入口<span>42</span></a></div>
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-recall"><b>召回率</b></a><span>真正该救的人里，你救到了百分之多少。漏掉的叫「漏网」。</span></div><div class="t-item"><a href="glossary.html#term-precision-purity"><b>精确率（圈选纯度）</b></a><span>你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。</span></div><div class="t-item"><a href="glossary.html#term-threshold-cut-off"><b>阈值（切点）</b></a><span>把模型输出的分数变成「是 / 否」的那条线。线往一边挪就少抓人，往另一边挪就多抓人。</span></div><div class="t-item"><a href="glossary.html#term-false-positive"><b>误伤</b></a><span>模型说他是好人，其实真实风险偏高。救错人的代价。</span></div><div class="t-item"><a href="glossary.html#term-wrongly-rejected"><b>错杀</b></a><span>真实风险明明够低，却被规则拒掉的人。本案例一共 2,259 个。</span></div><div class="t-item"><a href="glossary.html#term-loss-ratio-combined-ratio"><b>赔付率与综合成本率</b></a><span>赔付率 = 赔出去的钱 ÷ 收进来的保费；综合成本率 = 赔付率 + 费用率。超过 100% 就是承保亏损。</span></div></div>
+<div class="pager">
+<a href="ch09.html"><span class="dir">◀ 上一页</span>外推风险：18 个样本</a>
+<a class="next" href="ch11.html"><span class="dir">下一页 ▶</span>「看起来更好」的陷阱</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

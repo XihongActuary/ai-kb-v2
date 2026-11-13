@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16 · 最常见的六个误区 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav on" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="16">
+<div class="ph-kicker">
+<span class="ph-no">16</span>
+<span class="ph-part">第 1 段 · 理论</span>
+<span class="ph-idx" title="你在第 16 页">共 43 页</span>
+</div>
+<h1>机器学习最常见的六个误区</h1>
+<p class="ph-lead">很多模型问题，<b>不是算法不够强，是认知先出了偏差</b>。
+下面这六句话，每一句听着都挺像那么回事，每一句都能把项目带沟里去。
+本案例在写的过程中基本<b>全踩过一遍</b>，所以这一页不举教科书例子，只讲我们翻过的车。</p>
+</header>
+<div class="toc"><div class="t">本页目录</div><a href="#m1">误区一：训练集分数高，就说明模型好</a><a href="#m2">误区二：模型越复杂越好</a><a href="#m3">误区三：数据越多越好</a><a href="#m4">误区四：特征越多越好</a><a href="#m5">误区五：准确率高就一定可用</a><a href="#m6">误区六：把模型跑出来就结束了</a></div>
+<div class="mlkb"><span class="ml-k">往深了学 · 机器学习知识库</span><a href="../ml-kb/oneday.html" target="_blank" rel="noopener">一小时精读</a></div>
+
+
+
+<div class="sv wide"><svg viewBox="0 0 644 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto"><text x="30" y="60" font-size="10.5" fill="#b53d2e">✗</text><text x="44" y="60" font-size="10.5" fill="#2b2a26">① 训练集分数高，就说明模型好</text><text x="410" y="60" font-size="10.5" fill="#8a8578">✓</text><text x="424" y="60" font-size="10.5" fill="#2b2a26">训练 / 验证 / 测试三个都要看</text><text x="30" y="96" font-size="10.5" fill="#b53d2e">✗</text><text x="44" y="96" font-size="10.5" fill="#2b2a26">② 模型越复杂越好</text><text x="410" y="96" font-size="10.5" fill="#8a8578">✓</text><text x="424" y="96" font-size="10.5" fill="#2b2a26">简单模型往往更稳、更好解释</text><text x="30" y="132" font-size="10.5" fill="#b53d2e">✗</text><text x="44" y="132" font-size="10.5" fill="#2b2a26">③ 数据量越多越好</text><text x="410" y="132" font-size="10.5" fill="#8a8578">✓</text><text x="424" y="132" font-size="10.5" fill="#2b2a26">数据质量与口径比数量重要得多</text><text x="30" y="168" font-size="10.5" fill="#b53d2e">✗</text><text x="44" y="168" font-size="10.5" fill="#2b2a26">④ 特征越多越好</text><text x="410" y="168" font-size="10.5" fill="#8a8578">✓</text><text x="424" y="168" font-size="10.5" fill="#2b2a26">无效特征只会增加噪声、拖慢训练</text><text x="30" y="204" font-size="10.5" fill="#b53d2e">✗</text><text x="44" y="204" font-size="10.5" fill="#2b2a26">⑤ 准确率高就一定可用</text><text x="410" y="204" font-size="10.5" fill="#8a8578">✓</text><text x="424" y="204" font-size="10.5" fill="#2b2a26">类别不平衡时，准确率会骗你</text><text x="30" y="240" font-size="10.5" fill="#b53d2e">✗</text><text x="44" y="240" font-size="10.5" fill="#2b2a26">⑥ 把模型跑出来就结束了</text><text x="410" y="240" font-size="10.5" fill="#8a8578">✓</text><text x="424" y="240" font-size="10.5" fill="#2b2a26">还要解释结果、监控效果、回业务迭代</text><line x1="20" y1="266" x2="624" y2="266" stroke="#ddd5c2"/><text x="322" y="290" font-size="11" fill="#2f6b5a" text-anchor="middle">真正该关注四件事：① 问题定义清不清晰　② 数据质量靠不靠谱　③ 模型有没有泛化能力　④ 结果能不能指导业务</text></svg><div class="fig-cap">左边是六个听起来很对、实际很坑的念头；右边是对应的纠正。底部是真正该长期盯着的四件事。</div></div>
+
+
+<div class="gof">
+  <div class="gof-h">本页要做的三件事</div><p class="gof-what">六句听着都对、做就错的念头，本案例基本全踩过一遍。</p>
+  <div class="gof-row"><span class="gof-k gof-goal">目标</span>
+    <div class="gof-v">识别六句「听着对、做就错」的行话，避免在项目还没开始时就把方向走歪。</div></div>
+  <div class="gof-row"><span class="gof-k gof-out">输出</span>
+    <div class="gof-v">六条纠正 + 本案例里对应的真实数字（比如<a class="tl" href="glossary.html#term-extrapolation-ood" title="外推（训练域外）｜给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。">外推</a><a class="tl" href="glossary.html#term-precision-purity" title="精确率（圈选纯度）｜你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。">纯度</a>从 96.6% 掉到 62.2%）。</div></div>
+  <div class="gof-row"><span class="gof-k gof-read">怎么读</span>
+    <div class="gof-v">对照这张对照表扫一遍，看自己中了哪几条；尤其第 5、6 条，是本项目真正付出代价的两条。</div></div>
+<div class="gof-row"><span class="gof-k gof-know">读完你会知道</span><div class="gof-v">真正该长期盯的是四件事：问题定义、数据质量、<a class="tl" href="glossary.html#term-generalization" title="泛化能力｜模型在「从没见过的新数据」上还能不能打得一样好。这才是它真正的本事。">泛化能力</a>、结果能不能指导业务。</div></div></div>
+
+<h2 id="m1">误区一：训练集分数高，就说明模型好</h2>
+<p><b>错在哪：</b>模型可以<b>把训练样本整段背下来</b>——这不是学会，是抄答案。真正该看的是它面对<b>从没见过的人</b>表现如何。</p>
+<p><b>本案例：</b>内插域（模型见过的那 11,200 人）<a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> <b>0.885</b>、圈最便宜 20% 的<a class="tl" href="glossary.html#term-precision-purity" title="精确率（圈选纯度）｜你圈出来的这批人里，真正对的有百分之多少。圈错的就是「误伤」。">纯度</a> <b>96.6%</b>；
+换成<a class="tl" href="glossary.html#term-extrapolation-ood" title="外推（训练域外）｜给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。">外推</a>域（8,800 个从没见过的人），<a class="tl" href="glossary.html#term-auc" title="AUC（排序能力）｜随机抽一个好人和一个坏人，模型能把好人排得更靠前的概率。0.5 = 瞎猜，1.0 = 完美。">AUC</a> 掉到 <b>0.833</b>、纯度掉到 <b>62.2%</b>——<b>掉了 18.9 个百分点</b>。</p>
+<div class="note"><b>怎么防：</b>留一份数据当「期末考」(<a href="b05.html">B5</a>)，考前一次都不许看。
+这份数据只用来算最后的成绩，不参与任何<a class="tl" href="glossary.html#term-hyperparameter-search" title="超参数搜索｜把几组候选超参数都试一遍（网格 = 全试，随机 = 抽着试），按验证集分数挑最好的那一组。">调参</a>。</div>
+
+<h2 id="m2">误区二：模型越复杂越好</h2>
+<p><b>错在哪：</b>复杂模型能记住更多<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声</a>。它把「这条规则有偏差」这种偶然事件也当成规律学了。</p>
+<p><b>本案例：</b>四个模型里，最朴素的<b>常数<a class="tl" href="glossary.html#term-baseline" title="基线｜一个「不动脑子也能做出来」的参照分数，比如全猜平均值。模型连它都打不过，那就别做了。">基线</a></b>（什么特征都不看）deviance 是 8,994.5；
+<a class="tl" href="glossary.html#term-poisson-regression" title="泊松回归｜专门预测「次数」的 GLM（出险几次、住院几次）。它保证预测出来永远是正数。">Poisson</a> <a class="tl" href="glossary.html#term-glm" title="广义线性模型｜精算的老熟人：把各个因子的影响「加起来」，再套一层变换。好处是每个系数都能讲出业务含义。">GLM</a> 建模<a class="tl" href="glossary.html#term-pure-premium" title="纯保费｜刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。">纯保费</a>后是 9,005.9，<b>反而是<a class="tl" href="glossary.html#term-baseline" title="基线｜一个「不动脑子也能做出来」的参照分数，比如全猜平均值。模型连它都打不过，那就别做了。">基线</a>的 100.1%</b>——
+也就是说「直接上模型」这一动作<b>一点忙都没帮上</b>（详见 <a href="ch03.html">ch03</a>）。
+最后是靠拆成「<a class="tl" href="glossary.html#term-frequency" title="出险频率｜一年里平均出几次险。是个「次数」，所以用泊松那套工具。">频率</a> × <a class="tl" href="glossary.html#term-loss-function" title="损失函数｜一个「打分尺」，专门衡量模型猜得有多离谱。训练的目标就是让这个数越来越小。">损失</a>」才真正动起来。</p>
+<div class="note"><b>正确的问法：</b>「这个复杂度，换来的提升配得上它的代价吗？」
+代价包括：更难解释、更难维护、出错时更难定位。保险定价里，<b>能讲清为什么的人比<a class="tl" href="glossary.html#term-accuracy-confusion-matrix-f1" title="准确率（混淆矩阵 · F1）｜准确率 = 猜对的比例；混淆矩阵 = 把「该抓抓了 / 该抓没抓 / 不该抓抓了 / 不…">准确率</a>高 0.5 个点更重要</b>。</div>
+
+<h2 id="m3">误区三：数据越多越好</h2>
+<p><b>错在哪：</b>100 万条口径不一致的数据，不如 1 万条干净的数据。<b>标签错一点，数据再多也是往沟里带。</b></p>
+<p><b>本案例：</b>最致命的一处就是 <code>claim_cnt = −1</code>。
+它的意思是「<b>这个人的出险记录我们不知道</b>」，不是「这个人一次险都没出过」。
+只要把它当成 0，等于宣称「被拒的 8,800 个全都是完美司机」——
+模型会学出一个荒唐结论，而且<b>样本越多，学得越自信、越离谱</b>。详见 <a href="ch02.html">ch02</a>。</p>
+<div class="note"><b>投入顺序建议：</b>先花时间统一口径、补齐标签定义，再谈加数据量。</div>
+
+<h2 id="m4">误区四：特征越多越好</h2>
+<p><b>错在哪：</b>无效特征增加<a class="tl" href="glossary.html#term-noise" title="噪声｜数据里那些没有规律、纯属随机的抖动。模型能学到的规律有下限，学过头就变成在背噪声。">噪声</a>，还拖慢训练、让人更难判断哪个特征真有用。</p>
+<p><b>本案例：</b>我们特意用了 <b><a class="tl" href="glossary.html#term-ipw" title="逆概率加权｜被抽中概率低的人，算平均时给他更大的权重，把被抽歪的样本掰回来。">IPW</a> <a class="tl" href="glossary.html#term-ipw" title="逆概率加权｜被抽中概率低的人，算平均时给他更大的权重，把被抽歪的样本掰回来。">逆概率加权</a> / <a class="tl" href="glossary.html#term-dr" title="双重稳健｜先用模型把所有人预测一遍，再用审计样本的实际数据把模型的偏差补回来。两条腿走路，断一条还…">双重稳健</a></b> 来修正「渠道」这类变量（<a href="ch08.html">ch08</a>），
+因为线上渠道<a class="tl" href="glossary.html#term-wrongly-rejected" title="错杀｜真实风险明明够低，却被规则拒掉的人。本案例一共 2,259 个。">错杀</a>率是代理渠道的 <b>2.3 倍</b>——「渠道」这个特征不是没用，
+而是<b>它混进了「资料全不全」和「风险高不高」两件事</b>。加特征容易，判断特征「该不该加」才难。</p>
+<div class="note"><b>本案例的做法：</b>不是一刀切删掉渠道，而是把它<b>单独拎出来做敏感性分析</b>，
+看结论在「含渠道 / 不含渠道」下稳不稳。稳，就留。</div>
+
+<h2 id="m5">误区五：<a class="tl" href="glossary.html#term-accuracy-confusion-matrix-f1" title="准确率（混淆矩阵 · F1）｜准确率 = 猜对的比例；混淆矩阵 = 把「该抓抓了 / 该抓没抓 / 不该抓抓了 / 不…">准确率</a>高就一定可用</h2>
+<p><b>错在哪：</b>类别不平衡时，准确率会骗人。比如模型对所有人都判「不出险」，准确率可以高达 90%+，
+但它<b>一个坏司机都没找出来</b>。</p>
+<p><b>本案例：</b>我们<b>根本不看准确率</b>，看的是<b>圈最便宜 20% 里好司机占比（纯度）</b>和<b><a class="tl" href="glossary.html#term-recall" title="召回率｜真正该救的人里，你救到了百分之多少。漏掉的叫「漏网」。">召回</a>率</b>。
+模型内插域纯度 <b>96.6%</b>、外推域 <b>62.2%</b>；圈 4,400 件时业务增益最大，<b>387,474 元</b>（<a href="ch10.html">ch10</a>）。
+这三个数字放在一起，才回答了「划不划算」。</p>
+<div class="note red"><b>这一条的影子在 ch11 出现过：</b>模型 B 报表上全面优于 A，但它其实一点都没更准，
+只是把预测刻度整体压低了。<b>指标要成对看，别只看一个。</b></div>
+
+<h2 id="m6">误区六：把模型跑出来就结束了</h2>
+<p><b>错在哪：</b>模型上线只是开始。它<b>需要被解释、被<a class="tl" href="glossary.html#term-monitoring" title="上线后监控｜上线只是开始：每天盯住分数分布、人群构成和真实结果，偏了就报警，该回滚就回滚。">监控</a>、被业务持续迭代</b>。</p>
+<p><b>本案例：</b>我们最后给的不是一个模型，是一份 <b>SOP 与清单</b>（<a href="ch13.html">ch13</a>）：
+第一年只做保守版——<b>只对「模型熟悉的人」放宽，远点维持原规则</b>。
+为什么？因为外推域的纯度只有 <b>62.2%</b>，还没到「可以规模化放开」的程度。</p>
+<div class="note jade"><b>上线后真正要看的四件事：</b>
+① 谁被改了结论、改成了什么；② 这批人的实际赔付，和预测差多少（<b><a class="tl" href="glossary.html#term-calibration" title="校准｜模型说「这个人值 1000 元」，实际是不是真接近 1000 元。排序准 ≠ 数值准。">校准</a><a class="tl" href="glossary.html#term-drift" title="漂移｜上线之后，数据的分布或者「输入 → 结果」的关系慢慢变了。模型没坏，是世界变了。">漂移</a></b>）；
+③ 渠道 / 车型结构变了没有（<b><a class="tl" href="glossary.html#term-drift" title="漂移｜上线之后，数据的分布或者「输入 → 结果」的关系慢慢变了。模型没坏，是世界变了。">分布漂移</a></b>）；④ 业务侧按名单复核完，省下来多少钱。
+四项任一超标，退回第 ② 步重来。</div>
+
+<div class="note jade"><b>看完这一页，你只需要记住三句话</b><ol><li>六句话听着都挺对，<b>每一句都能把项目带沟里</b>：训练集高分、越复杂越好、数据越多越好、特征越多越好、准确率高就可用、跑完就结束了。</li><li>本案例真正付过代价的是<b>第 5、6 条</b>：外推纯度从 96.6% 掉到 62.2%，直接决定了第一年只能保守上线。</li><li>记住对照表底部那四件事：<b>问题定义、数据质量、<a class="tl" href="glossary.html#term-generalization" title="泛化能力｜模型在「从没见过的新数据」上还能不能打得一样好。这才是它真正的本事。">泛化能力</a>、能不能指导业务</b>——这才是长期该盯的。</li></ol></div>
+
+
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-overfitting"><b>过拟合</b></a><span>把训练题背得滚瓜烂熟，一换新题就崩。记住了噪声，没学到规律。</span></div><div class="t-item"><a href="glossary.html#term-training-set"><b>训练集</b></a><span>拿来「教」机器的那部分数据，答案一起给它看。</span></div><div class="t-item"><a href="glossary.html#term-test-set"><b>测试集</b></a><span>机器从没见过的那部分数据，答案先藏起来，用来检验它是不是真学会了。</span></div><div class="t-item"><a href="glossary.html#term-generalization"><b>泛化能力</b></a><span>模型在「从没见过的新数据」上还能不能打得一样好。这才是它真正的本事。</span></div><div class="t-item"><a href="glossary.html#term-bias-variance-tradeoff"><b>偏差-方差权衡</b></a><span>偏差 = 模型太死板，怎么练都偏；方差 = 模型太敏感，换批数据就变脸。两头都要压，而且常常此消彼长。</span></div><div class="t-item"><a href="glossary.html#term-extrapolation-ood"><b>外推（训练域外）</b></a><span>给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。</span></div></div>
+<div class="pager">
+<a href="b12.html"><span class="dir">◀ 上一页</span>遇到问题该选哪类模型</a>
+<a class="next" href="b09.html"><span class="dir">下一页 ▶</span>学习地图 · 门路推荐</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>35 · 落地 SOP 与清单 — AI 实践库</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+<div class="brand">西红<b>精算</b> · AI 实践库</div>
+<a class="brand-sub" href="index.html" title="回到知识地图">场景一 · 找出被错杀的好司机</a>
+<details class="sb-about" id="about">
+<summary><span class="sba-t">关于这个库 · 关于西红精算</span><span class="caret">▸</span></summary>
+<div class="sba-body">
+<div class="sba-h">这个库在做什么</div>
+<p>一个车险场景，从「这事到底要不要做」一路走到「上线之后怎么盯」，共 <b>43 页</b>、四段：
+先看全貌 → 讲透道理 → 端到端做完 → 附录随查。</p>
+<p><b>它不打算让你相信结论，它打算让你自己把结论跑出来一遍。</b>三条硬做法：
+数据自己造（<code>code/gen_data.py</code>，不含任何真实保单）；
+模型手写（Poisson GLM、决策树、GBDT 全不调现成包）；
+数字只有一个来源（<code>out/facts.json</code>，页面里不写死任何一个）。</p>
+
+<div class="sba-h">怎么读</div>
+<p>零基础：从 <a href="b01.html">05 机器学习到底在干什么</a> 顺着读。<br>
+赶时间：<a href="x01.html">02 一页讲清楚</a>。<br>
+只要结论：<a href="s07.html">03 三十秒版本</a>。<br>
+要落地过监管：<a href="ch13.html">35 落地 SOP 与清单</a>。</p>
+
+<div class="sba-h">西红精算是谁</div>
+<p><b>用数据讲保险 · 用真心做科普。</b>精算师视角，让风险从模糊变得可度量、可应对。<br>
+四根支柱：精算通识 · 风险识别 · 风险应对 · 精算心境。<br>
+四条硬规矩：<b>不卖焦虑 · 不讲术语 · 数字有出处 · 结论留退路</b>。</p>
+
+<div class="sba-h">在哪儿找到我们</div>
+<p>知识星球「用数据看保险的精算师们」：
+<a href="https://t.zsxq.com/JhXu6" target="_blank" rel="noopener">t.zsxq.com/JhXu6</a><br>
+姊妹项目：<a href="https://xihongactuary.github.io/risk-map/" target="_blank" rel="noopener">风险地图</a> ·
+<a href="https://xihongactuary.github.io/alm-kb/" target="_blank" rel="noopener">ALM 知识库</a> ·
+<a href="https://xihongactuary.github.io/ca-alm-kb/" target="_blank" rel="noopener">科目八</a> ·
+<a href="https://xihongactuary.github.io/ca-fm-kb/" target="_blank" rel="noopener">财务管理</a> ·
+<a href="https://xihongactuary.github.io/cross-solvency/" target="_blank" rel="noopener">偿二代</a> ·
+<a href="https://xihongactuary.github.io/cas25-kb/" target="_blank" rel="noopener">CAS25</a></p>
+</div>
+</details>
+<button class="nav-title" type="button" data-t="g1" aria-expanded="true"><span class="nt-t">第 0 段 · 知识地图：先看全貌再出发</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g1">
+<a class="nav" href="index.html"><span class="no">01</span>知识地图：这套库怎么读</a>
+<a class="nav" href="x01.html"><span class="no">02</span>一页讲清楚：问题 · 方法 · 效果</a>
+<a class="nav" href="s07.html"><span class="no">03</span>三十秒版本：怎么讲给老板听</a>
+<a class="nav" href="x02.html"><span class="no">04</span>三个动画 · 各自给出了什么</a>
+</div>
+<button class="nav-title" type="button" data-t="g2" aria-expanded="true"><span class="nt-t">第 1 段 · 理论：先把道理讲透</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g2">
+<a class="nav" href="b01.html"><span class="no">05</span>机器学习到底在干什么</a>
+<a class="nav" href="b02.html"><span class="no">06</span>数据长什么样：一行一个人</a>
+<a class="nav" href="b03.html"><span class="no">07</span>模型是什么：一个会算数的套路</a>
+<a class="nav" href="b04.html"><span class="no">08</span>训练是什么：反复改到改不动</a>
+<a class="nav" href="b05.html"><span class="no">09</span>过拟合：背熟习题却考砸</a>
+<a class="nav" href="b06.html"><span class="no">10</span>算法是什么：找数字的工艺</a>
+<a class="nav" href="b07.html"><span class="no">11</span>家族树：AI / ML / 深度学习</a>
+<a class="nav" href="b08.html"><span class="no">12</span>怎么判断一个模型好不好</a>
+<a class="nav" href="b14.html"><span class="no">13</span>模型是怎么被教会的一趟下山路</a>
+<a class="nav" href="b11.html"><span class="no">14</span>算法怎么分：先按任务分</a>
+<a class="nav" href="b12.html"><span class="no">15</span>遇到问题该选哪类模型</a>
+<a class="nav" href="b13.html"><span class="no">16</span>最常见的六个误区</a>
+<a class="nav" href="b09.html"><span class="no">17</span>门路推荐：理论之后往哪走</a>
+</div>
+<button class="nav-title" type="button" data-t="g3" aria-expanded="true"><span class="nt-t">第 2 段 · 端到端：从问题定义一路做到落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g3">
+<a class="nav" href="b10.html"><span class="no">18</span>路线图：端到端七步</a>
+<button class="nav-title sub" type="button" data-t="g4" aria-expanded="true"><span class="nt-t">阶段一 · 先决定要不要做</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g4">
+<a class="nav" href="s01.html"><span class="no">19</span>当下是怎么做的</a>
+<a class="nav" href="s02.html"><span class="no">20</span>不用机器学习行不行</a>
+<a class="nav" href="s05.html"><span class="no">21</span>四种范式：从预测到决策</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g5" aria-expanded="true"><span class="nt-t">阶段二 · 把问题翻译成机器能算的</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g5">
+<a class="nav" href="p01.html"><span class="no">22</span>把业务问题翻译成可计算的问题</a>
+<a class="nav" href="ch01.html"><span class="no">23</span>从你熟悉的 GLM 出发</a>
+<a class="nav" href="ch02.html"><span class="no">24</span>标签不可见：−1 不是 0</a>
+<a class="nav" href="ch03.html"><span class="no">25</span>频率 × 损失：拆开再拼</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g6" aria-expanded="true"><span class="nt-t">阶段三 · 训练：看着模型学会</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g6">
+<a class="nav" href="ch04.html"><span class="no">26</span>动画 · Poisson GLM 迭代</a>
+<a class="nav" href="ch05.html"><span class="no">27</span>动画 · 决策树挑问题</a>
+<a class="nav" href="ch06.html"><span class="no">28</span>动画 · GBDT 逐轮补差</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g7" aria-expanded="true"><span class="nt-t">阶段四 · 检验：模型会不会骗人</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g7">
+<a class="nav" href="ch07.html"><span class="no">29</span>选择偏差：审计样本的坑</a>
+<a class="nav" href="ch08.html"><span class="no">30</span>IPW 与双重稳健</a>
+<a class="nav" href="ch09.html"><span class="no">31</span>外推风险：从没见过的人</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g8" aria-expanded="true"><span class="nt-t">阶段五 · 把模型换成钱</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g8">
+<a class="nav" href="ch10.html"><span class="no">32</span>业务账与圈选阈值</a>
+<a class="nav" href="ch11.html"><span class="no">33</span>「看起来更好」的陷阱</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g9" aria-expanded="true"><span class="nt-t">阶段六 · 复盘与落地</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g9">
+<a class="nav" href="ch12.html"><span class="no">34</span>端到端复盘</a>
+<a class="nav on" href="ch13.html"><span class="no">35</span>落地 SOP 与清单</a>
+</div>
+<button class="nav-title sub" type="button" data-t="g10" aria-expanded="true"><span class="nt-t">阶段七 · 上线之后</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g10">
+<a class="nav" href="s03.html"><span class="no">36</span>投入产出账：要花多少钱</a>
+<a class="nav" href="s04.html"><span class="no">37</span>上线之后：风险才开始</a>
+<a class="nav" href="s06.html"><span class="no">38</span>组织与分工：谁来干</a>
+</div>
+</div>
+<button class="nav-title" type="button" data-t="g11" aria-expanded="true"><span class="nt-t">第 3 段 · 附录：随查随用</span><span class="caret">▾</span></button>
+<div class="nav-items" data-i="g11">
+<a class="nav" href="m01.html"><span class="no">39</span>常见模型速查</a>
+<a class="nav" href="a01.html"><span class="no">40</span>常见算法速查</a>
+<a class="nav" href="glossary.html"><span class="no">41</span>术语表 · 中英双语</a>
+<a class="nav" href="code.html"><span class="no">42</span>代码入口 · 全部源码</a>
+<a class="nav" href="q01.html"><span class="no">43</span>自测题库 · 15 道</a>
+</div>
+<div class="side-foot">看不懂的词随时查<a href="glossary.html">术语表</a><br>零基础请先读 <a href="b01.html">05 · 机器学习到底在干什么</a><br>数字唯一来源：<code>out/facts.json</code></div>
+</aside>
+<main class="main">
+<header class="pghead" data-no="35">
+<div class="ph-kicker">
+<span class="ph-no">35</span>
+<span class="ph-part">第 2 段 · 端到端</span>
+<span class="ph-idx" title="你在第 35 页">共 43 页</span>
+</div>
+<h1>落地 SOP 与复核清单</h1>
+<p class="ph-lead">案例讲完了，最后交付可以带走的东西：一张给复核团队用的清单怎么读、
+第一年怎么分步走、以及一份「别把模拟当现实」的边界声明。</p>
+</header>
+<div class="toc"><div class="t">本页目录</div><a href="#list">复核清单长什么样</a><a href="#sop">第一年的分步打法</a><a href="#limit">边界声明（请连同任何引用一起转发）</a><a href="#next">下一站</a></div>
+
+
+
+
+
+<div class="gof">
+  <div class="gof-h">本页要做的三件事</div><p class="gof-what">导出清单怎么用、第一年该做到什么程度、什么情况下必须停下来人工看。</p>
+  <div class="gof-row"><span class="gof-k gof-goal">目标</span>
+    <div class="gof-v">交付能直接带走的东西——一张复核清单、第一年的分步打法、一份边界声明。</div></div>
+  <div class="gof-row"><span class="gof-k gof-out">输出</span>
+    <div class="gof-v">按优先级排序的 rejected_scored.csv 怎么读，以及保守版落地 SOP。</div></div>
+  <div class="gof-row"><span class="gof-k gof-read">怎么读</span>
+    <div class="gof-v">第一年不追求多救，只追求把「救错了吗」变成可测量的数据；有了测量，第二年、第三年的一切优化才有地基。</div></div>
+<div class="gof-row"><span class="gof-k gof-know">读完你会知道</span><div class="gof-v">第一年只做保守版：只对「模型熟悉的人」放宽，远点维持原规则。少赚一点，但不出事。</div></div></div>
+
+<h2 id="list">复核清单长什么样</h2>
+<p>流水线导出的 <code>out/rejected_scored.csv</code> 每行一个被拒保件，按处理优先级排序：</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>优先级</th><th class="num">件数</th><th>定义</th><th>建议动作</th></tr>
+<tr><td class="good">1</td><td class="num">985</td>
+  <td>近点 + 预测最低 20%</td><td>模型最有把握的区域，优先批量复核</td></tr>
+<tr><td>2</td><td class="num">5,288</td>
+  <td>近点 + 其余</td><td>有余力再做，按预测从低到高</td></tr>
+<tr><td class="hl">3</td><td class="num">2,527</td>
+  <td>远点（模型没把握）</td><td class="hl">仍走原人工流程，不采信模型分数</td></tr>
+</table></div>
+<p>清单头部（预测<a class="tl" href="glossary.html#term-pure-premium" title="纯保费｜刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。">纯保费</a>最低的几件）长这样——注意它们的画像：
+<b>经济型轿车 + 线上渠道</b>，正是被规则偏见压得最狠的人群：</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th class="num">ID</th><th>车型</th><th>渠道</th><th class="num">模型预测（元）</th>
+  <th class="num">风险分位</th></tr>
+<tr><td class="num">7713</td><td>经济型轿车</td><td>线上渠道</td><td class="num">588</td><td class="num">0.0%</td></tr><tr><td class="num">5628</td><td>SUV</td><td>直销渠道</td><td class="num">631</td><td class="num">0.0%</td></tr><tr><td class="num">5937</td><td>经济型轿车</td><td>代理渠道</td><td class="num">658</td><td class="num">0.0%</td></tr><tr><td class="num">11303</td><td>经济型轿车</td><td>线上渠道</td><td class="num">665</td><td class="num">0.0%</td></tr><tr><td class="num">10512</td><td>经济型轿车</td><td>线上渠道</td><td class="num">684</td><td class="num">0.1%</td></tr>
+</table></div>
+
+<h2 id="sop">第一年的分步打法</h2>
+<div class="steps">
+  <div class="step"><h4 id="sec4-1">第 1–3 月 · 只做「近点 + 优先级 1」的试点</h4>
+    <p>规模约 985 件。目标不是省钱，是<b>积累真实结局</b>：
+    放宽的人后来真出险了多少？<a class="tl" href="glossary.html#term-false-positive" title="误伤｜模型说他是好人，其实真实风险偏高。救错人的代价。">误伤</a>的人成本比预期高多少？这是未来一切<a class="tl" href="glossary.html#term-calibration" title="校准｜模型说「这个人值 1000 元」，实际是不是真接近 1000 元。排序准 ≠ 数值准。">校准</a>的原料。</p></div>
+  <div class="step"><h4 id="sec4-2">第 4–6 月 · 用真实结局回填<a class="tl" href="glossary.html#term-calibration" title="校准｜模型说「这个人值 1000 元」，实际是不是真接近 1000 元。排序准 ≠ 数值准。">校准</a></h4>
+    <p>试点结果拿回来做两件事：重估预测偏差（内插校准 → <a class="tl" href="glossary.html#term-extrapolation-ood" title="外推（训练域外）｜给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。">外推</a>校准）；
+    用 DR 把「新结局样本」和「<a class="tl" href="glossary.html#term-audit-sample" title="审计样本｜从被拒的人里抽一小部分，人工去查他们真实风险是多少。昂贵但能救命。">审计</a>样本」合并成更稳的基准。远点人群继续不碰。</p></div>
+  <div class="step"><h4 id="sec4-3">第 7–12 月 · 扩档到优先级 2，并把倒 U 曲线重算</h4>
+    <p>有了真实成本，第 32 页的业务账可以全部用真数重算——届时圈选规模
+    （本案例峰值 4,400 件）应当以真实曲线为准重新定位。</p></div>
+  <div class="step"><h4 id="sec4-4">年度 · 结构性复查</h4>
+    <p>重跑特征覆盖体检和 <a class="tl" href="glossary.html#term-extrapolation-ood" title="外推（训练域外）｜给模型一个它训练时从没见过的类型的人打分。它可能装作很懂，其实是在瞎猜。">OOD</a> <a class="tl" href="glossary.html#term-distribution" title="分布｜把所有可能的结果、以及它们各自出现的机会，摆在一张图上。看形状就知道「常见什么样、罕见什…">分布</a>：核保规则这一年改过没有？人群结构<a class="tl" href="glossary.html#term-drift" title="漂移｜上线之后，数据的分布或者「输入 → 结果」的关系慢慢变了。模型没坏，是世界变了。">漂移</a>了没有？
+    <b>模型会老化，护栏不会——体检脚本应当进生产排程，而不是躺在研究目录里。</b></p></div>
+</div>
+
+<h2 id="limit">边界声明（请连同任何引用一起转发）</h2>
+<div class="note red">
+<b>一、数据是模拟的。</b>20,000 个司机由 <code>gen_data.py</code> 按合理规律生成。
+真实<a class="tl" href="glossary.html#term-distribution" title="分布｜把所有可能的结果、以及它们各自出现的机会，摆在一张图上。看形状就知道「常见什么样、罕见什…">分布</a>、真实核保规则、真实「配合度」都与本库不同——数字不可直接引用，<b>方法可以</b>。<br>
+<b>二、<a class="tl" href="glossary.html#term-tweedie" title="Tweedie 分布｜一种能同时处理「大量 0」和「极少数巨额」的分布，车险定价的正统工具。本库未实现，只讲思路。">Tweedie</a> 未实现。</b>更优雅的一体化建模路线留作练习。<br>
+<b>三、抽样概率在模拟器里是已知的。</b>现实中 <a class="tl" href="glossary.html#term-ipw" title="逆概率加权｜被抽中概率低的人，算平均时给他更大的权重，把被抽歪的样本掰回来。">IPW</a> 的权重本身要估计，
+<a class="tl" href="glossary.html#term-dr" title="双重稳健｜先用模型把所有人预测一遍，再用审计样本的实际数据把模型的偏差补回来。两条腿走路，断一条还…">双重稳健</a>的价值因此更大，而不是更小。<br>
+<b>四、「真实<a class="tl" href="glossary.html#term-pure-premium" title="纯保费｜刚好够付赔款的那个保费，不含费用和利润。= 出险频率 × 每次损失。">纯保费</a>」这个上帝视角字段只在评估时使用。</b>训练阶段模型看不到它，
+所有页面凡涉及真值的对比，都是站在「裁判席」说话，不是站在「选手席」。<br>
+<b>五、能做实验的场合，实验优于模型。</b>本库走的是预测路线，
+是因为「把本该拒的人放进来」有真实赔付与合规代价，不是因为预测更好。
+凡是能设计随机对照、风险敞口又可控的场景，都应该<b>先做实验，再谈模型</b>——
+机器学习是「不能做实验时」的次优解。详见 <a href="s05.html">决策篇 S5 · 四种范式</a>。
+</div>
+
+<h2 id="next">下一站</h2>
+<p>场景一（定价 · 找出<a class="tl" href="glossary.html#term-wrongly-rejected" title="错杀｜真实风险明明够低，却被规则拒掉的人。本案例一共 2,259 个。">错杀</a>）到此走完。按同样的框架，后续场景依次是：
+<b>场景二 · 巨灾巨赔的预警（<a class="tl" href="glossary.html#term-heavy-tail" title="重尾｜极少数人赔得极多，金额大到能把所有指标搅乱。">重尾</a>与极值）</b>、<b>场景三 · 客户流失与续保（<a class="tl" href="glossary.html#term-classification" title="分类（预测类别）｜要预测的结果是几个固定选项里的一个（会不会续保、是不是欺诈），模型学的是「打勾」。">分类</a>与生存）</b>、
+<b>场景四 · 反欺诈（不平衡样本与代价敏感）</b>。每个场景都会重复本库的骨架：
+一个真问题 → 翻译成标签 → 看着模型学 → 防三种骗（指标骗、样本骗、外推骗）→ 变成钱。</p>
+
+<div class="quote q-talk"><span class="q-tag">说人话</span>
+<p>落地 SOP 的全部智慧可以压成一句：<b>第一年不追求多救，只追求把「救错了吗」这件事
+变成可测量的数据。</b>有了测量，第二年的一切优化才有地基。</p></div>
+<div class="quote q-mgmt"><span class="q-tag">管理启示</span>
+<p>给决策层的最后一句话：<b>批准一个模型项目，本质上是批准一条学习曲线，而不是批准一个<a class="tl" href="glossary.html#term-accuracy-confusion-matrix-f1" title="准确率（混淆矩阵 · F1）｜准确率 = 猜对的比例；混淆矩阵 = 把「该抓抓了 / 该抓没抓 / 不该抓抓了 / 不…">准确率</a>。</b>
+本库的保守方案第一年净增益约 62 万元——真正的资产是那份逐步填充真实结局的数据资产，
+它让第二年、第三年的每一分投入都站在实地上。</p></div>
+
+
+<div class="terms-here"><div class="th-t">本页词语解释<span>正文里带虚线的词，点一下也能到这里</span></div><div class="t-item"><a href="glossary.html#term-wrongly-rejected"><b>错杀</b></a><span>真实风险明明够低，却被规则拒掉的人。本案例一共 2,259 个。</span></div><div class="t-item"><a href="glossary.html#term-false-positive"><b>误伤</b></a><span>模型说他是好人，其实真实风险偏高。救错人的代价。</span></div><div class="t-item"><a href="glossary.html#term-audit-sample"><b>审计样本</b></a><span>从被拒的人里抽一小部分，人工去查他们真实风险是多少。昂贵但能救命。</span></div><div class="t-item"><a href="glossary.html#term-psi"><b>PSI</b></a><span>比较「训练时的人群分布」和「现在的人群分布」差多少。通常超过 0.25 就该报警，0.1 以内算稳定。</span></div><div class="t-item"><a href="glossary.html#term-drift"><b>漂移</b></a><span>上线之后，数据的分布或者「输入 → 结果」的关系慢慢变了。模型没坏，是世界变了。</span></div><div class="t-item"><a href="glossary.html#term-channel"><b>渠道</b></a><span>保单是从哪儿卖出去的（代理人、电销、网销、银保）。它常常只是「信息好不好拿到」的替身，不是风险本身。</span></div></div>
+<div class="pager">
+<a href="ch12.html"><span class="dir">◀ 上一页</span>端到端复盘</a>
+<a class="next" href="s03.html"><span class="dir">下一页 ▶</span>投入产出账</a>
+</div>
+<div class="foot">西红精算 · 用数据讲保险 · 用真心做科普<br>本库全部结论由 <code>ai-kb/code</code> 中的模拟数据与手写模型产生，数字统一来自 <code>out/facts.json</code>（三个动画的数字来自 <code>out/anim_facts.json</code>，由 <code>node code/_animfacts.js</code> 复算），可一键复现。<br>看不懂的词见 <a href="glossary.html">术语表</a> · 想看源代码<a href="code.html">代码入口</a> · 读完还是飘？看 <a href="x01.html">一页讲清楚</a> · <a href="#about" data-about="1">关于这个库 · 关于西红精算</a> · 知识星球：用数据看保险的精算师们</div>
+</main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('button[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.parentNode;
+      var code = box.querySelector('pre');
+      if (!code) return;
+      var txt = code.innerText;
+      function done() {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.className = 'copybtn done';
+        setTimeout(function () { btn.textContent = old; btn.className = 'copybtn'; }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(done, fallback);
+      } else { fallback(); }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { btn.textContent = '请手动选中复制'; }
+        document.body.removeChild(ta);
+      }
+    });
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('button.nav-title').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var g = btn.getAttribute('data-t');
+      var box = document.querySelector('[data-i="' + g + '"]');
+      if (!box) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (open) { box.setAttribute('data-hidden', '1'); }
+      else { box.removeAttribute('data-hidden'); }
+    });
+  });
+  /* 页脚「关于这个库」：展开侧栏那个折叠块并滚过去。
+     <details> 只认 .open，光跳锚点是看不到内容的。 */
+  document.querySelectorAll('a[data-about]').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var d = document.getElementById('about');
+      if (!d) return;
+      ev.preventDefault();
+      d.open = true;
+      d.scrollIntoView({ block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>
